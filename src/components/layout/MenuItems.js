@@ -1,93 +1,52 @@
-import React from "react";
-import {
-  DownOutlined,
-  SmileOutlined,
-  LoginOutlined,
-  LogoutOutlined,
-} from "@ant-design/icons";
-import { FcBusinessman } from "react-icons/fc";
-import { Dropdown, Space, Avatar } from "antd";
-import Badge from "@mui/material/Badge";
-import Tooltip from "@mui/material/Tooltip";
-import { MdOutlineNotificationsActive } from "react-icons/md";
-
-const themes = {
-  light: {
-    sidebar: {
-      backgroundColor: "#EBEBEB",
-      color: "#636363;",
-    },
-    menu: {
-      menuContent: "#F0F0F0",
-      icon: "#777777",
-      fontSize: 40,
-      hover: {
-        backgroundColor: "#f9f9f9",
-        color: "#44596e",
-      },
-      disabled: {
-        color: "#9fb6cf",
-      },
-    },
-  },
-};
-const menuUser = [
+import React from 'react';
+import { DownOutlined, SmileOutlined } from '@ant-design/icons';
+import { Dropdown, Space } from 'antd';
+const items = [
   {
-    key: "1",
-    label: "Profile",
-    icon: <FcBusinessman />,
+    key: '1',
+    label: (
+      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+        1st menu item
+      </a>
+    ),
   },
   {
-    key: "2",
-    label: "Login",
-    icon: <LoginOutlined />,
+    key: '2',
+    label: (
+      <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+        2nd menu item (disabled)
+      </a>
+    ),
+    icon: <SmileOutlined />,
+    disabled: true,
   },
   {
-    key: "3",
-    label: "Logout",
-    icon: <LogoutOutlined />,
+    key: '3',
+    label: (
+      <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+        3rd menu item (disabled)
+      </a>
+    ),
+    disabled: true,
+  },
+  {
+    key: '4',
+    danger: true,
+    label: 'a danger item',
   },
 ];
-
 const MenuItems = () => (
-  <>
-    <Space>
-      {/* <Space size="large">
-    <Badge count={99}>
-      <Avatar shape="square" size="large" />
-    </Badge>
-    </Space> */}
-
-      <Tooltip title="Notification" arrow>
-        <Badge
-          badgeContent={100}
-          sx={{
-            "& .MuiBadge-badge": {
-              color: "white",
-              backgroundColor: "red",
-            },
-          }}
-        >
-          <MdOutlineNotificationsActive />
-        </Badge>
-      </Tooltip>
-
-      <Dropdown
-        style={{ width: 150 }}
-        menu={{
-          items: menuUser,
-        }}
-        placement="bottomLeft"
-      >
-        <Space>
-          <Avatar
-            src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${1}`}
-          />
-
-          <DownOutlined />
-        </Space>
-      </Dropdown>
-    </Space>
-  </>
+  <Dropdown
+    menu={{
+      items,
+    }}
+  >
+    <a onClick={(e) => e.preventDefault()}>
+      <Space>
+        Hover me
+        <DownOutlined />
+      </Space>
+    </a>
+  </Dropdown>
 );
 export default MenuItems;

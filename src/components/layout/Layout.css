@@ -2,37 +2,8 @@
     display: flex;
     justify-content: space-between;
     padding: 0px 30px;
-    color: white;
 }
 .header-title{
-    font-size: 35px;
+    font-size: 50px;
     font-weight: 600;
-    margin-left: 4rem;
 }
-
-.title-logo{
-    display: flex;
-}
-
-.demo-logo-vertical {
-    height: -10%;
-    margin-top: 60px;
-    padding-top: 50px;
-}
-
-.header {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: #002140;
-  }
-
-.logo {
-    width: 102px;
-    height: 44px;
-    object-fit: cover;
-  }
-  
-  .meun{
-    margin-top: auto;
-    margin-bottom: auto;
-  }
