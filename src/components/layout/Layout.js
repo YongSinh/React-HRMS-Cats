@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   DesktopOutlined,
   FileOutlined,
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
-} from '@ant-design/icons';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
-import './Layout.css'
-import MenuItems from './MenuItems';
+  SettingOutlined,
+  DashboardOutlined,
+  InfoCircleOutlined,
+  FieldTimeOutlined,
+  PayCircleOutlined,
+  FcBusinessman,
+  LoginOutlined,
+  LogoutOutlined,
+  BankOutlined,
+} from "@ant-design/icons";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Breadcrumb, Layout, Menu, theme } from "antd";
+import "./Layout.css";
+import MenuItems from "./MenuItems";
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
@@ -19,16 +28,84 @@ function getItem(label, key, icon, children) {
     label,
   };
 }
+// const menuUser = [
+//   {
+//     key: "1",
+//     label: "Profile",
+//     icon: <FcBusinessman />,
+//     onClick: handleProflie,
+//   },
+//   {
+//     key: "2",
+//     label: "Login",
+//     icon: <LoginOutlined />,
+//     onClick: onChangePassword,
+//   },
+//   {
+//     key: "3",
+//     label: "Logout",
+//     icon: <LogoutOutlined />,
+//     onClick: handleLogout,
+//   },
+// ];
+const logo = require("../../asset/image/catslogo.png");
+const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
+// const themes = {
+//   light: {
+//     sidebar: {
+//       backgroundColor: "#EBEBEB",
+//       color: "#636363;",
+//     },
+//     menu: {
+//       menuContent: "#F0F0F0",
+//       icon: "#777777",
+//       fontSize: 40,
+//       hover: {
+//         backgroundColor: "#f9f9f9",
+//         color: "#44596e",
+//       },
+//       disabled: {
+//         color: "#9fb6cf",
+//       },
+//     },
+//   },
+//   dark: {
+//     sidebar: {
+//       backgroundColor: "#E4E4E4",
+//       color: "#545454",
+//     },
+//     menu: {
+//       menuContent: "#DDDDDD",
+//       icon: "#545454",
+//       hover: {
+//         backgroundColor: "#F0F0F0",
+//         color: "#545454",
+//       },
+//       disabled: {
+//         color: "#3e5e7e",
+//       },
+//     },
+//   },
+// };
+
 const items = [
-  getItem('Task', 'tasks', <PieChartOutlined />),
-  getItem('Leave', 'leave', <DesktopOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [
-    getItem('Tom', '3'),
-    getItem('Bill', '4'),
-    getItem('Alex', '5'),
+  getItem("Dashboard", "Dashboard", <PieChartOutlined />),
+  getItem("Info & Management", "Info", <InfoCircleOutlined />),
+  getItem("Attendance", "Attendance", <FieldTimeOutlined />),
+  getItem("Leave Management", "/", <TeamOutlined />, [
+    getItem("All Employee", "leave", <TeamOutlined />),
+    getItem("Leave Request", "leave-request", <UserOutlined />),
   ]),
-  getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-  getItem('Files', '9', <FileOutlined />),
+  getItem("Payroll", "Payroll", <PayCircleOutlined />),
+  getItem("Department", "Department", <BankOutlined />),
+  getItem("Staff", "Staff", <UserOutlined />),
+  getItem("Report", "Report", <FileOutlined />),
+  getItem("Setting", "Setting", <SettingOutlined />, [
+    getItem("General", "2"),
+    getItem("Leave ", "3"),
+    getItem("Attendance ", "4"),
+    getItem("Payroll ", "4"),
+  ]),
 ];
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -37,67 +114,77 @@ const MainLayout = () => {
   } = theme.useToken();
   const navigate = useNavigate();
   const onChange = (value) => {
-   navigate(value.key)
-   console.log(value.key)
-  }
+    navigate(value.key);
+    console.log(value.key);
+  };
 
   return (
-    <Layout
-      style={{
-        minHeight: '100vh',
-      }}
-    >
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} onClick={onChange}/>
-      </Sider>
-      <Layout>
-        <Header
-        
-          style={{
-            padding: 0,
-            background: colorBgContainer,
-          }}
-        > 
-        <div className='header'>
-        <div className='header-title'>HRMS</div>
-        <MenuItems/>
+    <>
+      <div className="header">
+        <div className="title-logo">
+          <img
+            className="logo "
+            alt=""
+            src={theme === "light" ? logo : Whitelogo}
+          />
+          <div className="header-title">Human Resource Management System</div>
         </div>
 
-            </Header>
-        <Content
-          style={{
-            margin: '0 16px',
-          }}
+        <MenuItems />
+      </div>
+      <Layout
+        style={{
+          minHeight: "100vh",
+        }}
+      >
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(value) => setCollapsed(value)}
         >
-          <Breadcrumb
+          <Menu
+            theme="dark"
+            defaultSelectedKeys={["1"]}
+            mode="inline"
+            items={items}
+            onClick={onChange}
+          />
+        </Sider>
+        <Layout>
+          <Content
             style={{
-              margin: '16px 0',
+              margin: "0 16px",
             }}
           >
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
-          <div
+            <Breadcrumb
+              style={{
+                margin: "16px 0",
+              }}
+            >
+              <Breadcrumb.Item>User</Breadcrumb.Item>
+              <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            </Breadcrumb>
+            <div
+              style={{
+                padding: 24,
+                minHeight: 360,
+                background: colorBgContainer,
+                borderRadius: borderRadiusLG,
+              }}
+            >
+              <Outlet />
+            </div>
+          </Content>
+          <Footer
             style={{
-              padding: 24,
-              minHeight: 360,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
+              textAlign: "center",
             }}
           >
-         <Outlet/>
-          </div>
-        </Content>
-        <Footer
-          style={{
-            textAlign: 'center',
-          }}
-        >
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
+            © Copyright CATS. All Rights Reserved
+          </Footer>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 export default MainLayout;
