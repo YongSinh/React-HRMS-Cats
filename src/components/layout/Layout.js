@@ -89,23 +89,17 @@ const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 // };
 
 const items = [
-  getItem("Dashboard", "Dashboard", <PieChartOutlined />),
-  getItem("Info & Management", "Info", <InfoCircleOutlined />),
-  getItem("Attendance", "Attendance", <FieldTimeOutlined />),
-  getItem("Leave Management", "/", <TeamOutlined />, [
-    getItem("All Employee", "leave", <TeamOutlined />),
-    getItem("Leave Request", "leave-request", <UserOutlined />),
-  ]),
-  getItem("Payroll", "Payroll", <PayCircleOutlined />),
-  getItem("Department", "Department", <BankOutlined />),
-  getItem("Staff", "Staff", <UserOutlined />),
-  getItem("Report", "Report", <FileOutlined />),
-  getItem("Setting", "Setting", <SettingOutlined />, [
-    getItem("General", "2"),
-    getItem("Leave ", "3"),
-    getItem("Attendance ", "4"),
-    getItem("Payroll ", "4"),
-  ]),
+  getItem('Dashboard', 'dashboard', <PieChartOutlined />),
+  getItem('Info & Management', 'info', <InfoCircleOutlined />),
+  getItem('Attendance', 'attendance', <FieldTimeOutlined />),
+  getItem('Leave Management', '/', <TeamOutlined />, [getItem('All Employee', 'leave', <TeamOutlined />), getItem('Leave Request', 'leave-request', <UserOutlined />)]),
+  getItem('Payroll', '6', <PayCircleOutlined />,[getItem('Payroll','payroll'),getItem('Allowance List','allowance'),getItem('Deduction List','deduction')]), 
+  getItem('Department', 'department', <BankOutlined />), 
+  getItem('Staff', 'staff', <UserOutlined />), 
+  getItem('Report', 'report', <FileOutlined />),
+  getItem('Setting', 'setting', <SettingOutlined />, [getItem('General', '2'), getItem('Leave Type ', 'leave_type'),getItem('Attendance ', '4'),
+  getItem('Payroll ', '4')]),
+
 ];
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -132,12 +126,12 @@ const MainLayout = () => {
 
         <MenuItems />
       </div>
-      <Layout
+      <Layout 
         style={{
           minHeight: "100vh",
         }}
       >
-        <Sider
+        <Sider 
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
@@ -151,12 +145,12 @@ const MainLayout = () => {
           />
         </Sider>
         <Layout>
-          <Content
+          <Content 
             style={{
               margin: "0 16px",
             }}
           >
-            <Breadcrumb
+            <Breadcrumb 
               style={{
                 margin: "16px 0",
               }}
@@ -164,7 +158,7 @@ const MainLayout = () => {
               <Breadcrumb.Item>User</Breadcrumb.Item>
               <Breadcrumb.Item>Bill</Breadcrumb.Item>
             </Breadcrumb>
-            <div
+            <div 
               style={{
                 padding: 24,
                 minHeight: 360,
@@ -172,7 +166,7 @@ const MainLayout = () => {
                 borderRadius: borderRadiusLG,
               }}
             >
-              <Outlet />
+              < Outlet />
             </div>
           </Content>
           <Footer

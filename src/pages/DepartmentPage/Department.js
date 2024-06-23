@@ -1,6 +1,26 @@
-import React from 'react';
-import { Space, Table, Tag } from 'antd';
+
+import { Space, Table, Tag,Button,Form,Input } from 'antd';
+import React, { useState } from 'react';
+import {  Modal } from 'antd';
+import PageTitle from '../../components/Title_Page/TitlePage';
+import { EyeFilled, DeleteOutlined,EditFilled,PlusOutlined,PlusCircleOutlined} from "@ant-design/icons";
+
 const columns = [
+  {
+    title: "No",
+    dataIndex: "No",
+    render: (_, { No }) => {
+      return (
+        <>
+          <div>
+            <text style={{ fontSize: 13}} >
+              {No}
+            </text>
+          </div>
+        </>
+      );
+    },
+  },
   {
     title: 'depId',
     dataIndex: 'depId',
@@ -33,10 +53,12 @@ const columns = [
   {
     title: 'Action',
     key: 'action',
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+    render: (_, ) => (
+      <Space>
+      
+        <Button type="primary" icon={<PlusCircleOutlined />} />
+        <Button type="primary" icon={<EditFilled />} />
+        <Button type="primary" icon={<DeleteOutlined />} danger />
       </Space>
     ),
   },
@@ -925,5 +947,79 @@ const data = [
         
       
 ];
-const Department = () => <Table columns={columns} dataSource={data} />;
-export default Department;
+const DepartmentPage = () =>{ 
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+return(
+  <>
+   <PageTitle
+         PageTitle='Department'
+      
+      />
+
+  <Button 
+
+        type="primary"
+        icon={<PlusOutlined />}
+        style={{ marginBottom: 15, marginTop: 7, }}
+        onClick={showModal}>
+        
+        Add Department
+      </Button>
+      <Modal title="Add Department" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+      <Form layout="vertical" hideRequiredMark>
+      <Form.Item
+                name="depId"
+                label="Department ID"
+                rules={[
+                  {
+                    required: true,
+                    
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+        
+              <Form.Item
+                name="depName"
+                label="Department Name"
+                rules={[
+                  {
+                    required: true,
+                    
+                  },
+                ]}
+              >
+              <Input />
+              </Form.Item>
+              <Form.Item
+                name="positions"
+                label="Position"
+                rules={[
+                  {
+                    required: true,
+                    
+                  },
+                ]}
+              >
+              <Input />
+              </Form.Item>
+              </Form>
+      </Modal>
+      <Table columns={columns} dataSource={data} />;
+  </>
+)
+
+}
+export default DepartmentPage;
