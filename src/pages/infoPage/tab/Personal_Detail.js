@@ -1,10 +1,7 @@
 
-
 import './style/personaldetail.css';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-
-
 //Componets form MUI
 import Grid from '@mui/material/Unstable_Grid2';
 
@@ -31,7 +28,6 @@ import 'antd/dist/antd'; // or 'antd/dist/antd.less'
 import PageTitle from '../../../components/Title_Page/TitlePage';
 import { Box } from '@mui/material';
 const { CheckableTag } = Tag;
-
 
 
 
@@ -141,7 +137,7 @@ const Personal_Detail = () => {
     //     });
     // };
 
-
+    const image = require('../../../asset/image/catslogo.png');
 
 
 
@@ -151,11 +147,17 @@ const Personal_Detail = () => {
 
             <span className='span-case1'> Personal Info:</span>
             <div style={{ minWidth: '85rem' }}>
-
+          
+            
+            <img src={image} height={200} width={200}
+            
+          />
+          
 
                 <Grid container spacing={{ xs: 2 }} >
-
+           
                     <Grid xs={9} >
+                        
                     <Grid container spacing={{ xs: 2 }} >
                         <div className='border-box form-entry'>
                       
@@ -184,7 +186,7 @@ const Personal_Detail = () => {
                                             <Input />
                                         </Form.Item>
                                     </Grid>
-
+                  
                                     <Grid xs={4}>
                                         <Form.Item label="Gender" name={'gender'}>
                                             <Radio.Group name="radiogroup" defaultValue={1}>

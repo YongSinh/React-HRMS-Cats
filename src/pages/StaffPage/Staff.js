@@ -1,7 +1,7 @@
-const Staff = () =>{
+const StaffPage = () =>{
     return(
         <h1>Hello</h1>
     )
 }
 
-export default Staff;
+export default StaffPage;

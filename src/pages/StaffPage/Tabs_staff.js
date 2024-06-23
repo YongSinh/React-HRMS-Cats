@@ -13,7 +13,7 @@ const Tabs_staff = () => {
   ];
   return (
     <>
-      <PageTitle PageTitle="Staff" />
+      <PageTitle PageTitle="Department" />
       <div className="border-box">
         <Tabs defaultActiveKey="1" type="card" size={"large"} items={items} />
       </div>
