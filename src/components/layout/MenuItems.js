@@ -1,7 +1,6 @@
 import React from "react";
 import {
   DownOutlined,
-  SmileOutlined,
   LoginOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
@@ -14,8 +13,8 @@ import { MdOutlineNotificationsActive } from "react-icons/md";
 const themes = {
   light: {
     sidebar: {
-      backgroundColor: "#EBEBEB",
-      color: "#636363;",
+      // backgroundColor: "#EBEBEB",
+      // color: "#636363;",
     },
     menu: {
       menuContent: "#F0F0F0",
@@ -31,7 +30,9 @@ const themes = {
     },
   },
 };
-const menuUser = [
+
+const menuUser =  [
+  
   {
     key: "1",
     label: "Profile",
@@ -49,15 +50,39 @@ const menuUser = [
   },
 ];
 
-const MenuItems = () => (
-  <>
-    <Space>
-      {/* <Space size="large">
-    <Badge count={99}>
-      <Avatar shape="square" size="large" />
-    </Badge>
-    </Space> */}
+const headerStyles = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '0 16px',
+  backgroundColor: themes.light.sidebar.backgroundColor,
+  color: themes.light.sidebar.color,
+  height: '60px',
+};
 
+const menuStyles = {
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const badgeStyles = {
+  marginRight: '30px',
+};
+
+const dropdownStyles = {
+
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  padding: '10px 10px',
+  borderRadius: '5px',
+  transition: 'background-color 0.3s ease',
+  
+};
+
+const MenuItems = () => (
+  <div style={headerStyles}>
+    <div style={menuStyles}>
       <Tooltip title="Notification" arrow>
         <Badge
           badgeContent={100}
@@ -67,27 +92,31 @@ const MenuItems = () => (
               backgroundColor: "red",
             },
           }}
+          style={badgeStyles}
         >
-          <MdOutlineNotificationsActive />
+          <MdOutlineNotificationsActive size={28} />
         </Badge>
       </Tooltip>
 
       <Dropdown
-        style={{ width: 150 }}
         menu={{
           items: menuUser,
         }}
         placement="bottomLeft"
       >
-        <Space>
+        <div style={dropdownStyles}>
           <Avatar
             src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${1}`}
+            size="large"
           />
-
-          <DownOutlined />
-        </Space>
+          <DownOutlined style={{ marginLeft: '8px' }} />
+        </div>
       </Dropdown>
-    </Space>
-  </>
+    </div>
+  </div>
 );
+
 export default MenuItems;
+
+
+
