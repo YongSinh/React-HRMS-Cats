@@ -5,7 +5,7 @@ import All_Attendance from "./tab/All_Attendance";
 import Personal_Attendace from "./tab/Personal_Attendance";
 import './TabsAttendance.css';
 
-const Info = () => {
+const Tabs_attendance = () => {
   const items = [
     {
       key: "1",
@@ -28,4 +28,4 @@ const Info = () => {
     </>
   );
 };
-export default Info;
+export default Tabs_attendance;
