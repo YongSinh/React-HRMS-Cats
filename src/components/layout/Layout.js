@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Breadcrumb, Layout, Menu, Button, theme } from "antd";
+import "./Layout.css";
+import MenuItems from "./MenuItems";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -6,20 +10,14 @@ import {
   TeamOutlined,
   UserOutlined,
   SettingOutlined,
-  DashboardOutlined,
   InfoCircleOutlined,
   FieldTimeOutlined,
   PayCircleOutlined,
-  FcBusinessman,
-  LoginOutlined,
-  LogoutOutlined,
   BankOutlined,
 } from "@ant-design/icons";
-import { Outlet, useNavigate } from "react-router-dom";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
-import "./Layout.css";
-import MenuItems from "./MenuItems";
+
 const { Header, Content, Footer, Sider } = Layout;
+
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -28,65 +26,9 @@ function getItem(label, key, icon, children) {
     label,
   };
 }
-// const menuUser = [
-//   {
-//     key: "1",
-//     label: "Profile",
-//     icon: <FcBusinessman />,
-//     onClick: handleProflie,
-//   },
-//   {
-//     key: "2",
-//     label: "Login",
-//     icon: <LoginOutlined />,
-//     onClick: onChangePassword,
-//   },
-//   {
-//     key: "3",
-//     label: "Logout",
-//     icon: <LogoutOutlined />,
-//     onClick: handleLogout,
-//   },
-// ];
+
 const logo = require("../../asset/image/catslogo.png");
 const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
-// const themes = {
-//   light: {
-//     sidebar: {
-//       backgroundColor: "#EBEBEB",
-//       color: "#636363;",
-//     },
-//     menu: {
-//       menuContent: "#F0F0F0",
-//       icon: "#777777",
-//       fontSize: 40,
-//       hover: {
-//         backgroundColor: "#f9f9f9",
-//         color: "#44596e",
-//       },
-//       disabled: {
-//         color: "#9fb6cf",
-//       },
-//     },
-//   },
-//   dark: {
-//     sidebar: {
-//       backgroundColor: "#E4E4E4",
-//       color: "#545454",
-//     },
-//     menu: {
-//       menuContent: "#DDDDDD",
-//       icon: "#545454",
-//       hover: {
-//         backgroundColor: "#F0F0F0",
-//         color: "#545454",
-//       },
-//       disabled: {
-//         color: "#3e5e7e",
-//       },
-//     },
-//   },
-// };
 
 const items = [
   getItem("Dashboard", "Dashboard", <PieChartOutlined />),
@@ -99,7 +41,7 @@ const items = [
   getItem("Payroll", "Payroll", <PayCircleOutlined />),
   getItem("Department", "Department", <BankOutlined />),
   getItem("Staff", "Staff", <UserOutlined />),
-  getItem("Report", "Report", <FileOutlined />),
+  getItem("Report", "report", <FileOutlined />),
   getItem("Setting", "Setting", <SettingOutlined />, [
     getItem("General", "2"),
     getItem("Leave ", "3"),
@@ -107,40 +49,54 @@ const items = [
     getItem("Payroll ", "4"),
   ]),
 ];
+
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const navigate = useNavigate();
+
   const onChange = (value) => {
     navigate(value.key);
     console.log(value.key);
   };
 
+  const handleLogoClick = () => {
+    navigate("/"); // Change the route as per your requirement
+  };
+
   return (
-    <>
-      <div className="header">
+    <Layout style={{ minHeight: "100vh" }}>
+      <Header className="header">
         <div className="title-logo">
-          <img
-            className="logo "
-            alt=""
-            src={theme === "light" ? logo : Whitelogo}
-          />
+          <Button
+            type="text"
+            onClick={handleLogoClick}
+            style={{ padding: 0, border: "none" }}
+          >
+            <img
+              className="logo"
+              alt=""
+              src={theme === "light" ? logo : Whitelogo}
+              style={{ cursor: "pointer" }}
+            />
+          </Button>
           <div className="header-title">Human Resource Management System</div>
         </div>
-
         <MenuItems />
-      </div>
-      <Layout
-        style={{
-          minHeight: "100vh",
-        }}
-      >
+      </Header>
+      <Layout>
         <Sider
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
+          style={{
+            overflow: "auto",
+            height: "100vh",
+            position: "fixed",
+            left: 0,
+          }}
         >
           <Menu
             theme="dark"
@@ -150,21 +106,14 @@ const MainLayout = () => {
             onClick={onChange}
           />
         </Sider>
-        <Layout>
-          <Content
-            style={{
-              margin: "0 16px",
-            }}
-          >
-            <Breadcrumb
-              style={{
-                margin: "16px 0",
-              }}
-            >
+        <Layout style={{ marginLeft: collapsed ? 80 : 200, marginTop: 64 }}>
+          <Content className="content">
+            <Breadcrumb className="breadcrumb">
               <Breadcrumb.Item>User</Breadcrumb.Item>
               <Breadcrumb.Item>Bill</Breadcrumb.Item>
             </Breadcrumb>
             <div
+              className="site-layout-background"
               style={{
                 padding: 24,
                 minHeight: 360,
@@ -178,13 +127,16 @@ const MainLayout = () => {
           <Footer
             style={{
               textAlign: "center",
+              background: "#fff",
+              borderTop: "1px solid #e8e8e8",
             }}
           >
             © Copyright CATS. All Rights Reserved
           </Footer>
         </Layout>
       </Layout>
-    </>
+    </Layout>
   );
 };
+
 export default MainLayout;
