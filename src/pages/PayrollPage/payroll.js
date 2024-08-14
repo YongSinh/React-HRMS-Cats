@@ -1,7 +1,7 @@
-const payroll= () =>{
+const Payroll= () =>{
     return(
         <h1>Hello</h1>
     )
 }
 
-export default payroll;
+export default Payroll;
