@@ -27,20 +27,13 @@ import {
     RollbackOutlined
 } from '@ant-design/icons';
 import 'antd/dist/antd';
-
-
-
-
-
-
-
 const Emergency = () =>{
     return(
         <>
      <div className='charge'>
 
 <span className='span-case1'> Emergency Contact </span>
-<div style={{ minWidth: '95rem' }}>
+<div style={{ minWidth: '100%' }}>
 <Grid container spacing={{ xs: 1 }} >
     
 

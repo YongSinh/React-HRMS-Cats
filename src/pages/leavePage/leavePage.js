@@ -54,9 +54,17 @@ const LeavePage = () => {
       dataIndex: 'action',
       render: (_, ) => (
         <Space>
-          <Button icon={<EyeFilled />} />
-          <Button type="primary" icon={<EditFilled />} />
-          <Button type="primary" icon={<DeleteOutlined />} danger />
+            <Button
+      type="primary"
+      icon={<EditFilled />}
+      style={{ backgroundColor: '#2196F3', borderColor: '#2196F3' }}
+    >
+    </Button>
+    <Button
+          type="primary"
+          icon={<DeleteOutlined />}
+          style={{ backgroundColor: "#F44336", borderColor: "#F44336" }}
+        ></Button>
         </Space>
       ),
     },
@@ -632,10 +640,10 @@ const LeavePage = () => {
 
   return (
     <>
-      <PageTitle
+      {/* <PageTitle
          PageTitle='Leave'
       
-      />
+      /> */}
 
       <Space  >
         

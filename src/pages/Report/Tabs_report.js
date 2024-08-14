@@ -13,7 +13,7 @@ const Tabs_report = () => {
   ];
   return (
     <>
-      <PageTitle PageTitle="Report" />
+      {/* <PageTitle PageTitle="Report" /> */}
       <div className="border-box">
         <Tabs defaultActiveKey="1" type="card" size={"large"} items={items} />
       </div>

@@ -33,7 +33,7 @@ const Special =() =>{
          <div className='charge'>
 
 <span className='span-case1'> Special:</span>
-<div style={{ minWidth: '95rem' }}>
+<div style={{ minWidth: '100%' }}>
 <Grid container spacing={{ xs: 1 }} >
     
 

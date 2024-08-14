@@ -24,9 +24,75 @@
     margin-bottom: 20px;
     width: 100%;
 } */
- .table-thead{
-    background-color: blueviolet;
- }
 
 
 
+/* Default light mode styles */
+/* :root {
+    --bg-color: #fff;
+    --text-color: #000;
+    --tab-bg: #f5f5f5;
+    --tab-active-bg: #e8e8e8;
+    --tab-border-color: #e8e8e8;
+  }
+  
+  [data-theme="dark"] {
+    --bg-color: #141414;
+    --text-color: #fff;
+    --tab-bg: #1f1f1f;
+    --tab-active-bg: #303030;
+    --tab-border-color: #303030;
+  }
+  
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  .border-box {
+    padding: 10px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--tab-border-color);
+    border-radius: 8px;
+  }
+  
+  .ant-tabs-card .ant-tabs-tab {
+    background: var(--tab-bg);
+    color: var(--text-color);
+    border-color: var(--tab-border-color);
+  }
+  
+  .ant-tabs-card .ant-tabs-tab-active {
+    background: var(--tab-active-bg);
+    color: var(--text-color);
+    border-color: var(--tab-border-color);
+  }
+  
+  .ant-tabs-card .ant-tabs-tab:hover {
+    background: var(--tab-active-bg);
+    color: var(--text-color);
+  }
+  
+  .ant-tabs-nav .ant-tabs-tab {
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .ant-tabs-nav .ant-tabs-tab .ant-tabs-tab-btn {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .ant-tabs-content-holder {
+    background-color: var(--bg-color);
+  }
+   */
+
+
+  
+
+  

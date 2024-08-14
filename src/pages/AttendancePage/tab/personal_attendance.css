@@ -14,15 +14,8 @@ margin-left: 13rem;
 
 }
 .drawer-content{
-  background-color:#07327810;
+ background: #ffffff18;
+  padding: 30px;
   border: 30px;
   border-radius:0.6rem;
-}
-.red-row {
-  background-color: red;
-  color: white;
-}
-.ant-table-thead > tr > th {
-  background-color: green;
-  color: white;
 }

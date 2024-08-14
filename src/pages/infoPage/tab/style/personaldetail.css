@@ -1,4 +1,4 @@
-.descripancy{
+/* .descripancy{
     font-size: 23px;
     font-weight: 500;
     margin-bottom: 30px;
@@ -17,23 +17,17 @@
      border-radius: 5px;
  }
  
- .case .span-case{
-     position: absolute;
-     top: -10px;
-     left: 15px;
-     background: #EBEBEB;
-     font-size: medium;
-     font-weight: 500;
-     width: 150px;
- }
+
   .span-case1{
     position: absolute;
-    top: -8px;
+    top: 5px;
     left: 15px;
     background: #EBEBEB;
     font-size: medium;
     font-weight: 500;
     width: 150px;
+    border-radius: 8px;
+   
 }
  
  .case .case-items{
@@ -46,7 +40,7 @@
  }
  .charge{
      border: 2px #D9D9D9 solid;
-     /* box-shadow: 1px 1px 3px 0px #979797ac; */
+  
      padding: 40px;
      position: relative;
      width: 100%;
@@ -62,4 +56,118 @@
  
    .form-entry{
      min-height: 51.5rem;
-   }
+   } */
+
+   /* personaldetail.css */
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Main container */
+  .charge {
+    background-color: white;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1200px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  /* Section titles */
+  .span-case1 {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    display: block;
+  }
+  
+  .span-case {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    margin: 20px 0 10px;
+    display: block;
+  }
+  
+  /* Form Styles */
+  .form-entry {
+    background-color: #fafafa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .form-entry .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  /* Grid Spacing */
+  .ant-row {
+    row-gap: 20px;
+  }
+  
+  .ant-col {
+    padding: 0 10px;
+  }
+  
+  /* Inputs and Labels */
+  .ant-form-item-label > label {
+    color: #555;
+  }
+  
+  .ant-input,
+  .ant-select-selector,
+  .ant-picker {
+    border-radius: 4px;
+  }
+  
+  .ant-input:focus,
+  .ant-select-selector:focus,
+  .ant-picker:focus {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+  
+  /* Checkable Tag Styles */
+  .ant-tag-checkable {
+    border-radius: 16px;
+    padding: 4px 12px;
+  }
+  
+  .ant-tag-checkable-checked {
+    background-color: #1890ff;
+    color: white;
+    border-color: #1890ff;
+  }
+  
+  /* Button Styles */
+  .ant-btn {
+    border-radius: 4px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .charge {
+      padding: 15px;
+      margin: 15px;
+    }
+  
+    .span-case1 {
+      font-size: 1.2em;
+    }
+  
+    .span-case {
+      font-size: 1em;
+    }
+  
+    .form-entry {
+      padding: 15px;
+    }
+  }
+  

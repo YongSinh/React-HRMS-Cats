@@ -1,0 +1,135 @@
+/* General Drawer Styling */
+.ant-drawer-header {
+  position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    height: 3.77rem;
+    background-color: #001529;
+    color: #fff;
+    padding: 16px 28px;
+
+  }
+
+  .ant-drawer-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: #fff;
+    
+  
+  }
+  
+  .ant-drawer-body {
+   
+    padding: 24px;
+  }
+
+  .ant-form-item-label > label {
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .ant-input,
+  .ant-select-selector {
+    border-radius: 8px;
+    height: 40px;
+    border-color: #8a8a8a;
+  }
+  
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .ant-divider-horizontal {
+    margin: 24px 0;
+  }
+  
+
+  .ant-tabs-tab {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #1890ff;
+  }
+  
+  .ant-tabs-ink-bar {
+    background-color: #1890ff;
+  }
+  
+  .ant-form-item-control-input-content input {
+    color: #333;
+    font-size: 14px;
+  }
+  
+  
+  @media (max-width: 768px) {
+    .ant-drawer-body {
+      padding: 16px;
+    }
+  
+    .ant-drawer-header {
+
+      padding: 12px 16px;
+    }
+  
+    .ant-form-item-label > label {
+      font-size: 14px;
+    }
+  
+    .ant-tabs-tab {
+      font-size: 14px;
+    }
+  }
+  .ant-row {
+    row-gap: 0px;
+}
+
+.ant-tabs .ant-tabs-content-holder {
+  margin-top: -15px;
+  background-color: #fff;
+  flex: auto;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 5px;
+  padding:18px;
+}
+.fome1{
+/*  
+  border-radius: 0 5px 5px 5px; */
+  /* padding:18px; */
+  background-color: #fff  ;
+}
+.ant-tabs-top >.ant-tabs-nav,.ant-tabs-bottom >.ant-tabs-nav,.ant-tabs-bottom >div>.ant-tabs-nav {
+  margin: 0 0 6 0;
+}
+/* .ant-divider-horizontal {
+  display: flex;
+    margin: 24px 0;
+    height: 100px;
+    background-color: aqua;
+} */
+
+
+.ant-drawer .ant-drawer-body {
+  flex: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 24px;
+  overflow: auto;
+  margin-top: 50px;
+}
+[data-theme="dark"] .fome1{
+  background: #1f1f1f;
+  color: #fff;
+}
+[data-theme="dark"] .ant-tabs .ant-tabs-content-holder{
+  background: #1f1f1f;
+  color: #fff;
+}
+
+[data-theme="dark"] .ant-typography{
+
+  color: #fff;
+}

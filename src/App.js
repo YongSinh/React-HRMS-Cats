@@ -5,10 +5,10 @@ import DashboardPage from './pages/Dashboard/dashboard';
 import LeavePage from './pages/leavePage/leavePage';
 import InfoPage from './pages/infoPage/info';
 import LeaveRequest from './pages/leavePage/myleave';
-import DepartmentPage from './pages/DepartmentPage/Tabs_Department';
-import StaffPage from './pages/StaffPage/Tabs_staff';
-import PayrollPage from './pages/PayrollPage/Tabs_payroll';
-import Report from './pages/Report/Tabs_report';
+import DepartmentPage from './pages/DepartmentPage/Department';
+import StaffPage from './pages/StaffPage/Staff';
+import PayrollPage from './pages/PayrollPage/Payroll';
+import Report from './pages/Report/Report';
 import AttendancePage from './pages/AttendancePage/Tabs_Attendance';
 import './App.css';
 
@@ -26,8 +26,9 @@ function App() {
             <Route path="/department" element={<DepartmentPage />} />
             <Route path="/staff" element={<StaffPage />} />
             <Route path="/report" element={<Report />} />
-            <Route path="/payroll" element={<PayrollPage />} />
+            <Route path="/Payroll" element={<PayrollPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
+            
           </Route>
         </Routes>
       </BrowserRouter>

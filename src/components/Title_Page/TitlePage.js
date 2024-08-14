@@ -34,13 +34,13 @@ const PageTitle = ({
         <>
         <div className='main-page'>
             <span className='page-title'>{PageTitle}</span>
-            <Breadcrumb
+            {/* <Breadcrumb
             className='breadcrumb'
             separator='>'
             >
                <Breadcrumb.Item>HRMS</Breadcrumb.Item>
               {breadcrumbs}
-            </Breadcrumb>
+            </Breadcrumb> */}
         </div>
 
         </>

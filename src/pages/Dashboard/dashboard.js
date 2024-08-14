@@ -3,8 +3,6 @@ import PageTitle from '../../components/Title_Page/TitlePage';
 import CardCustom from './Card/Card';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2';
-import { PiAirplaneTakeoff } from "react-icons/pi";
-import { TfiReceipt } from "react-icons/tfi";
 import { Chart } from "react-google-charts";
 
 // import AboutPage from '../About/AboutPage';
@@ -47,7 +45,7 @@ const DashboardPage = () => {
     return (
         <>
             <PageTitle
-                PageTitle='Dashboard'
+                PageTitle='TODAY'
             />
             
             <Box sx={{ flexGrow: 1 }}>

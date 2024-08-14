@@ -4,6 +4,7 @@ import { Button,Select,Space,DatePicker,Table } from 'antd';
 import { Link } from 'react-router-dom';
 import Drawerleave from './Drawer';
 import PageTitle from '../../components/Title_Page/TitlePage';
+import './myleave.css';
 const { RangePicker } = DatePicker;
 const LeaveRequest = () => {
   const [open, setOpen] = useState(false);
@@ -52,10 +53,35 @@ const LeaveRequest = () => {
       dataIndex: 'action',
       render: (_, ) => (
         <Space>
-          <Button icon={<EyeFilled />} />
-          <Button type="primary" icon={<EditFilled />} />
-          <Button type="primary" icon={<SendOutlined />} />
-          <Button type="primary" icon={<DeleteOutlined />} danger />
+             <Button
+      type="primary"
+      icon={<EyeFilled />}
+      style={{ backgroundColor: '#4CAF50', borderColor: '#4CAF50' }}
+    >
+
+    </Button>
+    <Button
+      type="primary"
+      icon={<EditFilled />}
+      style={{ backgroundColor: '#2196F3', borderColor: '#2196F3' }}
+    >
+
+    </Button>
+    <Button
+      type="primary"
+      icon={<SendOutlined />}
+      style={{ backgroundColor: '#FFC107', borderColor: '#FFC107' }}
+    >
+    
+    </Button>
+    <Button
+      type="primary"
+      icon={<DeleteOutlined />}
+      danger
+      style={{ backgroundColor: '#F44336', borderColor: '#F44336' }}
+    >
+  
+    </Button>
         </Space>
       ),
     },
@@ -80,9 +106,9 @@ const LeaveRequest = () => {
   ]
   return (
     <>
-     <PageTitle
+     {/* <PageTitle
                 PageTitle='Leave Request'
-            />
+            /> */}
   
 
     

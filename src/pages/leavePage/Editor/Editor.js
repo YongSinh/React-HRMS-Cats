@@ -86,3 +86,4 @@ Editor.formats = [
 ];
 
 export default Editor;
+
