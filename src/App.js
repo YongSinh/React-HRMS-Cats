@@ -14,6 +14,7 @@ import DeductionPage from './pages/DeductionPage/DeductionPage';
 import PayrollPage from './pages/PayrollPage/Payroll';
 import PayslipPage from './pages/Payslip/payslip';
 import TaxPage from './pages/tax/TaxPage';
+import SalaryPage from './pages/Salary/SalaryPage';
 import './App.css';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
             <Route path="/product/:productId" element={<PayslipPage />} />
             <Route path="/allowance" element={<AllowancePage />} />
             <Route path="/deduction" element={<DeductionPage />} />
+            <Route path="/salary" element={<SalaryPage />} />
             <Route path="/tax" element={<TaxPage />} />
           </Route>
         </Routes>

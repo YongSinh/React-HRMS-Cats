@@ -47,6 +47,7 @@ const items = [
     getItem("Payslips", "/payslip"),
     getItem("Allowances", "/allowance"),
     getItem("Deductions", "/deduction"),
+    getItem("Salary","/salary"),
     getItem("Tax","/tax")
   ]),
   getItem("Setting", "Setting", <SettingOutlined />, [
