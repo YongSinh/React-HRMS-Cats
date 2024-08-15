@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
+import "./paySlip.css";
 //Componets form antd
 import {
   DatePicker,
@@ -19,10 +20,8 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
-import { useParams, Link } from "react-router-dom";
 const { Search } = Input;
 const { Title } = Typography;
-
 const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
 function useSelectAllOption(options) {
   const optionsWithAllOption = useMemo(
@@ -52,7 +51,7 @@ const columns = [
     title: "Employee ID",
     dataIndex: "name",
     key: "name",
-    fixed: 'left',
+    fixed: "left",
     render: (text) => <a>{text}</a>,
   },
   {
@@ -61,22 +60,32 @@ const columns = [
     key: "age",
   },
   {
-    title: "Date Form",
+    title: "Salary",
     dataIndex: "address",
     key: "address",
   },
   {
-    title: "Date To",
+    title: "Allownace",
     dataIndex: "address",
     key: "address",
   },
   {
-    title: "Type",
+    title: "Allownace Amount",
     dataIndex: "address",
     key: "address",
   },
   {
-    title: "Status",
+    title: "Deductios",
+    dataIndex: "address",
+    key: "address",
+  },
+  {
+    title: "Deduction Amount",
+    dataIndex: "address",
+    key: "address",
+  },
+  {
+    title: "Net Pay",
     dataIndex: "address",
     key: "address",
   },
@@ -103,7 +112,6 @@ const columns = [
   {
     title: "Action",
     key: "action",
-    fixed: 'right',
     render: (_, record) => (
       <Space size="middle">
         <a>Invite {record.name}</a>
@@ -133,23 +141,23 @@ const generateDateRanges = (year) => {
   }
   return ranges;
 };
-const PayrollPage = () => {
+const PayslipPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
-  const today = dayjs(now)
-  const dateFormat = 'YYYY';
-  const [year,setYear] = useState("2024")
+  const today = dayjs(now);
+  const dateFormat = "YYYY";
+  const [year, setYear] = useState("2024");
   const [salaryCycle, setSalaryCycle] = useState("1");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const handleMonthChange = (date) => {
     if (date) {
-      const start = date.startOf('month');
-      const end = date.endOf('month');
-      setStartDate(dayjs(start).format('YYYY-MM-DD'));
-      setEndDate(dayjs(end).format('YYYY-MM-DD'));
-      console.log('Start Date:', dayjs(start).format('YYYY-MM-DD'));
-      console.log('End Date:', dayjs(end).format('YYYY-MM-DD'));
+      const start = date.startOf("month");
+      const end = date.endOf("month");
+      setStartDate(dayjs(start).format("YYYY-MM-DD"));
+      setEndDate(dayjs(end).format("YYYY-MM-DD"));
+      console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
+      console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
     }
   };
 
@@ -168,7 +176,7 @@ const PayrollPage = () => {
   };
   const onChangeYear = (date, dateString) => {
     console.log(date, dateString);
-    setYear(dateString)
+    setYear(dateString);
   };
   const dateRanges = generateDateRanges(year);
   const options = [
@@ -177,7 +185,7 @@ const PayrollPage = () => {
     { label: "three", value: "three" },
   ];
   const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
-  const { productId } = useParams();
+
   const data = [
     {
       key: "1",
@@ -203,18 +211,20 @@ const PayrollPage = () => {
   ];
 
   const handleDateRangeChange = (value) => {
-    const [startDate, endDate] = value.split(' To ');
-    console.log('Start Date:', startDate);
-    console.log('End Date:', endDate);
+    const [startDate, endDate] = value.split(" To ");
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
   };
-
 
   return (
     <>
-      <PageTitle PageTitle="Payroll" />
-      <Link to={`/product/1`}>Hello</Link>
+      <PageTitle PageTitle="Payslip" />
       <Space.Compact block>
-        <DatePicker onChange={onChangeYear} defaultValue={dayjs(today, dateFormat)} picker="year"  />
+        <DatePicker
+          onChange={onChangeYear}
+          defaultValue={dayjs(today, dateFormat)}
+          picker="year"
+        />
         <Select
           placeholder="Select a Salary Cycle"
           optionFilterProp="label"
@@ -232,12 +242,13 @@ const PayrollPage = () => {
           ]}
         />
         {salaryCycle === "1" ? (
-          <DatePicker picker="month"  onChange={handleMonthChange}/>
+          <DatePicker picker="month" onChange={handleMonthChange} />
         ) : (
-          <Select 
-          style={{ width: 300 }} 
-          onChange={handleDateRangeChange}
-          placeholder="Select Range">
+          <Select
+            style={{ width: 300 }}
+            onChange={handleDateRangeChange}
+            placeholder="Select Range"
+          >
             {dateRanges.map((range, index) => (
               <Option key={index} value={range}>
                 {range}
@@ -245,11 +256,16 @@ const PayrollPage = () => {
             ))}
           </Select>
         )}
-         <Search style={{ width: 300 }} placeholder="input search text" onSearch={onSearch} enterButton />
+        <Search
+          style={{ width: 300 }}
+          placeholder="input search text"
+          onSearch={onSearch}
+          enterButton
+        />
       </Space.Compact>
       <br />
       <Card style={{ width: "100%" }}>
-        <Title level={2}>Generate Payroll</Title>
+        <Title level={2}>Generate Payslips</Title>
         <Divider dashed />
         <Form
           name="basic"
@@ -312,6 +328,56 @@ const PayrollPage = () => {
                 />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item label="Khmer Rate">
+                <Input placeholder="Khmer Riel" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Payment Type"
+                getValueFromEvent={getValueFromEvent}
+                name="selectWithAllOption"
+              >
+                <Select
+                  showSearch
+                  placeholder="Select a Payment Type"
+                  allowClear
+                  mode="multiple"
+                  options={optionsWithAllOption}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Allownace"
+                getValueFromEvent={getValueFromEvent}
+                name="selectWithAllOption"
+              >
+                <Select
+                  showSearch
+                  placeholder="Select a Allownace"
+                  allowClear
+                  mode="multiple"
+                  options={optionsWithAllOption}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Deductions"
+                getValueFromEvent={getValueFromEvent}
+                name="selectWithAllOption"
+              >
+                <Select
+                  showSearch
+                  placeholder="Select a Deductions"
+                  allowClear
+                  mode="multiple"
+                  options={optionsWithAllOption}
+                />
+              </Form.Item>
+            </Col>
           </Row>
           <Form.Item>
             <Button icon={<SendOutlined />} type="primary" htmlType="submit">
@@ -322,14 +388,16 @@ const PayrollPage = () => {
       </Card>
       <Divider dashed />
       <Card style={{ width: "100%" }}>
-        <Table 
-         scroll={{
-          x: 'max-content',
-        }}
-        columns={columns} dataSource={data} />
+        <Table
+          scroll={{
+            x: "max-content",
+          }}
+          columns={columns}
+          dataSource={data}
+        />
       </Card>
     </>
   );
 };
 
-export default PayrollPage;
+export default PayslipPage;

@@ -62,7 +62,7 @@ const data = [
   },
 ];
 
-const AllowancePage = () => {
+const TaxPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
@@ -76,17 +76,17 @@ const AllowancePage = () => {
 
   return (
     <>
-      <PageTitle PageTitle="Allowance List" />
+      <PageTitle PageTitle="Tax List" />
       <Button
         type="primary"
         icon={<PlusOutlined />}
         style={{ marginBottom: 15, marginTop: 7 }}
         onClick={showModal}
       >
-        Add Allowance
+        Add Tax
       </Button>
       <Modal
-        title="Add Deduction"
+        title="Add Tax"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -134,4 +134,4 @@ const AllowancePage = () => {
   );
 };
 
-export default AllowancePage;
+export default TaxPage;
