@@ -230,7 +230,7 @@ const SalaryPage = () => {
       </Space.Compact>
       <br />
       <Card style={{ width: "100%" }}>
-        <Title level={2}>Generate Payslips</Title>
+        <Title level={2}>Generate Salary</Title>
         <Divider dashed />
         <Form
           name="basic"
