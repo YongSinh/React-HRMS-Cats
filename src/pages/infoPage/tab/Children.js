@@ -35,7 +35,7 @@ const Children = () => {
 <div className='charge'>
 
 <span className='span-case1'> Children:</span>
-<div style={{ minWidth: '100%' }}>
+<div style={{ minWidth: '100' }}>
 <Grid container spacing={{ xs: 1 }} >
     
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EyeFilled, DeleteOutlined, EditFilled, ExclamationCircleOutlined } from "@ant-design/icons";
+import { EyeFilled, DeleteOutlined, EditFilled, ExclamationCircleOutlined,SearchOutlined } from "@ant-design/icons";
 import { Select, Table, Tag, Space, Button, Modal, Input } from "antd";
 import Title from "antd/es/skeleton/Title";
 
@@ -223,8 +223,37 @@ const All_Attendance = () => {
             label: "Tom",
           },
         ]}
+        
       />
-
+        <Select
+        showSearch
+        style={{ marginBottom: 15, marginTop: 7,marginLeft: 10 }}
+        placeholder="Select Department"
+        optionFilterProp="children"
+        onChange={onChange}
+        onSearch={onSearch}
+        filterOption={filterOption}
+        options={[
+          {
+            value: "iT",
+            label: "IT",
+          },
+          {
+            value: "deverloper",
+            label: "Deverloper",
+          },
+          {
+            value: "ui/ux",
+            label: "UI/UX",
+          },
+        ]}
+       />
+        <Button icon={<SearchOutlined />}
+          type="primary"
+          style={{ backgroundColor: "green", borderColor: "green", marginLeft:10 }}
+        >
+          Search
+        </Button>
       <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
 
       <Modal

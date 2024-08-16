@@ -66,9 +66,9 @@ const Info = () => {
 
 return (
   <>
-      {/* <PageTitle
+      <PageTitle
           PageTitle='Info & Management'
-      /> */}
+      />
 
 
    <div className='border-box match'>
