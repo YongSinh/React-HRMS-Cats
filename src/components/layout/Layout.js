@@ -42,6 +42,14 @@ const items = [
   getItem("Department", "Department", <BankOutlined />),
   getItem("Staff", "Staff", <UserOutlined />),
   getItem("Report", "report", <FileOutlined />),
+  getItem("Hr Payroll", "Setting", <SettingOutlined />, [
+    getItem("Payroll", "/payroll"),
+    getItem("Payslips", "/payslip"),
+    getItem("Allowances", "/allowance"),
+    getItem("Deductions", "/deduction"),
+    getItem("Salary","/salary"),
+    getItem("Tax","/tax")
+  ]),
   getItem("Setting", "Setting", <SettingOutlined />, [
     getItem("General", "2"),
     getItem("Leave ", "3"),
@@ -108,10 +116,6 @@ const MainLayout = () => {
         </Sider>
         <Layout style={{ marginLeft: collapsed ? 80 : 200, marginTop: 64 }}>
           <Content className="content">
-            <Breadcrumb className="breadcrumb">
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
             <div
               className="site-layout-background"
               style={{
