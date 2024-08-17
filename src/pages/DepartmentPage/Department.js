@@ -965,6 +965,11 @@ const DepartmentPage = () =>{
 
 return(
   <>
+<<<<<<< HEAD
+   
+
+=======
+>>>>>>> 4bd5d1938f2cc0bd942ba19691ce7a304e7aafae
   <Button 
 
         type="primary"
