@@ -6,7 +6,7 @@ import LeavePage from './pages/leavePage/leavePage';
 import InfoPage from './pages/infoPage/info';
 import LeaveRequest from './pages/leavePage/myleave';
 import DepartmentPage from './pages/DepartmentPage/Tabs_Department';
-import StaffPage from './pages/StaffPage/Tabs_staff';
+import Staff from './pages/StaffPage/Staff';
 import Report from './pages/Report/Tabs_report';
 import AttendancePage from './pages/AttendancePage/Tabs_Attendance';
 import AllowancePage from './pages/AllowancePage/Allowance';
@@ -29,7 +29,7 @@ function App() {
             <Route path="/info" element={<InfoPage />} />
             <Route path="/leave-request" element={<LeaveRequest />} />
             <Route path="/department" element={<DepartmentPage />} />
-            <Route path="/staff" element={<StaffPage />} />
+            <Route path="/staff" element={<Staff />} />
             <Route path="/report" element={<Report />} />
             <Route path="/payroll" element={<PayrollPage />} />
             <Route path="/payslip" element={<PayslipPage />} />
