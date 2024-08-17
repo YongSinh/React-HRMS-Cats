@@ -7,11 +7,22 @@ import InfoPage from './pages/infoPage/info';
 import LeaveRequest from './pages/leavePage/myleave';
 import DepartmentPage from './pages/DepartmentPage/Tabs_Department';
 import StaffPage from './pages/StaffPage/Tabs_staff';
+<<<<<<< HEAD
 import PayrollPage from './pages/PayrollPage/Tabs_payroll';
 import ReportPage from './pages/Report/Report'
 import AttendancePage from './pages/AttendancePage/Tabs_Attendance';
 import DeductionPage from './pages/DeductionPage/DeductionPage';
 import AllowancePage from './pages/AllowancePage/Allowance';
+=======
+import Report from './pages/Report/Tabs_report';
+import AttendancePage from './pages/AttendancePage/Tabs_Attendance';
+import AllowancePage from './pages/AllowancePage/Allowance';
+import DeductionPage from './pages/DeductionPage/DeductionPage';
+import PayrollPage from './pages/PayrollPage/Payroll';
+import PayslipPage from './pages/Payslip/payslip';
+import TaxPage from './pages/tax/TaxPage';
+import SalaryPage from './pages/Salary/SalaryPage';
+>>>>>>> 4bd5d1938f2cc0bd942ba19691ce7a304e7aafae
 import './App.css';
 
 function App() {
@@ -29,9 +40,18 @@ function App() {
             <Route path="/staff" element={<StaffPage />} />
             <Route path="/report" element={<ReportPage />} />
             <Route path="/payroll" element={<PayrollPage />} />
+            <Route path="/payslip" element={<PayslipPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
+<<<<<<< HEAD
             <Route path="/deduction" element={<DeductionPage/>}/>
             <Route path="/allowance" element={<AllowancePage/>}/>
+=======
+            <Route path="/product/:productId" element={<PayslipPage />} />
+            <Route path="/allowance" element={<AllowancePage />} />
+            <Route path="/deduction" element={<DeductionPage />} />
+            <Route path="/salary" element={<SalaryPage />} />
+            <Route path="/tax" element={<TaxPage />} />
+>>>>>>> 4bd5d1938f2cc0bd942ba19691ce7a304e7aafae
           </Route>
         </Routes>
       </BrowserRouter>

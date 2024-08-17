@@ -1,141 +1,8 @@
-<<<<<<< HEAD
-import React from "react";
-//Componets form MUI
-import Grid from "@mui/material/Unstable_Grid2";
-
-//Componets form antd
-import {
-  Collapse,
-  DatePicker,
-  Space,
-  Button,
-  List,
-  Checkbox,
-  Form,
-  Input,
-  Select,
-  Tag,
-  Radio,
-} from "antd";
-const onChange = (date, dateString) => {
-  console.log(date, dateString);
-};
-
-const PayrollPage = () => {
-  const [form] = Form.useForm();
-  return (
-    <>
-      <h2>Preference</h2>
-      <div className="info">
-        <h3>How payrun works?</h3>
-        <ol>
-          <li>
-            Default pay run is applicable to generate payslip for all employees
-            (Except those are updated individually) whenever it executes from
-            the Payrun module.
-          </li>
-          <li>
-            You can set pay run individually over the default from the Employees
-            details.
-          </li>
-        </ol>
-      </div>
-
-      <div>
-        <div style={{ minWidth: "95rem" }}>
-          <Grid container spacing={{ xs: 2 }}>
-            <Grid xs={9}>
-              <div className="border-box form-entry">
-                <Form
-                  form={form}
-                  layout="vertical"
-                  // layout="horizontal"
-                  //  onFinish={onFinish}
-                  //  onFinishFailed={onFinishFailed}
-                  autoComplete="off"
-                >
-                  <Grid container spacing={1}>
-                    <Grid xs={6}>
-                      <Form.Item label="Select Month" name={""}>
-                        <Space direction="vertical">
-                          <DatePicker onChange={onChange} picker="month" />
-                        </Space>
-                      </Form.Item>
-                    </Grid>
-                  </Grid>
-
-                  <Grid container spacing={1}>
-                    <Grid xs={9}>
-                      <Form.Item label="Payrun period" name={"payrun"}>
-                        <Space>
-                          <Select
-                            style={{
-                              width: 1000,
-                              height: 30,
-                            }}
-                            Select
-                            options={[
-                              {
-                                value: "monthly",
-                                label: "Monthly",
-                              },
-                              {
-                                value: "first of month",
-                                label: "First of Month",
-                              },
-                              {
-                                value: "second of month",
-                                label: "Second of Month",
-                              },
-                            ]}
-                          />
-                        </Space>
-                      </Form.Item>
-                    </Grid>
-                    <Grid xs={9}>
-                      <Form.Item label="Payrun generate type" name={"pgt"}>
-                        <Space>
-                          <Select
-                            style={{
-                              width: 1000,
-                              height: 30,
-                            }}
-                            Select
-                            options={[
-                              {
-                                value: "monthly",
-                                label: "Monthly",
-                              },
-                              {
-                                value: "first of month",
-                                label: "First of Month",
-                              },
-                              {
-                                value: "second of month",
-                                label: "Second of Month",
-                              },
-                            ]}
-                          />
-                        </Space>
-                      </Form.Item>
-                    </Grid>
-                  </Grid>
-                  <Button type="primary">Generate</Button>
-
-                  <Button style={{ margin: 10 }}>Cancel</Button>
-                </Form>
-              </div>
-            </Grid>
-          </Grid>
-        </div>
-      </div>
-=======
 import React, { useState, useCallback, useMemo } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
 //Componets form antd
 import {
-  DatePicker,
   Space,
   Table,
   Tag,
@@ -148,13 +15,13 @@ import {
   Typography,
   Input,
   Card,
+  DatePicker,
 } from "antd";
 import dayjs from "dayjs";
 import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
-import { useParams, Link } from "react-router-dom";
 const { Search } = Input;
 const { Title } = Typography;
-
+const { RangePicker } = DatePicker;
 const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
 function useSelectAllOption(options) {
   const optionsWithAllOption = useMemo(
@@ -184,58 +51,32 @@ const columns = [
     title: "Employee ID",
     dataIndex: "name",
     key: "name",
-    fixed: 'left',
+    fixed: "left",
     render: (text) => <a>{text}</a>,
   },
   {
-    title: "RefNo",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Date Form",
+    title: "Salary",
     dataIndex: "address",
     key: "address",
   },
   {
-    title: "Date To",
+    title: "Form Date",
     dataIndex: "address",
     key: "address",
   },
   {
-    title: "Type",
+    title: "To Date",
     dataIndex: "address",
     key: "address",
   },
   {
-    title: "Status",
+    title: "Tax",
     dataIndex: "address",
     key: "address",
-  },
-  {
-    title: "Create Date",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
   },
   {
     title: "Action",
     key: "action",
-    fixed: 'right',
     render: (_, record) => (
       <Space size="middle">
         <a>Invite {record.name}</a>
@@ -265,23 +106,23 @@ const generateDateRanges = (year) => {
   }
   return ranges;
 };
-const PayrollPage = () => {
+const SalaryPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
-  const today = dayjs(now)
-  const dateFormat = 'YYYY';
-  const [year,setYear] = useState("2024")
+  const today = dayjs(now);
+  const dateFormat = "YYYY";
+  const [year, setYear] = useState("2024");
   const [salaryCycle, setSalaryCycle] = useState("1");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const handleMonthChange = (date) => {
     if (date) {
-      const start = date.startOf('month');
-      const end = date.endOf('month');
-      setStartDate(dayjs(start).format('YYYY-MM-DD'));
-      setEndDate(dayjs(end).format('YYYY-MM-DD'));
-      console.log('Start Date:', dayjs(start).format('YYYY-MM-DD'));
-      console.log('End Date:', dayjs(end).format('YYYY-MM-DD'));
+      const start = date.startOf("month");
+      const end = date.endOf("month");
+      setStartDate(dayjs(start).format("YYYY-MM-DD"));
+      setEndDate(dayjs(end).format("YYYY-MM-DD"));
+      console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
+      console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
     }
   };
 
@@ -300,7 +141,7 @@ const PayrollPage = () => {
   };
   const onChangeYear = (date, dateString) => {
     console.log(date, dateString);
-    setYear(dateString)
+    setYear(dateString);
   };
   const dateRanges = generateDateRanges(year);
   const options = [
@@ -309,7 +150,7 @@ const PayrollPage = () => {
     { label: "three", value: "three" },
   ];
   const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
-  const { productId } = useParams();
+
   const data = [
     {
       key: "1",
@@ -335,18 +176,20 @@ const PayrollPage = () => {
   ];
 
   const handleDateRangeChange = (value) => {
-    const [startDate, endDate] = value.split(' To ');
-    console.log('Start Date:', startDate);
-    console.log('End Date:', endDate);
+    const [startDate, endDate] = value.split(" To ");
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
   };
-
 
   return (
     <>
-      <PageTitle PageTitle="Payroll" />
-      <Link to={`/product/1`}>Hello</Link>
+      <PageTitle PageTitle="Salary" />
       <Space.Compact block>
-        <DatePicker onChange={onChangeYear} defaultValue={dayjs(today, dateFormat)} picker="year"  />
+        <DatePicker
+          onChange={onChangeYear}
+          defaultValue={dayjs(today, dateFormat)}
+          picker="year"
+        />
         <Select
           placeholder="Select a Salary Cycle"
           optionFilterProp="label"
@@ -364,12 +207,13 @@ const PayrollPage = () => {
           ]}
         />
         {salaryCycle === "1" ? (
-          <DatePicker picker="month"  onChange={handleMonthChange}/>
+          <DatePicker picker="month" onChange={handleMonthChange} />
         ) : (
-          <Select 
-          style={{ width: 300 }} 
-          onChange={handleDateRangeChange}
-          placeholder="Select Range">
+          <Select
+            style={{ width: 300 }}
+            onChange={handleDateRangeChange}
+            placeholder="Select Range"
+          >
             {dateRanges.map((range, index) => (
               <Option key={index} value={range}>
                 {range}
@@ -377,11 +221,16 @@ const PayrollPage = () => {
             ))}
           </Select>
         )}
-         <Search style={{ width: 300 }} placeholder="input search text" onSearch={onSearch} enterButton />
+        <Search
+          style={{ width: 300 }}
+          placeholder="input search text"
+          onSearch={onSearch}
+          enterButton
+        />
       </Space.Compact>
       <br />
       <Card style={{ width: "100%" }}>
-        <Title level={2}>Generate Payroll</Title>
+        <Title level={2}>Generate Salary</Title>
         <Divider dashed />
         <Form
           name="basic"
@@ -444,6 +293,47 @@ const PayrollPage = () => {
                 />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item label="Salary">
+                <Input placeholder="Salary" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Tax Rate"
+                getValueFromEvent={getValueFromEvent}
+                name="selectWithAllOption"
+              >
+                <Select
+                  showSearch
+                  placeholder="Select a Payment Type"
+                  allowClear
+                  mode="multiple"
+                  options={optionsWithAllOption}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item
+                label="Date"
+                getValueFromEvent={getValueFromEvent}
+                name="selectWithAllOption"
+              >
+                <RangePicker
+                  style={{width:"100%"}}
+                  id={{
+                    start: "startInput",
+                    end: "endInput",
+                  }}
+                  onFocus={(_, info) => {
+                    console.log("Focus:", info.range);
+                  }}
+                  onBlur={(_, info) => {
+                    console.log("Blur:", info.range);
+                  }}
+                />
+              </Form.Item>
+            </Col>
           </Row>
           <Form.Item>
             <Button icon={<SendOutlined />} type="primary" htmlType="submit">
@@ -454,15 +344,16 @@ const PayrollPage = () => {
       </Card>
       <Divider dashed />
       <Card style={{ width: "100%" }}>
-        <Table 
-         scroll={{
-          x: 'max-content',
-        }}
-        columns={columns} dataSource={data} />
+        <Table
+          scroll={{
+            x: "max-content",
+          }}
+          columns={columns}
+          dataSource={data}
+        />
       </Card>
->>>>>>> 4bd5d1938f2cc0bd942ba19691ce7a304e7aafae
     </>
   );
 };
 
-export default PayrollPage;
+export default SalaryPage;

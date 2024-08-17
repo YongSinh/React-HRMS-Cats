@@ -13,7 +13,7 @@ import { ImOpt } from "react-icons/im";
 
 const columns = [
   {
-    title: "No",
+    title: "ID",
     dataIndex: "No",
     render: (_, { No }) => {
       return (
@@ -26,16 +26,30 @@ const columns = [
     },
   },
   {
-    title: "Allowance information",
+    title: "Tax Able Salary",
     dataIndex: "description",
     key: "description",
   },
   {
-    title: "Amount",
+    title: "Rat",
     dataIndex: "amount",
     key: "aMount",
   },
-
+  {
+    title: "Amout",
+    dataIndex: "amount",
+    key: "aMount",
+  },
+  {
+    title: "Lower Limit",
+    dataIndex: "amount",
+    key: "aMount",
+  },
+  {
+    title: "Upper Limit",
+    dataIndex: "amount",
+    key: "aMount",
+  },
   {
     title: "Action",
     key: "action",
@@ -62,7 +76,7 @@ const data = [
   },
 ];
 
-const AllowancePage = () => {
+const TaxPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
@@ -76,25 +90,58 @@ const AllowancePage = () => {
 
   return (
     <>
-      <PageTitle PageTitle="Allowance List" />
+      <PageTitle PageTitle="Tax List" />
       <Button
         type="primary"
         icon={<PlusOutlined />}
         style={{ marginBottom: 15, marginTop: 7 }}
         onClick={showModal}
       >
-        Add Allowance
+        Add Tax
       </Button>
       <Modal
-        title="Add Deduction"
+        title="Add Tax"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
       >
         <Form layout="vertical" hideRequiredMark>
           <Form.Item
-            name="depId"
-            label="Allowance ID"
+            name="Id"
+            label="Tax ID"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="taxAbleSalary"
+            label="Tax Able Salary"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="rate"
+            label="Tax Rate"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="amount"
+            label="Tax Amount"
             rules={[
               {
                 required: true,
@@ -105,8 +152,8 @@ const AllowancePage = () => {
           </Form.Item>
 
           <Form.Item
-            name="depName"
-            label="Allowance"
+            name="lowerLimit"
+            label="Lower Limit"
             rules={[
               {
                 required: true,
@@ -116,15 +163,15 @@ const AllowancePage = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            name="description"
-            label="Description"
+            name="upperLimit"
+            label="Upper Limit"
             rules={[
               {
                 required: true,
               },
             ]}
           >
-            <Input.TextArea rows={4} />
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
@@ -134,4 +181,4 @@ const AllowancePage = () => {
   );
 };
 
-export default AllowancePage;
+export default TaxPage;

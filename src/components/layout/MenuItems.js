@@ -106,9 +106,11 @@ const MenuItems = () => (
       >
         <div style={dropdownStyles}>
           <Avatar
+            style={{marginRight:'8px'}}
             src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${1}`}
             size="large"
           />
+          YongSinh
           <DownOutlined style={{ marginLeft: '8px' }} />
         </div>
       </Dropdown>

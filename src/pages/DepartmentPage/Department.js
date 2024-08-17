@@ -9,12 +9,12 @@ const columns = [
   {
     title: "No",
     dataIndex: "No",
-    render: (_, { No }) => {
+    render: (items, item, index) => {
       return (
         <>
           <div>
             <text style={{ fontSize: 13}} >
-              {No}
+              {index+1}
             </text>
           </div>
         </>
@@ -37,6 +37,9 @@ const columns = [
     title: 'positions',
     key: 'positions',
     dataIndex: 'positions',
+    ellipsis: {
+      showTitle: true,
+    },
     render: (_, { positions }) => (
       <>
         {positions.map((positions) => {
@@ -962,8 +965,11 @@ const DepartmentPage = () =>{
 
 return(
   <>
+<<<<<<< HEAD
    
 
+=======
+>>>>>>> 4bd5d1938f2cc0bd942ba19691ce7a304e7aafae
   <Button 
 
         type="primary"
