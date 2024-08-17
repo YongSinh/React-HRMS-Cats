@@ -11,191 +11,170 @@ import {
   Form,
   Input,
   Row,
-  Select,
   Tag,
+  TimePicker,
 } from "antd";
-const { Option } = Select;
+
+const { RangePicker } = DatePicker;
+
 const columns = [
   {
     title: "ID",
     dataIndex: "ID",
-    render: (_, { ID }) => {
-      return (
-        <>
-          <div>
-            <text style={{ fontSize: 13 }}>{ID}</text>
-          </div>
-        </>
-      );
-    },
+    render: (text) => <div style={{ fontSize: 13 }}>{text}</div>,
   },
   {
     title: "Name",
     dataIndex: "name",
   },
   {
-    title: "Date",
-    dataIndex: "address",
-    // render: (_, { address }) => {
-    //   let color = 'green';
-    //   return(
-    //     <>
-    //     <div >
-    //     <Tag style={{fontSize:30}} color={color}>
-    //           {address}
-    //         </Tag>
-    //     </div>
-
-    //   </>
-    //   )
-    // }
+    title: "Start Date - End Date",
+    dataIndex: "dateRange",
   },
   {
     title: "Time In",
+    dataIndex: "timeIn",
   },
   {
     title: "Time Out",
+    dataIndex: "timeOut",
   },
   {
     title: "Position",
+    dataIndex: "position",
+  },
+  {
+    title: "Description",
+    dataIndex: "description",
   },
   {
     title: "Status",
     dataIndex: "Status",
-    render: (_, { Status }) => {
+    render: (Status) => {
       let color;
-      switch(Status) {
-        case 'Active':
-          color = 'Green';
+      switch (Status) {
+        case "Active":
+          color = "green";
           break;
-        case 'Late':
-          color = 'Yellow';
+        case "Late":
+          color = "yellow";
           break;
-        case 'Unactive':
-          color = 'Red';
+        case "Unactive":
+          color = "red";
           break;
+        default:
+          color = "grey";
       }
       return (
-        <>
-          <div>
-            <Tag style={{ fontSize: 13 }} color={color}>
-              {Status}
-            </Tag>
-          </div>
-        </>
+        <Tag style={{ fontSize: 13 }} color={color}>
+          {Status}
+        </Tag>
       );
     },
   },
   {
     title: "Remark",
+    dataIndex: "remark",
   },
   {
     title: "Action",
     key: "action",
-    render: (_) => (
-      <Space class="icon-container">
-        <Button className="fas fa-home" icon={<EyeFilled />} />
+    render: () => (
+      <Space>
+        <Button
+          type="primary"
+          icon={<EyeFilled />}
+          style={{ backgroundColor: "#4CAF50", borderColor: "#4CAF50" }}
+        />
       </Space>
     ),
   },
 ];
 
-
-const data = [];
-for (let i = 0; i < 46; i++) {
-  data.push({
+const initialData = [];
+for (let i = 0; i < 6; i++) {
+  initialData.push({
     key: i,
     name: `Edward King ${i}`,
-    age: 32,
-    address: `London, Park Lane no. ${i}`,
-    ID: `001${i}`,
+    dateRange: `2023-08-01 - 2023-08-07`,
+    timeIn: "08:00 AM",
+    timeOut: "05:00 PM",
+    position: "Developer",
+    description: `Worked on Project ${i}`,
+    ID: `0${i}`,
     Status: `Unactive`,
-   
+    remark: `Remark ${i}`,
   });
 }
 
-
-
-
-const Personal_Attendace = () => {
+const Personal_Attendance = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [timeSwitch, setTimeSwitct] = useState(1)
-const handleChange = (value) => {
-  setTimeSwitct(value)
-  console.log(`selected ${value}`);
-};
+  const [data, setData] = useState(initialData);
+  const [form] = Form.useForm();
+  const [open, setOpen] = useState(false);
+
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
+
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
-    selections: [
-      Table.SELECTION_ALL,
-      Table.SELECTION_INVERT,
-      Table.SELECTION_NONE,
-      {
-        
-        key: "odd",
-        text: "Select Odd Row",
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return false;
-            }
-            return true;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-      {
-        key: "even",
-        text: "Select Even Row",
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return true;
-            }
-            return false;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-    ],
   };
-  const [open, setOpen] = useState(false);
+
   const showDrawer = () => {
     setOpen(true);
   };
+
   const onClose = () => {
     setOpen(false);
+    form.resetFields();
   };
+
+  const onSubmit = () => {
+    form.validateFields().then((values) => {
+      const dateRange = values.dateTime
+        ? `${values.dateTime[0].format("YYYY-MM-DD")} - ${values.dateTime[1].format("YYYY-MM-DD")}`
+        : "";
+      const newAttendance = {
+        key: data.length + 1,
+        ID: `KH0${data.length + 1}`,
+        name: values.name,
+        dateRange: dateRange,
+        timeIn: values.timeIn ? values.timeIn.format("HH:mm A") : "",
+        timeOut: values.timeOut ? values.timeOut.format("HH:mm A") : "",
+        Status: "Active",
+        description: values.description,
+        position: "Employee", // This can be dynamic
+        remark: "New Remark", // This can be dynamic
+      };
+      // Prepend the new record to the data array
+      setData([newAttendance, ...data]);
+      onClose();
+    });
+  };
+
   return (
     <>
-      <Button 
+      <Button
         type="primary"
         onClick={showDrawer}
         icon={<PlusOutlined />}
-        style={{ marginBottom: 15, marginTop: 7, }}
+        style={{ marginBottom: 15, marginTop: 7 }}
       >
         Mark Attendance
       </Button>
-      <Drawer 
-        title="Create Your Attendance "
+      <Drawer
+        title="Create Your Attendance"
         width={720}
         onClose={onClose}
         open={open}
-        styles={{
-          body: {
-            paddingBottom: 80,
-          },
+        bodyStyle={{
+          paddingBottom: 80,
         }}
-        
       >
-        <Form className="drawer-content" layout="vertical" hideRequiredMark>
+        <Form form={form} layout="vertical" hideRequiredMark>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -211,64 +190,67 @@ const handleChange = (value) => {
                 <Input placeholder="Please enter user name" />
               </Form.Item>
             </Col>
-
-                {timeSwitch === 1 ?
-                (            <Col span={12}>
-                  <Form.Item
-                    name="dateTime"
-                    label="DateTime"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please choose the dateTime",
-                      },
-                    ]}
-                  >
-                    <DatePicker.RangePicker
-                      style={{
-                        width: "100%",
-                      }}
-                      getPopupContainer={(trigger) => trigger.parentElement}
-                    />
-                  </Form.Item>
-                </Col>):(
-                              <Col span={12}>
-                              <Form.Item
-                                name="dateTimeOut"
-                                label="DateTimeTimeOUt"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "Please choose the dateTime",
-                                  },
-                                ]}
-                              >
-                                <DatePicker.RangePicker
-                                  style={{
-                                    width: "100%",
-                                  }}
-                                  getPopupContainer={(trigger) => trigger.parentElement}
-                                />
-                              </Form.Item>
-                            </Col>
-                )}
-          
-            <Select
-      style={{
-        width: 120,
-      }}
-     // disabled
-      onChange={handleChange}
-      options={[
-        {
-          value: 1,
-          label: 'Time-In',
-        },
-        {
-          value: 2,
-          label: 'Time-out',
-        },
-      ]}/>
+            <Col span={12}>
+              <Form.Item
+                name="dateTime"
+                label="Date Range"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please choose the date range",
+                  },
+                ]}
+              >
+                <RangePicker
+                  style={{
+                    width: "100%",
+                  }}
+                  getPopupContainer={(trigger) => trigger.parentElement}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="timeIn"
+                label="Time In"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select time in",
+                  },
+                ]}
+              >
+                <TimePicker
+                  style={{
+                    width: "100%",
+                  }}
+                  format="HH:mm A"
+                  getPopupContainer={(trigger) => trigger.parentElement}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="timeOut"
+                label="Time Out"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select time out",
+                  },
+                ]}
+              >
+                <TimePicker
+                  style={{
+                    width: "100%",
+                  }}
+                  format="HH:mm A"
+                  getPopupContainer={(trigger) => trigger.parentElement}
+                />
+              </Form.Item>
+            </Col>
           </Row>
           <Row gutter={16}>
             <Col span={24}>
@@ -278,41 +260,30 @@ const handleChange = (value) => {
                 rules={[
                   {
                     required: true,
-                    message: "please enter url description",
+                    message: "Please enter description",
                   },
                 ]}
               >
-                <Input.TextArea
-                  rows={4}
-                  placeholder="please enter url description"
-                />
-
-                
+                <Input.TextArea rows={4} placeholder="Please enter description" />
               </Form.Item>
-              
-       
-        
             </Col>
-
-            <Space className="btn_s-c" style={{marginBottom: 120}}>
-            <Button onClick={onClose}>
-              Cancel
-              </Button>
-            <Button onClick={onClose} type="primary">
+          </Row>
+          <Space style={{ marginBottom: 120 }}>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onSubmit} type="primary">
               Submit
             </Button>
           </Space>
-          </Row>
-          
-
         </Form>
-      
       </Drawer>
-      <Table 
-      rowSelection={rowSelection} 
-      columns={columns}
-       dataSource={data} />
+      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
     </>
   );
 };
-export default Personal_Attendace;
+
+export default Personal_Attendance;
+
+
+
+
+
