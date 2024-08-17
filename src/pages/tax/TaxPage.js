@@ -1,4 +1,4 @@
-import { Space, Table, Tag, Button, Form, Input } from "antd";
+import { Space, Table,  Button, Form, Input } from "antd";
 import React, { useState } from "react";
 import PageTitle from "../../components/Title_Page/TitlePage";
 import { Modal } from "antd";
@@ -9,7 +9,6 @@ import {
   PlusOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { ImOpt } from "react-icons/im";
 
 const columns = [
   {
