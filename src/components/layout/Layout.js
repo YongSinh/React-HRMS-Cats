@@ -38,7 +38,11 @@ const items = [
     getItem("All Employee", "leave", <TeamOutlined />),
     getItem("Leave Request", "leave-request", <UserOutlined />),
   ]),
-  getItem("Payroll", "Payroll", <PayCircleOutlined />),
+  getItem("Payroll", "1", <PayCircleOutlined />,[
+    getItem("Payroll", "Payroll"),
+    getItem("Deduction", "deduction" ),
+    getItem("Allowance", "allowance" ),
+  ]),
   getItem("Department", "Department", <BankOutlined />),
   getItem("Staff", "Staff", <UserOutlined />),
   getItem("Report", "report", <FileOutlined />),
@@ -46,7 +50,7 @@ const items = [
     getItem("General", "2"),
     getItem("Leave ", "3"),
     getItem("Attendance ", "4"),
-    getItem("Payroll ", "4"),
+   
   ]),
 ];
 

@@ -962,10 +962,7 @@ const DepartmentPage = () =>{
 
 return(
   <>
-   <PageTitle
-         PageTitle='Department'
-      
-      />
+   
 
   <Button 
 

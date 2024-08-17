@@ -146,7 +146,7 @@ const Personal_Detail = () => {
         <div className='charge'>
 
             <span className='span-case1'> Personal Info:</span>
-            <div style={{ minWidth: '85rem' }}>
+            <div style={{ minWidth: '100%' }}>
           
             
             <img src={image} height={200} width={200}
@@ -154,11 +154,10 @@ const Personal_Detail = () => {
           />
           
 
-                <Grid container spacing={{ xs: 2 }} >
+                
            
                     <Grid xs={9} >
-                        
-                    <Grid container spacing={{ xs: 2 }} >
+                 
                         <div className='border-box form-entry'>
                       
                             <Form
@@ -372,9 +371,7 @@ const Personal_Detail = () => {
                           
                         </div>
                         </Grid>
-                    </Grid>
-
-                </Grid>
+              
             </div>
         </div>
 
