@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { EyeFilled, DeleteOutlined, EditFilled, ExclamationCircleOutlined,SearchOutlined } from "@ant-design/icons";
-import { Select, Table, Tag, Space, Button, Modal, Input } from "antd";
-import Title from "antd/es/skeleton/Title";
+import { EyeFilled, DeleteOutlined, EditFilled, ExclamationCircleOutlined, SearchOutlined } from "@ant-design/icons";
+import { Select, Table, Tag, Space, Button, Modal, Input, DatePicker, TimePicker } from "antd";
+import moment from "moment";
 
 const { confirm } = Modal;
+const { RangePicker } = DatePicker;
 
 const All_Attendance = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -13,17 +14,23 @@ const All_Attendance = () => {
       initialData.push({
         key: i,
         name: `Edward King ${i}`,
-        age: 32,
+        age: `2024-01-01 - 2024-12-31`,
         department: `Department ${i}`,
         position: `Position ${i}`,
         Status: `Active`,
         ID: `001${i}`,
         remark: `Remark ${i}`,
+        timeIn: "09:00 AM",
+        timeOut: "05:00 PM",
       });
     }
     return initialData;
   });
-  
+
+  const [filteredData, setFilteredData] = useState(data);
+  const [selectedPosition, setSelectedPosition] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [editValues, setEditValues] = useState({});
@@ -47,16 +54,27 @@ const All_Attendance = () => {
 
   const handleDelete = (ID) => {
     setData((prevData) => prevData.filter((item) => item.ID !== ID));
+    setFilteredData((prevData) => prevData.filter((item) => item.ID !== ID));
   };
 
   const showEditModal = (record) => {
     setCurrentRecord(record);
-    setEditValues(record);
+    setEditValues({
+      ...record,
+      rangeDate: record.age.split(" - ").map((date) => moment(date, "YYYY-MM-DD")),
+      timeIn: moment(record.timeIn, "hh:mm A"),
+      timeOut: moment(record.timeOut, "hh:mm A"),
+    });
     setIsEditModalVisible(true);
   };
 
   const handleEdit = () => {
     setData((prevData) =>
+      prevData.map((item) =>
+        item.key === currentRecord.key ? { ...item, ...editValues } : item
+      )
+    );
+    setFilteredData((prevData) =>
       prevData.map((item) =>
         item.key === currentRecord.key ? { ...item, ...editValues } : item
       )
@@ -68,51 +86,81 @@ const All_Attendance = () => {
     setEditValues((prevValues) => ({ ...prevValues, [field]: value }));
   };
 
+  const handleRangeChange = (dates, dateStrings) => {
+    setEditValues((prevValues) => ({
+      ...prevValues,
+      age: `${dateStrings[0]} - ${dateStrings[1]}`,
+    }));
+  };
+
+  const handleTimeChange = (field, time, timeString) => {
+    setEditValues((prevValues) => ({
+      ...prevValues,
+      [field]: timeString,
+    }));
+  };
+
+  const handlePositionChange = (value) => {
+    setSelectedPosition(value);
+  };
+
+  const handleDepartmentChange = (value) => {
+    setSelectedDepartment(value);
+  };
+
+  const handleSearch = () => {
+    const filtered = data.filter((item) => {
+      return (
+        (selectedPosition ? item.position === selectedPosition : true) &&
+        (selectedDepartment ? item.department === selectedDepartment : true)
+      );
+    });
+    setFilteredData(filtered);
+  };
+
   const columns = [
     {
       title: "ID",
       dataIndex: "ID",
-      render: (_, { ID }) => {
-        return (
-          <>
-            <div>
-              <text style={{ fontSize: 13 }}>{ID}</text>
-            </div>
-          </>
-        );
-      },
+      render: (_, { ID }) => (
+        <div>
+          <text style={{ fontSize: 13 }}>{ID}</text>
+        </div>
+      ),
     },
     {
       title: "Name",
       dataIndex: "name",
     },
     {
-      title: "Date",
+      title: "Start Date - End Date",
       dataIndex: "age",
     },
     {
-      title: "Department",
-      dataIndex: "department",
+      title: "Time In",
+      dataIndex: "timeIn",
+    },
+    {
+      title: "Time Out",
+      dataIndex: "timeOut",
     },
     {
       title: "Position",
       dataIndex: "position",
     },
     {
+      title: "Department",
+      dataIndex: "department",
+    },
+   
+    {
       title: "Status",
       dataIndex: "Status",
-      render: (_, { Status }) => {
-        let color = "green";
-        return (
-          <>
-            <div>
-              <Tag style={{ fontSize: 13 }} color={color}>
-                {Status}
-              </Tag>
-            </div>
-          </>
-        );
-      },
+      render: (_, { Status }) => (
+        <Tag style={{ fontSize: 13 }} color="green">
+          {Status}
+        </Tag>
+      ),
     },
     {
       title: "Remark",
@@ -146,58 +194,13 @@ const All_Attendance = () => {
   ];
 
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
-    selections: [
-      Table.SELECTION_ALL,
-      Table.SELECTION_INVERT,
-      Table.SELECTION_NONE,
-      {
-        key: "odd",
-        text: "Select Odd Row",
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return false;
-            }
-            return true;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-      {
-        key: "even",
-        text: "Select Even Row",
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return true;
-            }
-            return false;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-    ],
   };
-
-  const onChange = (value) => {
-    console.log(`selected ${value}`);
-  };
-
-  const onSearch = (value) => {
-    console.log("search:", value);
-  };
-
-  const filterOption = (input, option) =>
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   return (
     <>
@@ -206,55 +209,40 @@ const All_Attendance = () => {
         style={{ marginBottom: 15, marginTop: 7 }}
         placeholder="Select Position"
         optionFilterProp="children"
-        onChange={onChange}
-        onSearch={onSearch}
-        filterOption={filterOption}
+        onChange={handlePositionChange}
+        filterOption={(input, option) =>
+          (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+        }
         options={[
-          {
-            value: "jack",
-            label: "Jack",
-          },
-          {
-            value: "lucy",
-            label: "Lucy",
-          },
-          {
-            value: "tom",
-            label: "Tom",
-          },
+          { value: "Position 1", label: "Position 1" },
+          { value: "Position 2", label: "Position 2" },
+          { value: "Position 3", label: "Position 3" },
         ]}
-        
       />
-        <Select
+      <Select
         showSearch
-        style={{ marginBottom: 15, marginTop: 7,marginLeft: 10 }}
+        style={{ marginBottom: 15, marginTop: 7, marginLeft: 10 }}
         placeholder="Select Department"
         optionFilterProp="children"
-        onChange={onChange}
-        onSearch={onSearch}
-        filterOption={filterOption}
+        onChange={handleDepartmentChange}
+        filterOption={(input, option) =>
+          (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+        }
         options={[
-          {
-            value: "iT",
-            label: "IT",
-          },
-          {
-            value: "deverloper",
-            label: "Deverloper",
-          },
-          {
-            value: "ui/ux",
-            label: "UI/UX",
-          },
+          { value: "Department 1", label: "Department 1" },
+          { value: "Department 2", label: "Department 2" },
+          { value: "Department 3", label: "Department 3" },
         ]}
-       />
-        <Button icon={<SearchOutlined />}
-          type="primary"
-          style={{ backgroundColor: "green", borderColor: "green", marginLeft:10 }}
-        >
-          Search
-        </Button>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+      />
+      <Button
+        icon={<SearchOutlined />}
+        type="primary"
+        style={{ backgroundColor: "green", borderColor: "green", marginLeft: 10 }}
+        onClick={handleSearch}
+      >
+        Search
+      </Button>
+      <Table rowSelection={rowSelection} columns={columns} dataSource={filteredData} />
 
       <Modal
         title="Edit User"
@@ -263,25 +251,37 @@ const All_Attendance = () => {
         onCancel={() => setIsEditModalVisible(false)}
         okText="Save"
       >
-        <Input 
-       
+        <Input
           value={editValues.ID}
           onChange={(e) => handleInputChange("ID", e.target.value)}
           placeholder="Enter new ID"
           style={{ marginBottom: 8 }}
         />
-        
         <Input
           value={editValues.name}
           onChange={(e) => handleInputChange("name", e.target.value)}
           placeholder="Enter new name"
           style={{ marginBottom: 8 }}
         />
-        <Input
-          value={editValues.age}
-          onChange={(e) => handleInputChange("age", e.target.value)}
-          placeholder="Enter new date"
-          style={{ marginBottom: 8 }}
+        <RangePicker
+          value={editValues.rangeDate}
+          onChange={handleRangeChange}
+          format="YYYY-MM-DD"
+          style={{ marginBottom: 8, width: '100%' }}
+        />
+        <TimePicker
+          value={editValues.timeIn}
+          onChange={(time, timeString) => handleTimeChange("timeIn", time, timeString)}
+          format="hh:mm A"
+          use12Hours
+          style={{ marginBottom: 8, width: '100%' }}
+        />
+        <TimePicker
+          value={editValues.timeOut}
+          onChange={(time, timeString) => handleTimeChange("timeOut", time, timeString)}
+          format="hh:mm A"
+          use12Hours
+          style={{ marginBottom: 8, width: '100%' }}
         />
         <Input
           value={editValues.department}

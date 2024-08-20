@@ -31,22 +31,22 @@ const columns = [
   },
   {
     title: "Rat",
-    dataIndex: "amount",
+    dataIndex: "rat",
     key: "aMount",
   },
   {
-    title: "Amout",
+    title: "Amount",
     dataIndex: "amount",
     key: "aMount",
   },
   {
     title: "Lower Limit",
-    dataIndex: "amount",
+    dataIndex: "l_amount",
     key: "aMount",
   },
   {
     title: "Upper Limit",
-    dataIndex: "amount",
+    dataIndex: "u_mount",
     key: "aMount",
   },
   {
@@ -64,14 +64,20 @@ const data = [
   {
     key: "description",
     No: 1,
-    description: "John Brown",
-    amount: "150$",
+    description: "400$",
+    rat: "5%",
+    amount:"4.97$",
+    l_amount:"3.5$",
+    u_mount:"9.9$",
   },
   {
     key: "description",
     No: 2,
-    description: "John Brown",
-    amount: "250$",
+    description: "600$",
+    rat: "15%",
+    amount:"5.9$",
+    l_amount:"3.5$",
+    u_mount:"9.9$",
   },
 ];
 

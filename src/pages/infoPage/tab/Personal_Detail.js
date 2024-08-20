@@ -161,6 +161,7 @@ const Personal_Detail = () => {
                   <Grid container spacing={1}>
                     <Grid xs={4}>
                       <Form.Item label="Employee ID" name={"id"}>
+                        
                         <Input />
                       </Form.Item>
                     </Grid>

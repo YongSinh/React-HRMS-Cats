@@ -17,9 +17,11 @@ import {
   Typography,
   Input,
   Card,
+  
 } from "antd";
 import dayjs from "dayjs";
-import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
+import { SendOutlined, DownloadOutlined,EditFilled,
+  DeleteOutlined, } from "@ant-design/icons";
 const { Search } = Input;
 const { Title } = Typography;
 const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
@@ -110,12 +112,13 @@ const columns = [
     ),
   },
   {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
+    title: 'Action',
+    key: 'action',
+    render: (_, ) => (
+      <Space>
+
+        <Button type="primary" icon={<EditFilled />} />
+        <Button type="primary" icon={<DeleteOutlined />} danger />
       </Space>
     ),
   },

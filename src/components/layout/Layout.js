@@ -38,11 +38,7 @@ const items = [
     getItem("All Employee", "leave", <TeamOutlined />),
     getItem("Leave Request", "leave-request", <UserOutlined />),
   ]),
-  getItem("Payroll", "1", <PayCircleOutlined />,[
-    getItem("Payroll", "Payroll"),
-    getItem("Deduction", "deduction" ),
-    getItem("Allowance", "allowance" ),
-  ]),
+
   getItem("Department", "Department", <BankOutlined />),
   getItem("Staff", "Staff", <UserOutlined />),
   getItem("Report", "report", <FileOutlined />),

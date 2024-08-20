@@ -22,13 +22,13 @@ const columns = [
     },
   },
   {
-    title: 'depId',
+    title: 'Department ID',
     dataIndex: 'depId',
     key: 'depId',
 
   },
   {
-    title: 'depName',
+    title: 'Department Name',
     dataIndex: 'depName',
     key: 'depName',
   },

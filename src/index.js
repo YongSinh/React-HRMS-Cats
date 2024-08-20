@@ -23,57 +23,57 @@ const url = "http://localhost:8085/api/"
 //   }
 // });
 
-keycloak
-  .init({
-    onLoad: "check-sso", // check-sso | login-required
-    KeycloakResponseType: "code",
-    silentCheckSsoRedirectUri:window.location.origin + "/silent-check-sso.html",
-    checkLoginIframe: false,
-    pkceMethod: "S256",
-    token: storedToken,
-    refreshToken: storedRefreshToken,
-  })
-  .then((authenticated) => {
-    if (!authenticated) {
-      console.log("user is not authenticated..!");
+// keycloak
+//   .init({
+//     onLoad: "check-sso", // check-sso | login-required
+//     KeycloakResponseType: "code",
+//     silentCheckSsoRedirectUri:window.location.origin + "/silent-check-sso.html",
+//     checkLoginIframe: false,
+//     pkceMethod: "S256",
+//     token: storedToken,
+//     refreshToken: storedRefreshToken,
+//   })
+//   .then((authenticated) => {
+//     if (!authenticated) {
+//       console.log("user is not authenticated..!");
       
-    }
+//     }
 
-    localStorage.setItem("access_token", UserService.getToken());
-    localStorage.setItem("refresh_token", keycloak.refreshToken);
-    keycloak
-      .updateToken(60)
-      .then(function (refreshed) {
-        if (refreshed) {
+//     localStorage.setItem("access_token", UserService.getToken());
+//     localStorage.setItem("refresh_token", keycloak.refreshToken);
+//     keycloak
+//       .updateToken(60)
+//       .then(function (refreshed) {
+//         if (refreshed) {
           
-        } else {
+//         } else {
           
-        }
-      })
-      .catch(function () {
-        UserService.doLogin();
+//         }
+//       })
+//       .catch(function () {
+//         UserService.doLogin();
         
-      });
-    // setTimeout(() => {}, 20 * 60 * 1000);
+//       });
+//     // setTimeout(() => {}, 20 * 60 * 1000);
 
-    // if the access token is due to expire within the next 80 seconds refresh it
+//     // if the access token is due to expire within the next 80 seconds refresh it
 
-    // axios.interceptors.request.use((config) =>
-    // keycloak
-    //   .updateToken(60)
-    //   .then(() => {
-    //     config.headers.Authorization = "Bearer " + keycloak.token;
-    //     return Promise.resolve(config);
-    //   })
-    //   .catch((err)=>{
-    //       console.log(err)
-    //       UserService.doLogin()
-    //   }
-    //   )
-    // );
+//     // axios.interceptors.request.use((config) =>
+//     // keycloak
+//     //   .updateToken(60)
+//     //   .then(() => {
+//     //     config.headers.Authorization = "Bearer " + keycloak.token;
+//     //     return Promise.resolve(config);
+//     //   })
+//     //   .catch((err)=>{
+//     //       console.log(err)
+//     //       UserService.doLogin()
+//     //   }
+//     //   )
+//     // );
 
-    console.log("'user is authenticated..!");
-  });
+//     console.log("'user is authenticated..!");
+//   });
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

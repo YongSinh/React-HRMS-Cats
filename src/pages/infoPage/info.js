@@ -67,7 +67,7 @@ const Info = () => {
 return (
   <>
       <PageTitle
-          PageTitle='Info & Management'
+          PageTitle='Information & Management'
       />
 
 
