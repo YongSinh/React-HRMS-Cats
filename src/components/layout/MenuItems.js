@@ -9,7 +9,7 @@ import { Dropdown, Space, Avatar } from "antd";
 import Badge from "@mui/material/Badge";
 import Tooltip from "@mui/material/Tooltip";
 import { MdOutlineNotificationsActive } from "react-icons/md";
-
+import UserService from "../../UserService/UserService";
 const themes = {
   light: {
     sidebar: {
@@ -31,8 +31,11 @@ const themes = {
   },
 };
 
+const handleLogout = () => {
+  UserService.doLogout();
+  //window.location.href = "https://www.cats.com.kh/apps/sso/logout";
+};
 const menuUser =  [
-  
   {
     key: "1",
     label: "Profile",
@@ -47,6 +50,7 @@ const menuUser =  [
     key: "3",
     label: "Logout",
     icon: <LogoutOutlined />,
+    onClick: handleLogout,
   },
 ];
 

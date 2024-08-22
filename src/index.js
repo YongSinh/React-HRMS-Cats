@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import UserService from "./UserService/UserService";
-import keycloak from "./UserService/keycloak";
+import keycloak from "./UserService/keycloak.js";
 import axios from "axios"; 
 
 const storedToken = localStorage.getItem("access_token");
@@ -25,7 +25,7 @@ const url = "http://localhost:8085/api/"
 
 keycloak
   .init({
-    onLoad: "check-sso", // check-sso | login-required
+    onLoad: "login-required", // check-sso | login-required
     KeycloakResponseType: "code",
     silentCheckSsoRedirectUri:window.location.origin + "/silent-check-sso.html",
     checkLoginIframe: false,
@@ -45,7 +45,7 @@ keycloak
       .updateToken(60)
       .then(function (refreshed) {
         if (refreshed) {
-          
+          console.log("Token refreshed..!");
         } else {
           
         }

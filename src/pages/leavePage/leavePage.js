@@ -1,5 +1,5 @@
 import './leavePage.css'
-import { Button, Space, DatePicker, Table, Select,Pagination, Flex } from 'antd';
+import { Button, Space, DatePicker, Table, Select,Pagination,Tag, Flex } from 'antd';
 import { SearchOutlined,ExportOutlined,EyeFilled,EditFilled,DeleteOutlined } from '@ant-design/icons';
 import PageTitle from '../../components/Title_Page/TitlePage';
 const { RangePicker } = DatePicker;
@@ -17,6 +17,7 @@ const onSearch = (value) => {
 const filterOption = (input, option) =>
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 const LeavePage = () => {
+  
   
   
   const columns = [
@@ -42,12 +43,49 @@ const LeavePage = () => {
       //   multiple: 3,
       // },
     },
-
     {
-
-      title: ' birthDate',
-      dataIndex: 'birthDate',
-      
+      title: "Leave Date",
+      dataIndex: "leave_date",
+    },
+    {
+      title: "Leave Type",
+      dataIndex: "leave_type",
+    },
+    {
+      title: "Leave Duration",
+      dataIndex: "duration",
+    },
+    {
+      title: 'Department',
+      dataIndex: 'depId',
+      // sorter: {
+      //   compare: (a, b) => a.chinese - b.chinese,
+      //   multiple: 3,
+      // },
+    },
+    {
+      title: "Position",
+      dataIndex: "posId",
+    },
+    {
+      title: "Approve",
+      dataIndex: "approve",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (_, { Status }) => {
+        let color = "green";
+        return (
+          <>
+            <div>
+              <Tag style={{ fontSize: 13 }} color={color}>
+                {Status}
+              </Tag>
+            </div>
+          </>
+        );
+      },
     },
     {
       title: ' Action',
@@ -63,6 +101,9 @@ const LeavePage = () => {
   ];
   const data = [
         {
+          "leave_date":"2020-06-17",
+          "leave_type":"Anual Leave",
+          "duration": 2,
           "empId": 1000,
           "firstName": "Steven",
           "lastName": "King",
@@ -93,9 +134,13 @@ const LeavePage = () => {
           "jobHistoryDtoReps": [],
           "emergencyContacts": [],
           "siblingData": [],
-          "weight": 70
+          "weight": 70,
+          "status":"Active"
         },
         {
+          "leave_date":"2020-01-17",
+          "leave_type":"Anual Leave",
+          "duration": 1,
           "empId": 1001,
           "firstName": "Neena",
           "lastName": "Kochhar",
@@ -129,6 +174,9 @@ const LeavePage = () => {
           "weight": 60
         },
         {
+          "leave_date":"2020-06-07",
+          "leave_type":"Anual Leave",
+          "duration": 0.5,
           "empId": 1002,
           "firstName": "Lex",
           "lastName": "De Haan",
