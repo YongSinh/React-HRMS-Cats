@@ -17,6 +17,7 @@ import TaxPage from './pages/tax/TaxPage';
 import SalaryPage from './pages/Salary/SalaryPage';
 import LeaveTypePage from './pages/leavePage/LeaveType/leaveType';
 import LeaveBalancePage from './pages/leavePage/LeaveBalance/leaveBalance';
+import LeaveEmpPage from './pages/leavePage/LeaveEmp/LeaveEmp';
 import './App.css';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
             <Route path="/leave-balance" element={<LeaveBalancePage />} />
             <Route path="/salary" element={<SalaryPage />} />
             <Route path="/tax" element={<TaxPage />} />
+            <Route path="/leave-employee" element={<LeaveEmpPage />} />
           </Route>
         </Routes>
 
