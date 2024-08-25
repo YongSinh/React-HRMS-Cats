@@ -25,7 +25,7 @@ const url = "http://localhost:8085/api/"
 
 keycloak
   .init({
-    onLoad: "login-required", // check-sso | login-required
+    onLoad: "check-sso", // check-sso | login-required
     KeycloakResponseType: "code",
     silentCheckSsoRedirectUri:window.location.origin + "/silent-check-sso.html",
     checkLoginIframe: false,

@@ -5,9 +5,6 @@ import PageTitle from '../../components/Title_Page/TitlePage';
 const { RangePicker } = DatePicker;
 
 
-const onChange = (value) => {
-  console.log(`selected ${value}`);
-};
 const onSearch = (value) => {
   console.log('search:', value);
 };
@@ -786,5 +783,5 @@ const LeavePage = () => {
   )
 
 }
-const App = () => <Pagination defaultCurrent={6} total={500} />;
+// const App = () => <Pagination defaultCurrent={6} total={500} />;
 export default LeavePage;
