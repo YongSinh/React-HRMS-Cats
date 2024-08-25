@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import UserService from "./UserService/UserService";
-import keycloak from "./UserService/keycloak";
+import keycloak from "./UserService/keycloak.js";
 import axios from "axios"; 
 
 const storedToken = localStorage.getItem("access_token");
@@ -45,7 +45,7 @@ keycloak
       .updateToken(60)
       .then(function (refreshed) {
         if (refreshed) {
-          
+          console.log("Token refreshed..!");
         } else {
           
         }

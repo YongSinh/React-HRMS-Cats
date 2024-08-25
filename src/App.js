@@ -15,6 +15,8 @@ import PayrollPage from './pages/PayrollPage/Payroll';
 import PayslipPage from './pages/Payslip/payslip';
 import TaxPage from './pages/tax/TaxPage';
 import SalaryPage from './pages/Salary/SalaryPage';
+import LeaveTypePage from './pages/leavePage/LeaveType/leaveType';
+import LeaveBalancePage from './pages/leavePage/LeaveBalance/leaveBalance';
 import './App.css';
 
 function App() {
@@ -37,10 +39,14 @@ function App() {
             <Route path="/product/:productId" element={<PayslipPage />} />
             <Route path="/allowance" element={<AllowancePage />} />
             <Route path="/deduction" element={<DeductionPage />} />
+            <Route path="/leave-type" element={<LeaveTypePage />} />
+            <Route path="/leave-balance" element={<LeaveBalancePage />} />
             <Route path="/salary" element={<SalaryPage />} />
             <Route path="/tax" element={<TaxPage />} />
           </Route>
         </Routes>
+
+        
       </BrowserRouter>
     </>
   );

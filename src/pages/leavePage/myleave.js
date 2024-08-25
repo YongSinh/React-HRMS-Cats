@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PlusOutlined,EyeFilled,EditFilled,DeleteOutlined,SendOutlined } from '@ant-design/icons';
-import { Button,Select,Space,DatePicker,Table } from 'antd';
+import { Button,Select,Space,DatePicker,Table ,Tag} from 'antd';
 import { Link } from 'react-router-dom';
 import Drawerleave from './Drawer';
 import PageTitle from '../../components/Title_Page/TitlePage';
@@ -24,6 +24,18 @@ const LeaveRequest = () => {
       dataIndex: 'name',
     },
     {
+      title: "Leave Date",
+      dataIndex: "leave_date",
+    },
+    {
+      title: "Leave Type",
+      dataIndex: "leave_type",
+    },
+    {
+      title: "Leave Duration",
+      dataIndex: "duration",
+    },
+    {
       title: 'Department',
       dataIndex: 'department',
       // sorter: {
@@ -32,19 +44,35 @@ const LeaveRequest = () => {
       // },
     },
     {
-      title: 'Math Score',
-      dataIndex: 'math',
-      sorter: {
-        compare: (a, b) => a.math - b.math,
-        multiple: 2,
-      },
+      title: "Position",
+      dataIndex: "posId",
     },
     {
-      title: 'English Score',
-      dataIndex: 'english',
-      sorter: {
-        compare: (a, b) => a.english - b.english,
-        multiple: 1,
+      title: "Approve",
+      dataIndex: "approve",
+    },
+    {
+      title: "Remark",
+      dataIndex: "remarl",
+    },
+    {
+      title: "Reason",
+      dataIndex: "reason",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (_, { Status }) => {
+        let color = "green";
+        return (
+          <>
+            <div>
+              <Tag style={{ fontSize: 13 }} color={color}>
+                {Status}
+              </Tag>
+            </div>
+          </>
+        );
       },
     },
     {
@@ -64,18 +92,42 @@ const LeaveRequest = () => {
     {
       key: '1',
       no:1,
-      name: 'John Brown',
-      department: 98,
-      math: 60,
-      english: 70,
+      name: ' Tonny',
+      department: 'MIS',
+      leave_type: 'Anual Leave',
+      duration: 2,
+      posId:'Head of IT',
+      leave_date:"2024-01-01",
     },
     {
       key: '2',
       no:2,
+      name: 'David',
+      department: 'MIS',
+      leave_type: 'Anual Leave',
+      duration: 2,
+      posId:'System Devloper',
+      leave_date:"2024-01-01",
+    },
+    {
+      key: '3',
+      no:3,
+      name: 'John Brown',
+      department: 'MIS',
+      leave_type: 'Anual Leave',
+      duration: 2,
+      posId:'Cyber Security',
+      leave_date:"2024-01-01",
+    },
+    {
+      key: '4',
+      no:4,
       name: 'Jim Green',
-      department: 98,
-      math: 66,
-      english: 89,
+      department: 'MIS',
+      leave_type: 'Sick Leave',
+      duration: 1,
+      posId:'Data Analysis',
+      leave_date:"2024-01-01",
     },
   ]
   return (

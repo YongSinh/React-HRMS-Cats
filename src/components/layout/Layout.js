@@ -12,7 +12,7 @@ import {
   SettingOutlined,
   InfoCircleOutlined,
   FieldTimeOutlined,
-  PayCircleOutlined,
+  ControlOutlined,
   BankOutlined,
 } from "@ant-design/icons";
 
@@ -36,12 +36,15 @@ const items = [
   getItem("Attendance", "Attendance", <FieldTimeOutlined />),
   getItem("Leave Management", "/", <TeamOutlined />, [
     getItem("All Employee", "leave", <TeamOutlined />),
+    getItem("Leave Type", "leave-type", <TeamOutlined />),
+    getItem("Leave Balance", "leave-balance", <ControlOutlined />),
     getItem("Leave Request", "leave-request", <UserOutlined />),
   ]),
-  getItem("Payroll", "Payroll", <PayCircleOutlined />),
-  getItem("Department", "Department", <BankOutlined />),
-  getItem("Staff", "Staff", <UserOutlined />),
-  getItem("Report", "report", <FileOutlined />),
+  getItem("Info Management", "Management", <TeamOutlined />, [
+    getItem("Department", "Department", <BankOutlined />),
+    getItem("Position", "Position", <BankOutlined />),
+    getItem("Staff", "Staff", <UserOutlined />),
+  ]),
   getItem("Hr Payroll", "Setting", <SettingOutlined />, [
     getItem("Payroll", "/payroll"),
     getItem("Payslips", "/payslip"),
