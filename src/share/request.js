@@ -1,6 +1,6 @@
 import { message } from "antd";
 import axios from "axios";
-//import UserServicere from "../UserService/UserService"
+import UserServicere from "../UserService/UserService"
 export function getLocalAccessToken() {
   const accessToken = localStorage.getItem("access_token");
   return accessToken;
@@ -9,7 +9,7 @@ export function getLocalAccessToken() {
 //http://10.10.1.216:8282/
 export const config = {
   //base_server: "http://10.10.1.216:8282/api/",
-  base_server: "http://localhost:8085/api/",
+  base_server: "https://localhost:8085/api/",
   image_path: "",
   version: 1,
 };
@@ -28,10 +28,10 @@ export const request = async (url, method, param) => {
     url: config.base_server + url,
     method: method,
     data: param,
-    headers: {
-      ...header,
-      Authorization: "Bearer " + getLocalAccessToken(),
-    },
+    // headers: {
+    //   ...header,
+    //   Authorization: "Bearer " + getLocalAccessToken(),
+    // },
   })
     .then((res) => {
       return res.data;

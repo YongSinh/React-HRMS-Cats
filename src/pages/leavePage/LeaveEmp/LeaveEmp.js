@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 //Componets form MUI
 import PageTitle from "../../../components/Title_Page/TitlePage";
+import { useParams } from "react-router-dom";
 import "./leaveType.css";
 //Componets form antd
 import {
@@ -120,7 +121,7 @@ const LeaveEmpPage = () => {
     console.log(date, dateString);
     setYear(dateString);
   };
-
+  const { id } = useParams();
   const data = [
     {
       key: "1",
@@ -150,6 +151,7 @@ const LeaveEmpPage = () => {
       {/* <PageTitle PageTitle="Leave Type" /> */}
 
       <Card style={{ width: "100%" }}>
+        <Title>{id}</Title>
         <Button icon={<SendOutlined />} type="primary" htmlType="submit">
           submit
         </Button>

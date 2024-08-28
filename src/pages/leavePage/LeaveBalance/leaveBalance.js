@@ -17,6 +17,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 const { Search } = Input;
 const { Title } = Typography;
 
@@ -171,7 +172,6 @@ const LeaveBalancePage = () => {
         open={isModalOpen}
       />
       <PageTitle PageTitle="Leave Balance" />
-
       <Card style={{ width: "100%" }}>
         <Button type="primary" onClick={showModal}>
           Add Balance
