@@ -35,6 +35,7 @@ const LeaveTypePage = () => {
   const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(false);
   const [data, setData] = useState([]);
+ 
   const onEdit = (Item) => {
     handleClickView(Item);
     setEdit(true);

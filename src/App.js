@@ -5,7 +5,7 @@ import DashboardPage from './pages/Dashboard/dashboard';
 import LeavePage from './pages/leavePage/leavePage';
 import InfoPage from './pages/infoPage/info';
 import LeaveRequest from './pages/leavePage/myleave';
-import DepartmentPage from './pages/DepartmentPage/Tabs_Department';
+import DepartmentPage from './pages/DepartmentPage/Department';
 import Staff from './pages/StaffPage/Staff';
 import Report from './pages/Report/Tabs_report';
 import AttendancePage from './pages/AttendancePage/Tabs_Attendance';
