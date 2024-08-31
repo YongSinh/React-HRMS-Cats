@@ -42,7 +42,7 @@ const items = [
   ]),
   getItem("Info Management", "Management", <TeamOutlined />, [
     getItem("Department", "Department", <BankOutlined />),
-    getItem("Position", "Position", <BankOutlined />),
+    getItem("Position", "position", <BankOutlined />),
     getItem("Staff", "Staff", <UserOutlined />),
   ]),
   getItem("Hr Payroll", "Setting", <SettingOutlined />, [

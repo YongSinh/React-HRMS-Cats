@@ -18,6 +18,7 @@ import SalaryPage from './pages/Salary/SalaryPage';
 import LeaveTypePage from './pages/leavePage/LeaveType/leaveType';
 import LeaveBalancePage from './pages/leavePage/LeaveBalance/leaveBalance';
 import LeaveEmpPage from './pages/leavePage/LeaveEmp/LeaveEmp';
+import PositionPage from './pages/PositionPage/Position';
 import './App.css';
 import "antd/dist/antd"; // or 'antd/dist/antd.less'
 import "antd-button-color/dist/css/style.css"; // or 'antd-button-color/dist/css/style.less'
@@ -33,6 +34,7 @@ function App() {
             <Route path="/info" element={<InfoPage />} />
             <Route path="/leave-request" element={<LeaveRequest />} />
             <Route path="/department" element={<DepartmentPage />} />
+            <Route path="/position" element={<PositionPage />} />
             <Route path="/staff" element={<Staff />} />
             <Route path="/report" element={<Report />} />
             <Route path="/payroll" element={<PayrollPage />} />
