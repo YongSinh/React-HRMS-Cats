@@ -3,12 +3,12 @@ import React, { useState, useEffect } from "react";
 import { Modal } from "antd";
 import PageTitle from "../../components/Title_Page/TitlePage";
 import Swal from "sweetalert2";
+import getColumnSearchProps from "../../share/ColumnSearchProps";
 import {
   EyeFilled,
   DeleteOutlined,
   EditFilled,
   PlusOutlined,
-  PlusCircleOutlined,
   SaveFilled,
 } from "@ant-design/icons";
 import { request } from "../../share/request";
@@ -20,7 +20,7 @@ const PositionPage = () => {
   const [edit, setEdit] = useState(false);
   const [data, setData] = useState([]);
   const [item, setItem] = useState();
-  const [department, setDepartment] = useState([])
+  const [department, setDepartment] = useState([]);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -30,13 +30,14 @@ const PositionPage = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   const getListPos = () => {
     setLoading(true);
     request("info/position/position", "get", {}).then((res) => {
       if (res) {
         setData(res.data);
         setLoading(false);
-        console.log(res.data);
+       // console.log(res.data);
       }
     });
   };
@@ -50,15 +51,18 @@ const PositionPage = () => {
     // console.log("Failed:", Item);
     setIsModalOpen(true);
     form.setFieldsValue({
-      depName: Item.depName,
-      fName: Item.depFullName,
+      pId: Item.id,
+      pName: Item.posName,
+      depId: Item.depName,
+      section: Item.poSection,
+      poLevel: Item.poLevel,
     });
   };
-
 
   const getListDep = () => {
     request("info/department/department", "get", {}).then((res) => {
       if (res) {
+        console.log(res.data);
         const arrTmpP = res.data.map((dep) => ({
           label: dep.depName,
           value: dep.depId,
@@ -69,70 +73,71 @@ const PositionPage = () => {
   };
 
   const onDelete = (Item) => {
-    request(
-      `info/department/deleteDepartment/${Item.depId}`,
-      "delete",
-      {}
-    ).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: "Success!",
-          text: "Your has been deleted",
-          icon: "success",
-          showConfirmButton: true,
-          //timer: 1500,
-          // confirmButtonText: "Confirm",
-        });
-        getListPos();
-        setLoading(false);
+    request(`info/position/deletePosition/${Item.id}`, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getListPos();
+          setLoading(false);
+        }
       }
-    });
+    );
   };
 
   const onFinish = (Item) => {
     console.log("Success:", item);
+    const foundItem = department.find((item) => item.label === Item.depId);
+    var depId = edit ? foundItem.value : Item.depId
+    
     var param = {
-      "poId": Item.pId,
-      "posName": Item.pName,
-      "depId": Item.depId,
-      "poSection": Item.section,
-      "poLevel": Item.poLevel
-    }
+      poId: Item.pId,
+      posName: Item.pName,
+      depId: depId,
+      poSection: Item.section,
+      poLevel: Item.poLevel,
+    };
 
     let url = "info/position/addPosition";
     let method = "post";
     // case update
     if (edit) {
-      url = "info/department/editDepartment/" + item.depId;
+      url = "info/position/editPosition/" + item.id;
       method = "put";
     }
-    console.log(param)
-    setLoading(false)
+    //console.log(param);
+    //setLoading(false)
 
-    // request(url, method, param).then((res) => {
-    //   if (res.code === 200) {
-    //     Swal.fire({
-    //       title: "Success!",
-    //       text: "Your has been saved",
-    //       icon: "success",
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //       // confirmButtonText: "Confirm",
-    //     });
-    //     getListPos();
-    //     setLoading(false);
-    //     setEdit(false);
-    //     onReset();
-    //   } else {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Something went wrong, please check in error detail!",
-    //       text: res.message,
-    //     });
-    //     setLoading(false);
-    //     getListPos();
-    //   }
-    // });
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getListPos();
+        setLoading(false);
+        setEdit(false);
+        onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getListPos();
+      }
+    });
   };
 
   const onReset = () => {
@@ -169,11 +174,13 @@ const PositionPage = () => {
       title: "Position Name",
       dataIndex: "posName",
       key: "posName",
+      ...getColumnSearchProps("posName"),
     },
     {
       title: "Department Name",
       dataIndex: "depName",
       key: "depName",
+      ...getColumnSearchProps("depName"),
     },
     {
       title: "Position Level",
@@ -184,6 +191,7 @@ const PositionPage = () => {
       title: "Position Section",
       dataIndex: "poSection",
       key: "poSection",
+      ...getColumnSearchProps("poSection"),
     },
     {
       title: "Action",
@@ -224,7 +232,7 @@ const PositionPage = () => {
         style={{ marginBottom: 15, marginTop: 7 }}
         onClick={showModal}
       >
-        Add Department
+        Add Position
       </Button>
       <Modal
         title="Add Position"
@@ -251,6 +259,7 @@ const PositionPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please input Position ID!",
               },
             ]}
           >
@@ -262,6 +271,7 @@ const PositionPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please input Position Name!",
               },
             ]}
           >
@@ -273,6 +283,7 @@ const PositionPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please Select Department!",
               },
             ]}
           >
@@ -291,15 +302,7 @@ const PositionPage = () => {
               options={department}
             />
           </Form.Item>
-          <Form.Item
-            name="section"
-            label="Section"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
+          <Form.Item name="section" label="Section">
             <Input />
           </Form.Item>
           <Form.Item
@@ -308,6 +311,7 @@ const PositionPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please input Position Level!",
               },
             ]}
           >
