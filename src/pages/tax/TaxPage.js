@@ -129,7 +129,7 @@ const TaxPage = () => {
       if (res) {
         setData(res.data);
         setLoading(false);
-        console.log(res.data);
+       // console.log(res.data);
       }
     });
   };
@@ -186,9 +186,7 @@ const TaxPage = () => {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    getListTax();
-  }, []);
+
   return (
     <>
       <PageTitle PageTitle="Tax List" />
