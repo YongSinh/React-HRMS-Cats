@@ -62,7 +62,7 @@ const PositionPage = () => {
   const getListDep = () => {
     request("info/department/department", "get", {}).then((res) => {
       if (res) {
-        console.log(res.data);
+        //console.log(res.data);
         const arrTmpP = res.data.map((dep) => ({
           label: dep.depName,
           value: dep.depId,

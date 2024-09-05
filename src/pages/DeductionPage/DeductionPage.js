@@ -1,4 +1,4 @@
-import { Space, Table, Tag, Button, Form, Input,Modal, Popconfirm } from "antd";
+import { Space, Table, Button, Form, Input,Modal, Popconfirm } from "antd";
 import React, { useState , useEffect } from "react";
 import PageTitle from "../../components/Title_Page/TitlePage";
 import {
@@ -8,7 +8,6 @@ import {
   PlusOutlined,
   EyeFilled,
 } from "@ant-design/icons";
-import { ImOpt } from "react-icons/im";
 import { request } from "../../share/request";
 import Swal from "sweetalert2";
 const DeductionPage = () => {

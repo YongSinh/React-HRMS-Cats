@@ -51,6 +51,10 @@ const TaxPage = () => {
       }
     );
   };
+
+  useEffect(()=>{
+    getListTax()
+  },[]);
   const handleClickView = (Item) => {
     //console.log("Failed:", Item);
     setIsModalOpen(true);

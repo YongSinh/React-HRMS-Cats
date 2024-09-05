@@ -1,11 +1,10 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
 //Componets form antd
 import {
   Space,
   Table,
-  Tag,
   Button,
   Form,
   Select,
@@ -18,73 +17,38 @@ import {
   DatePicker,
 } from "antd";
 import dayjs from "dayjs";
+import { request } from "../../share/request";
+import Swal from "sweetalert2";
 import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
+import { isEmptyOrNull } from "../../share/helper";
 const { Search } = Input;
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
-const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
-function useSelectAllOption(options) {
-  const optionsWithAllOption = useMemo(
-    () => [SELECT_ALL_OPTION, ...options],
-    [options]
-  );
+  const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
+  function useSelectAllOption(options) {
+    const optionsWithAllOption = useMemo(
+      () => [SELECT_ALL_OPTION, ...options],
+      [options]
+    );
 
-  /** pass this to Form.Item's getValueFromEvent prop */
-  const getValueFromEvent = useCallback(
-    (value, selections) => {
-      if (!selections?.length) return selections;
-      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-        return selections;
-      }
-      const labelInValue = typeof value[0]?.label === "string";
-      // if "Select All" option selected, set value to all options
-      // also keep labelInValue in consideration
-      return labelInValue ? options : options.map((o) => o.value);
-    },
-    [options]
-  );
+    /** pass this to Form.Item's getValueFromEvent prop */
+    const getValueFromEvent = useCallback(
+      (value, selections) => {
+        if (!selections?.length) return selections;
+        if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
+          return selections;
+        }
+        const labelInValue = typeof value[0]?.label === "string";
+        // if "Select All" option selected, set value to all options
+        // also keep labelInValue in consideration
+        return labelInValue ? options : options.map((o) => o.value);
+      },
+      [options]
+    );
 
-  return [getValueFromEvent, optionsWithAllOption];
-}
-const columns = [
-  {
-    title: "Employee ID",
-    dataIndex: "name",
-    key: "name",
-    fixed: "left",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Salary",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Form Date",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "To Date",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Tax",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
+    return [getValueFromEvent, optionsWithAllOption];
+  }
+
 const { Option } = Select;
 
 const generateDateRanges = (year) => {
@@ -106,6 +70,7 @@ const generateDateRanges = (year) => {
   }
   return ranges;
 };
+
 const SalaryPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
@@ -115,17 +80,75 @@ const SalaryPage = () => {
   const [salaryCycle, setSalaryCycle] = useState("1");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [data, setData] = useState([]);
+  const [item, setItem] = useState();
+  const [department, setDepartment] = useState([]);
+  const [emp, setEmp] = useState([]);
   const handleMonthChange = (date) => {
     if (date) {
       const start = date.startOf("month");
       const end = date.endOf("month");
       setStartDate(dayjs(start).format("YYYY-MM-DD"));
       setEndDate(dayjs(end).format("YYYY-MM-DD"));
-      console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
-      console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
+      // console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
+      // console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
     }
   };
+  const getListEmp = (value) => {
+    if (!isEmptyOrNull(value)) {
+      request(
+        `info/employee/listEmployeeByDep?depId=${value}`,
+        "get",
+        {}
+      ).then((res) => {
+        if (res) {
+          //console.log(res.data);
+          const arrTmpP = res.data.map((emp) => ({
+            label: emp.firstName + " " + emp.lastName,
+            value: emp.empId,
+          }));
+          setEmp(arrTmpP);
+          //setDepartment(arrTmpP);
+        }
+      });
+    } else {
+      setEmp(" ");
+    }
+  };
+  const onChangeDep = (value) => {
+    getListEmp(value)
+   // console.log("search:", value);
+  };
+  const getListDep = () => {
+    request("info/department/department", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res.data);
+        const arrTmpP = res.data.map((dep) => ({
+          label: dep.depName,
+          value: dep.depId,
+        }));
+        setDepartment(arrTmpP);
+      }
+    });
+  };
 
+  const getList = () => {
+    setLoading(true);
+    request("payrolls/salary/getListSalary", "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
+
+  useEffect(() => {
+    getListDep();
+    getList();
+  }, []);
   const onFinish = (values) => {
     console.log("Success:", values);
   };
@@ -139,39 +162,52 @@ const SalaryPage = () => {
   const onSearch = (value) => {
     console.log("search:", value);
   };
+
+
   const onChangeYear = (date, dateString) => {
     console.log(date, dateString);
     setYear(dateString);
   };
   const dateRanges = generateDateRanges(year);
-  const options = [
-    { label: "one", value: "one" },
-    { label: "two", value: "two" },
-    { label: "three", value: "three" },
-  ];
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
 
-  const data = [
+  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(emp);
+  const columns = [
     {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
+      title: "Employee ID",
+      dataIndex: "empId",
+      key: "empId",
+      fixed: "left",
     },
     {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
+      title: "Salary",
+      dataIndex: "salary",
+      key: "salary",
     },
     {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
+      title: "Form Date",
+      dataIndex: "fromDate",
+      key: "fromDate",
+    },
+    {
+      title: "To Date",
+      dataIndex: "toDate",
+      key: "toDate",
+    },
+    {
+      title: "Tax Rate",
+      dataIndex: "tax",
+      key: "tax",
+      render: (text) => `${text * 100}%`,
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <a>Invite {record.name}</a>
+          <a>Delete</a>
+        </Space>
+      ),
     },
   ];
 
@@ -245,39 +281,34 @@ const SalaryPage = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Department"
-                name="department"
+                name="depId"
+                label="Select Department"
                 rules={[
                   {
                     required: true,
-                    message: "Please select department!",
+                    message: "Please Select Department!",
                   },
                 ]}
               >
                 <Select
                   showSearch
-                  placeholder="Select a Department"
-                  optionFilterProp="label"
-                  onChange={onChange}
-                  onSearch={onSearch}
+                  style={{
+                    width: "100%",
+                  }}
                   allowClear
-                  options={[
-                    {
-                      value: "jack",
-                      label: "Jack",
-                    },
-                    {
-                      value: "lucy",
-                      label: "Lucy",
-                    },
-                    {
-                      value: "tom",
-                      label: "Tom",
-                    },
-                  ]}
+                  onChange={onChangeDep}
+                  placeholder="Search to Select"
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  options={department}
                 />
               </Form.Item>
             </Col>
+  
             <Col span={12}>
               <Form.Item
                 label="Employees"
@@ -292,35 +323,34 @@ const SalaryPage = () => {
                   options={optionsWithAllOption}
                 />
               </Form.Item>
-            </Col>
-            <Col span={12}>
+            </Col> 
+            <Col span={8}>
               <Form.Item label="Salary">
                 <Input placeholder="Salary" />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={8}>
+              <Form.Item label="Khmer Rate">
+                <Input placeholder="Khmer Rate" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
               <Form.Item
                 label="Tax Rate"
-                getValueFromEvent={getValueFromEvent}
+               // getValueFromEvent={getValueFromEvent}
                 name="selectWithAllOption"
               >
-                <Select
-                  showSearch
-                  placeholder="Select a Payment Type"
-                  allowClear
-                  mode="multiple"
-                  options={optionsWithAllOption}
-                />
+              <Input placeholder="Tax Rate"/>
               </Form.Item>
             </Col>
             <Col span={24}>
               <Form.Item
                 label="Date"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+               // getValueFromEvent={getValueFromEvent}
+               // name="selectWithAllOption"
               >
                 <RangePicker
-                  style={{width:"100%"}}
+                  style={{ width: "100%" }}
                   id={{
                     start: "startInput",
                     end: "endInput",
@@ -345,6 +375,7 @@ const SalaryPage = () => {
       <Divider dashed />
       <Card style={{ width: "100%" }}>
         <Table
+          loading={loading}
           scroll={{
             x: "max-content",
           }}
