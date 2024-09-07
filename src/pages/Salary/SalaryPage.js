@@ -15,39 +15,44 @@ import {
   Input,
   Card,
   DatePicker,
+  Popconfirm,
 } from "antd";
 import dayjs from "dayjs";
 import { request } from "../../share/request";
 import Swal from "sweetalert2";
-import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
+import {
+  SendOutlined,
+  EyeFilled,
+  EditFilled,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 const { Search } = Input;
 const { Title } = Typography;
-const { RangePicker } = DatePicker;
-  const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
-  function useSelectAllOption(options) {
-    const optionsWithAllOption = useMemo(
-      () => [SELECT_ALL_OPTION, ...options],
-      [options]
-    );
+const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
+function useSelectAllOption(options) {
+  const optionsWithAllOption = useMemo(
+    () => [SELECT_ALL_OPTION, ...options],
+    [options]
+  );
 
-    /** pass this to Form.Item's getValueFromEvent prop */
-    const getValueFromEvent = useCallback(
-      (value, selections) => {
-        if (!selections?.length) return selections;
-        if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-          return selections;
-        }
-        const labelInValue = typeof value[0]?.label === "string";
-        // if "Select All" option selected, set value to all options
-        // also keep labelInValue in consideration
-        return labelInValue ? options : options.map((o) => o.value);
-      },
-      [options]
-    );
+  /** pass this to Form.Item's getValueFromEvent prop */
+  const getValueFromEvent = useCallback(
+    (value, selections) => {
+      if (!selections?.length) return selections;
+      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
+        return selections;
+      }
+      const labelInValue = typeof value[0]?.label === "string";
+      // if "Select All" option selected, set value to all options
+      // also keep labelInValue in consideration
+      return labelInValue ? options : options.map((o) => o.value);
+    },
+    [options]
+  );
 
-    return [getValueFromEvent, optionsWithAllOption];
-  }
+  return [getValueFromEvent, optionsWithAllOption];
+}
 
 const { Option } = Select;
 
@@ -84,7 +89,11 @@ const SalaryPage = () => {
   const [edit, setEdit] = useState(false);
   const [data, setData] = useState([]);
   const [item, setItem] = useState();
+  const [khRate, setKhmRate] = useState("");
+  const [salary, setSalary] = useState("");
   const [department, setDepartment] = useState([]);
+  const [tax, setTax] = useState([]);
+  const [taxRate, setTaxRate] = useState("");
   const [emp, setEmp] = useState([]);
   const handleMonthChange = (date) => {
     if (date) {
@@ -96,31 +105,39 @@ const SalaryPage = () => {
       // console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
     }
   };
+
   const getListEmp = (value) => {
     if (!isEmptyOrNull(value)) {
-      request(
-        `info/employee/listEmployeeByDep?depId=${value}`,
-        "get",
-        {}
-      ).then((res) => {
-        if (res) {
-          //console.log(res.data);
-          const arrTmpP = res.data.map((emp) => ({
-            label: emp.firstName + " " + emp.lastName,
-            value: emp.empId,
-          }));
-          setEmp(arrTmpP);
-          //setDepartment(arrTmpP);
+      request(`info/employee/listEmployeeByDep?depId=${value}`, "get", {}).then(
+        (res) => {
+          if (res) {
+            //console.log(res.data);
+            const arrTmpP = res.data.map((emp) => ({
+              label: emp.firstName + " " + emp.lastName,
+              value: emp.empId,
+            }));
+            setEmp(arrTmpP);
+            //setDepartment(arrTmpP);
+          }
         }
-      });
+      );
     } else {
       setEmp(" ");
     }
   };
   const onChangeDep = (value) => {
-    getListEmp(value)
-   // console.log("search:", value);
+    getListEmp(value);
+    // console.log("search:", value);
   };
+
+  const onChangeStart = (date, dateString) => {
+    console.log("Start: " + dateString);
+  };
+
+  const onChangeEnd = (date, dateString) => {
+    console.log("End: " + dateString);
+  };
+
   const getListDep = () => {
     request("info/department/department", "get", {}).then((res) => {
       if (res) {
@@ -133,6 +150,47 @@ const SalaryPage = () => {
       }
     });
   };
+
+  const onChangeSalary = (e) => {
+    const salary = e.target.value;
+    //console.log("salary: " + salary);
+    setSalary(salary); // Update salary state
+  };
+
+  const onChangeKhRate = (e) => {
+    const rate = e.target.value;
+    //console.log("Khmer Rate: " + rate);
+    setKhmRate(rate); // Update Khmer rate state
+  };
+
+  const getTaxRate = () => {
+    setLoading(true);
+    var salaryKh = salary * khRate;
+    console.log("Calculated salary in Khmer Rate:", salaryKh);
+    request(`payrolls/tax/getTaxRateBySalary?salary=${salaryKh}`, "get", {})
+      .then((res) => {
+        if (res) {
+          var data = res.data;
+          setTax(data);
+          setTaxRate(data.rate * 100 + "%");
+          setLoading(false);
+          // console.log(data)
+          //console.log(data.rate * 100+"%"); // You can handle the response data here
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.error(err); // Handle any errors here
+      });
+  };
+
+  // Run getTaxRate when either khSalary or khRate changes
+  useEffect(() => {
+    if (salary && khRate) {
+      // Check if both values are available
+      getTaxRate();
+    }
+  }, [salary, khRate]); // Dependency array
 
   const getList = () => {
     setLoading(true);
@@ -162,7 +220,6 @@ const SalaryPage = () => {
   const onSearch = (value) => {
     console.log("search:", value);
   };
-
 
   const onChangeYear = (date, dateString) => {
     console.log(date, dateString);
@@ -202,10 +259,28 @@ const SalaryPage = () => {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
+      render: (_, item) => (
+        <Space>
+          <Button
+            type="info"
+            icon={<EyeFilled />}
+            //onClick={() => handleClickView(item)}
+          />
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            //onClick={() => onEdit(item)}
+          />
+          <Popconfirm
+            title="Delete the department"
+            description="Are you sure to delete this department?"
+            //onConfirm={() => onDelete(item)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
         </Space>
       ),
     },
@@ -220,6 +295,145 @@ const SalaryPage = () => {
   return (
     <>
       <PageTitle PageTitle="Salary" />
+      <Card style={{ width: "100%" }}>
+        <Title level={2}>Generate Salary</Title>
+        <Divider dashed />
+        <Form
+          name="basic"
+          form={form}
+          initialValues={{
+            remember: false,
+          }}
+          layout={"vertical"}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="depId"
+                label="Select Department"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Department!",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  style={{
+                    width: "100%",
+                  }}
+                  allowClear
+                  onChange={onChangeDep}
+                  placeholder="Search to Select"
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  options={department}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Employees"
+                // getValueFromEvent={getValueFromEvent}
+                name="selectWithAllOption"
+              >
+                <Select
+                  showSearch
+                  placeholder="Select a Employees"
+                  allowClear
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  //mode="multiple"
+                  options={emp}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name={"salary"}
+                label="Salary"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Input Salary!",
+                  },
+                ]}
+              >
+                <Input onChange={onChangeSalary} placeholder="Salary" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name={"khmerRate"}
+                label="Khmer Rate"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Input Khmer Rate!",
+                  },
+                ]}
+              >
+                <Input onChange={onChangeKhRate} placeholder="Khmer Rate" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="Tax Rate">
+                <Input value={taxRate} placeholder="Tax Rate" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={"startDate"}
+                label="Start Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
+              >
+                <DatePicker
+                  onChange={onChangeStart}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={"endDate"}
+                label="End Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
+              >
+                <DatePicker onChange={onChangeEnd} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item>
+            <Button icon={<SendOutlined />} type="primary" htmlType="submit">
+              Generate
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+      <Divider dashed />
       <Space.Compact block>
         <DatePicker
           onChange={onChangeYear}
@@ -265,114 +479,6 @@ const SalaryPage = () => {
         />
       </Space.Compact>
       <br />
-      <Card style={{ width: "100%" }}>
-        <Title level={2}>Generate Salary</Title>
-        <Divider dashed />
-        <Form
-          name="basic"
-          initialValues={{
-            remember: false,
-          }}
-          layout={"vertical"}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-        >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="depId"
-                label="Select Department"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Department!",
-                  },
-                ]}
-              >
-                <Select
-                  showSearch
-                  style={{
-                    width: "100%",
-                  }}
-                  allowClear
-                  onChange={onChangeDep}
-                  placeholder="Search to Select"
-                  optionFilterProp="label"
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                  options={department}
-                />
-              </Form.Item>
-            </Col>
-  
-            <Col span={12}>
-              <Form.Item
-                label="Employees"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
-              >
-                <Select
-                  showSearch
-                  placeholder="Select a Employees"
-                  allowClear
-                  mode="multiple"
-                  options={optionsWithAllOption}
-                />
-              </Form.Item>
-            </Col> 
-            <Col span={8}>
-              <Form.Item label="Salary">
-                <Input placeholder="Salary" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label="Khmer Rate">
-                <Input placeholder="Khmer Rate" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Tax Rate"
-               // getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
-              >
-              <Input placeholder="Tax Rate"/>
-              </Form.Item>
-            </Col>
-            <Col span={24}>
-              <Form.Item
-                label="Date"
-               // getValueFromEvent={getValueFromEvent}
-               // name="selectWithAllOption"
-              >
-                <RangePicker
-                  style={{ width: "100%" }}
-                  id={{
-                    start: "startInput",
-                    end: "endInput",
-                  }}
-                  onFocus={(_, info) => {
-                    console.log("Focus:", info.range);
-                  }}
-                  onBlur={(_, info) => {
-                    console.log("Blur:", info.range);
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item>
-            <Button icon={<SendOutlined />} type="primary" htmlType="submit">
-              Generate
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
-      <Divider dashed />
       <Card style={{ width: "100%" }}>
         <Table
           loading={loading}

@@ -199,7 +199,7 @@ const PositionPage = () => {
       render: (_, item) => (
         <Space>
           <Button
-            type="primary"
+            type="info"
             icon={<EyeFilled />}
             onClick={() => handleClickView(item)}
           />
