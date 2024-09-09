@@ -89,7 +89,7 @@ const SalaryPage = () => {
   const [edit, setEdit] = useState(false);
   const [data, setData] = useState([]);
   const [item, setItem] = useState();
-  const [khRate, setKhmRate] = useState("");
+  const [khRate, setKhmRate] = useState(4100);
   const [salary, setSalary] = useState("");
   const [department, setDepartment] = useState([]);
   const [tax, setTax] = useState([]);
@@ -125,9 +125,37 @@ const SalaryPage = () => {
       setEmp(" ");
     }
   };
+  const handleClickView = (Item) => {
+    //console.log("Failed:", Item);
+    getEmpInfo(Item.empId)
+    console.log(Item.fromDate)
+    form.setFieldsValue({
+      emp:Item.empId,
+      endDate:dayjs(Item.toDate),
+      startDate:dayjs(Item.fromDate),
+      salary: Item.salary,
+      khmerRate: khRate,
+      taxRate: Item.tax * 100 + "%",
+    });
+  };
+
+
+  const getEmpInfo = (value) =>{
+    request(`info/employee/getEmployeeById/${value}`, "get", {}).then(
+      (res) => {
+        if (res) {
+          var data = res.data
+          form.setFieldsValue({
+            depId:data.depId
+          });
+          console.log(res.data);
+        }
+      }
+    );
+  }
+
   const onChangeDep = (value) => {
     getListEmp(value);
-    // console.log("search:", value);
   };
 
   const onChangeStart = (date, dateString) => {
@@ -153,6 +181,10 @@ const SalaryPage = () => {
 
   const onChangeSalary = (e) => {
     const salary = e.target.value;
+    
+    form.setFieldsValue({
+      khmerRate:khRate
+    });
     //console.log("salary: " + salary);
     setSalary(salary); // Update salary state
   };
@@ -174,7 +206,10 @@ const SalaryPage = () => {
           setTax(data);
           setTaxRate(data.rate * 100 + "%");
           setLoading(false);
-          // console.log(data)
+          form.setFieldsValue({
+            taxRate:data.rate * 100 + "%"
+          });
+          console.log(data)
           //console.log(data.rate * 100+"%"); // You can handle the response data here
         }
       })
@@ -207,12 +242,21 @@ const SalaryPage = () => {
     getListDep();
     getList();
   }, []);
+
   const onFinish = (values) => {
     console.log("Success:", values);
+    var startDate= dayjs(values.startDate).format("YYYY-MM-DD");
+    var endDate= dayjs(values.endDate).format("YYYY-MM-DD");
+    var param ={
+      "empId": values.emp,
+      "salary": values.salary,
+      "fromDate": startDate,
+      "toDate": endDate,
+      "taxId": tax.id
+    }
+    console.log(param)
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+
   const onChange = (value) => {
     setSalaryCycle(value);
     console.log(`selected ${value}`);
@@ -264,7 +308,7 @@ const SalaryPage = () => {
           <Button
             type="info"
             icon={<EyeFilled />}
-            //onClick={() => handleClickView(item)}
+            onClick={() => handleClickView(item)}
           />
           <Button
             type="primary"
@@ -288,8 +332,6 @@ const SalaryPage = () => {
 
   const handleDateRangeChange = (value) => {
     const [startDate, endDate] = value.split(" To ");
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
   };
 
   return (
@@ -305,8 +347,11 @@ const SalaryPage = () => {
             remember: false,
           }}
           layout={"vertical"}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
+          onFinish={(item) => {
+            form.resetFields();
+            onFinish(item);
+          }}
+         // onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Row gutter={16}>
@@ -344,7 +389,7 @@ const SalaryPage = () => {
               <Form.Item
                 label="Employees"
                 // getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                name="emp"
               >
                 <Select
                   showSearch
@@ -386,11 +431,14 @@ const SalaryPage = () => {
                   },
                 ]}
               >
-                <Input onChange={onChangeKhRate} placeholder="Khmer Rate" />
+                <Input onChange={onChangeKhRate} value={khRate} placeholder="Khmer Rate" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label="Tax Rate">
+              <Form.Item 
+              name={"taxRate"}
+              label="Tax Rate"
+              >
                 <Input value={taxRate} placeholder="Tax Rate" />
               </Form.Item>
             </Col>

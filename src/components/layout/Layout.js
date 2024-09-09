@@ -53,12 +53,6 @@ const items = [
     getItem("Salary","/salary"),
     getItem("Tax","/tax")
   ]),
-  getItem("Setting", "Setting", <SettingOutlined />, [
-    getItem("General", "2"),
-    getItem("Leave ", "3"),
-    getItem("Attendance ", "4"),
-    getItem("Payroll ", "4"),
-  ]),
 ];
 
 const MainLayout = () => {
