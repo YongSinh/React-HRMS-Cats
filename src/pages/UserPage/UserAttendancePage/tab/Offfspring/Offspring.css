@@ -1,0 +1,21 @@
+/* Add necessary custom styles here */
+.ant-table {
+    font-size: 14px;
+  }
+  .ant-table-thead > tr > th {
+    background-color: #f5f5f5;
+  }
+  .ant-table-cell {
+    text-align: center;
+  }
+  .ant-dropdown-trigger {
+    cursor: pointer;
+  }
+  .custom-select .ant-select-clear {
+    color: red;
+  }
+  
+  .custom-select .ant-select-clear:hover {
+    color: darkred; /* Darker red on hover */
+  }
+  

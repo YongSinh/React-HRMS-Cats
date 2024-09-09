@@ -1,0 +1,8 @@
+.custom-select .ant-select-clear {
+    color: red;
+  }
+  
+  .custom-select .ant-select-clear:hover {
+    color: darkred; /* Darker red on hover */
+  }
+  

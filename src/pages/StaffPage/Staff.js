@@ -1,105 +1,4 @@
-// import React, { useState } from "react";
-// import { Button, Select, Space,form } from "antd";
-// import StaffTable from "./StaffTable";
-// import StaffDrawer from "./StaffDrawer";
-// import "./Staff.css";
-
-// const initialData = [];
-// for (let i = 1; i < 28; i++) {
-//   initialData.push({
-//     key: i,
-//     name: `Edward King ${i}`,
-//     age: 32,
-//     Status: `Active`,
-//     ID: `KH007${i.toString().padStart(2, "0")}`,
-//     department: `Department ${i % 5}`,
-//     position: `Position ${i % 3}`,
-//   });
-// }
-
-// const Staff = () => {
-//   const [data, setData] = useState(initialData);
-//   const [drawerVisible, setDrawerVisible] = useState(false);
-
-//   const handleSelectChange = (value, type) => {
-//     console.log(`selected ${value} for ${type}`);
-//   };
-
-//   const handleSearch = (value) => {
-//     console.log("search:", value);
-//   };
-
-//   const filterOption = (input, option) =>
-//     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-
-//   const showDrawer = () => {
-//     setDrawerVisible(true);
-//   };
-
-//   const handleDrawerClose = () => {
-//     setDrawerVisible(false);
-//   };
-
-//   const handleSave = (newEntry) => {
-//     setData([...data, newEntry]);
-//     setDrawerVisible(false);
-//   };
-
-  
-//   return (
-//     <>
-//       <Space style={{ marginBottom: 15, marginTop: 7 }}>
-//         <Select
-//           showSearch
-//           placeholder="Select ID"
-//           optionFilterProp="children"
-//           onChange={(value) => handleSelectChange(value, "ID")}
-//           onSearch={handleSearch}
-//           filterOption={filterOption}
-//           options={[{ value: "0011", label: "0011" }]}
-//         />
-//         <Select
-//           showSearch
-//           placeholder="Select Position"
-//           optionFilterProp="children"
-//           onChange={(value) => handleSelectChange(value, "Position")}
-//           onSearch={handleSearch}
-//           filterOption={filterOption}
-//           options={[{ value: "Position 1", label: "Position 1" }]}
-//         />
-//         <Select
-//           showSearch
-//           placeholder="Select Department"
-//           optionFilterProp="children"
-//           onChange={(value) => handleSelectChange(value, "Department")}
-//           onSearch={handleSearch}
-//           filterOption={filterOption}
-//           options={[{ value: "Department 1", label: "Department 1" }]}
-//         />
-//         <Button
-//           type="primary"
-//           style={{ backgroundColor: "green", borderColor: "green" }}
-//         >
-//           Search
-//         </Button>
-//         <Button type="primary" onClick={showDrawer}>
-//           Add
-//         </Button>
-        
-//       </Space>
-//       <StaffTable data={data} setData={setData} />
-//       <StaffDrawer
-//         visible={drawerVisible}
-//         onClose={handleDrawerClose}
-//         onSave={handleSave}
-//       />
-//     </>
-//   );
-// };
-
-// export default Staff;
-
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {SearchOutlined} from '@ant-design/icons';
 import { Button, Select, Space, Form } from "antd";
 import StaffTable from "./StaffTable";
@@ -119,7 +18,9 @@ for (let i = 1; i < 28; i++) {
   });
 }
 
+
 const Staff = () => {
+
   const [data, setData] = useState(initialData);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [form] = Form.useForm();
@@ -205,6 +106,10 @@ const Staff = () => {
       .catch((info) => {
         console.log("Validate Failed:", info);
       });
+
+
+  
+    
   };
 
   return (

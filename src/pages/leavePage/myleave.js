@@ -5,12 +5,21 @@ import {
   EditFilled,
   DeleteOutlined,
   SendOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import { Button, Select, Space, DatePicker, Table } from "antd";
+import {
+  Button,
+  Select,
+  Space,
+  DatePicker,
+  Table,
+  Tag,
+  Dropdown,
+  Menu,
+} from "antd";
 import { Link } from "react-router-dom";
 import Drawerleave from "./Drawer";
 import PageTitle from "../../components/Title_Page/TitlePage";
-import "./myleave.css";
 const { RangePicker } = DatePicker;
 const LeaveRequest = () => {
   const [open, setOpen] = useState(false);
@@ -20,6 +29,31 @@ const LeaveRequest = () => {
   const onClose = () => {
     setOpen(false);
   };
+  const handleMenuClick = (e) => {
+    console.log('click', e);
+    // Add logic here for each menu item based on e.key
+  };
+  const menu = (
+    <Menu onClick={handleMenuClick}>
+      <Menu.Item key="1" icon={<EyeFilled />} style={{ color: "#4CAF50" }}>
+        View
+      </Menu.Item>
+      <Menu.Item key="2" icon={<EditFilled />} style={{ color: "#2196F3" }}>
+        Edit
+      </Menu.Item>
+      <Menu.Item key="3" icon={<SendOutlined />} style={{ color: "#FFC107" }}>
+        Send
+      </Menu.Item>
+      <Menu.Item
+        key="4"
+        icon={<DeleteOutlined />}
+        
+        style={{ color: "#F44336" }}
+      >
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
   const columns = [
     {
       title: "No",
@@ -31,6 +65,18 @@ const LeaveRequest = () => {
       dataIndex: "name",
     },
     {
+      title: "Leave Date",
+      dataIndex: "leave_date",
+    },
+    {
+      title: "Leave Type",
+      dataIndex: "leave_type",
+    },
+    {
+      title: "Leave Duration",
+      dataIndex: "duration",
+    },
+    {
       title: "Department",
       dataIndex: "department",
       // sorter: {
@@ -39,48 +85,46 @@ const LeaveRequest = () => {
       // },
     },
     {
-      title: "Math Score",
-      dataIndex: "math",
-      sorter: {
-        compare: (a, b) => a.math - b.math,
-        multiple: 2,
+      title: "Position",
+      dataIndex: "posId",
+    },
+    {
+      title: "Approve",
+      dataIndex: "approve",
+    },
+    {
+      title: "Remark",
+      dataIndex: "remarl",
+    },
+    {
+      title: "Reason",
+      dataIndex: "reason",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (_, { Status }) => {
+        let color = "green";
+        return (
+          <>
+            <div>
+              <Tag style={{ fontSize: 13 }} color={color}>
+                {Status}
+              </Tag>
+            </div>
+          </>
+        );
       },
     },
     {
-      title: "English Score",
-      dataIndex: "english",
-      sorter: {
-        compare: (a, b) => a.english - b.english,
-        multiple: 1,
-      },
-    },
-    {
-      title: " Action",
+      title: "Action",
       dataIndex: "action",
       render: (_) => (
-        <Space>
-          <Button
-            type="primary"
-            icon={<EyeFilled />}
-            style={{ backgroundColor: "#4CAF50", borderColor: "#4CAF50" }}
-          ></Button>
-          <Button
-            type="primary"
-            icon={<EditFilled />}
-            style={{ backgroundColor: "#2196F3", borderColor: "#2196F3" }}
-          ></Button>
-          <Button
-            type="primary"
-            icon={<SendOutlined />}
-            style={{ backgroundColor: "#FFC107", borderColor: "#FFC107" }}
-          ></Button>
-          <Button
-            type="primary"
-            icon={<DeleteOutlined />}
-            danger
-            style={{ backgroundColor: "#F44336", borderColor: "#F44336" }}
-          ></Button>
-        </Space>
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Button style={{   borderColor: "transparent", fontSize:"18px", padding:"0"}}>
+           <MoreOutlined /> 
+          </Button>
+        </Dropdown>
       ),
     },
   ];
@@ -88,25 +132,47 @@ const LeaveRequest = () => {
     {
       key: "1",
       no: 1,
-      name: "John Brown",
-      department: 98,
-      math: 60,
-      english: 70,
+      name: " Tonny",
+      department: "MIS",
+      leave_type: "Anual Leave",
+      duration: 2,
+      posId: "Head of IT",
+      leave_date: "2024-01-01",
     },
     {
       key: "2",
       no: 2,
+      name: "David",
+      department: "MIS",
+      leave_type: "Anual Leave",
+      duration: 2,
+      posId: "System Devloper",
+      leave_date: "2024-01-01",
+    },
+    {
+      key: "3",
+      no: 3,
+      name: "John Brown",
+      department: "MIS",
+      leave_type: "Anual Leave",
+      duration: 2,
+      posId: "Cyber Security",
+      leave_date: "2024-01-01",
+    },
+    {
+      key: "4",
+      no: 4,
       name: "Jim Green",
-      department: 98,
-      math: 66,
-      english: 89,
+      department: "MIS",
+      leave_type: "Sick Leave",
+      duration: 1,
+      posId: "Data Analysis",
+      leave_date: "2024-01-01",
     },
   ];
   return (
     <>
-      {/* <PageTitle
-                PageTitle='Leave Request'
-            /> */}
+      <PageTitle PageTitle="Leave Request" />
       <Space>
         <Select
           style={{
@@ -166,7 +232,7 @@ const LeaveRequest = () => {
         </Button>
         <Drawerleave open={open} onClose={onClose} />
       </Space>
-      <Table style={{ marginTop: 10 }} dataSource={data} columns={columns} />
+      <Table style={{ marginTop: 10 }} dataSource={data} columns={columns} />;
     </>
   );
 };

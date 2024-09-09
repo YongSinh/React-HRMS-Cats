@@ -14,7 +14,7 @@ import {
   BankOutlined,
 } from "@ant-design/icons";
 import "./Layout.css";
-import MenuItems from "./MenuItems";
+import MenuItems from "./MenuItems/MenuItems";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -27,7 +27,7 @@ function getItem(label, key, icon, children) {
   };
 }
 
-const gifimage =require("../../asset/image/cambodia-307_256.gif");
+const gifimage = require("../../asset/image/cambodia-307_256.gif");
 const logo = require("../../asset/image/catslogo.png");
 const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 
@@ -39,10 +39,17 @@ const items = [
     getItem("All Employee", "leave", <TeamOutlined />),
     getItem("Leave Request", "leave-request", <UserOutlined />),
   ]),
-  getItem("Payroll", "Payroll", <PayCircleOutlined />),
   getItem("Department", "Department", <BankOutlined />),
   getItem("Staff", "Staff", <UserOutlined />),
   getItem("Report", "report", <FileOutlined />),
+  getItem("Hr Payroll", "//", <SettingOutlined />, [
+    getItem("Payroll", "Payroll"),
+    getItem("Payslips", "payslip"),
+    getItem("Allowances", "allowance"),
+    getItem("Deductions", "deduction"),
+    getItem("Salary", "salary"),
+    getItem("Tax", "tax"),
+  ]),
   getItem("Setting", "Setting", <SettingOutlined />, [
     getItem("General", "2"),
     getItem("Leave ", "3"),
@@ -63,6 +70,14 @@ const breadcrumbNameMap = {
   "/Staff": "Staff",
   "/report": "Report",
   "/Setting": "Setting",
+  payroll: "payroll",
+  "/payslip": "payslip",
+  "/allowance": "allowance",
+  "/deduction": "deduction",
+  "/Salary": "salary",
+  "/tax": "tax",
+
+  "/Setting": "Setting",
   "/Setting/2": "General",
   "/Setting/3": "Leave",
   "/Setting/4": "Attendance",
@@ -78,7 +93,8 @@ const MainLayout = () => {
   const [selectedKey, setSelectedKey] = useState("Dashboard");
 
   useEffect(() => {
-    const pathKey = location.pathname === "/" ? "Dashboard" : location.pathname.split("/")[1];
+    const pathKey =
+      location.pathname === "/" ? "Dashboard" : location.pathname.split("/")[1];
     setSelectedKey(pathKey);
     localStorage.setItem("selectedMenuKey", pathKey);
   }, [location]);
@@ -148,10 +164,8 @@ const MainLayout = () => {
               style={{ cursor: "pointer" }}
             />
           </Button>
-          <div className="header-title">Human Resource Management System
-  
-          </div>
-          <div>
+          <div className="header-title">Human Resource Management System</div>
+          {/* <div>
             <img 
             className="logoCambodia"
             src={ gifimage }
@@ -159,7 +173,7 @@ const MainLayout = () => {
             style={{ display: "flex", marginLeft: "1rem" }}
             
             />
-          </div>
+          </div> */}
         </div>
         <MenuItems darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       </Header>

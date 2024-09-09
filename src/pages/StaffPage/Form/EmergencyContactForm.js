@@ -6,6 +6,7 @@ const { Title } = Typography;
 const HistoryForm = ({ onSave, onCancel }) => {
   return (
     <>
+     <Title level={4}>Emergency Contactn</Title>
     <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item

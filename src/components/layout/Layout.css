@@ -277,35 +277,11 @@ body,
   color: var(--primary-color);
   
 }
-
-/* .countText {
-
-  font-family: bebas neue;
-  background: linear-gradient(45deg, #ee7752, #a74848, #e73c7e, #23a6d5, #23d5ab, #000, #666666);
-  background-size: 250%;
-  -webkit-background-clip: text;
+.countText{
   background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: animate 8s ease-in-out infinite;
   text-align: center;
-  line-height: 0.8;
-
+  line-height: 0.1;
 }
-
-@keyframes animate {
-  0% {
-    background-position: 0 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0 50%;
-  }
-} */
-
 
 
 [data-theme="dark"] .ant-table {
@@ -429,6 +405,7 @@ body,
   cursor: pointer;
   user-select: none;
 }
+
 .ant-drawer .ant-drawer-body {
   flex: none;
   min-width: 0;
@@ -491,9 +468,7 @@ body,
   background: #cccbcb85;
   color: #fff;
 }
-/* .ant-modal .ant-modal-body{
-  background: #b1b0b0b3;
-} */
+
 .ant-menu-light:not(.ant-menu-horizontal) .ant-menu-item:not(.ant-menu-item-selected):hover{
   background-color: rgba(128, 128, 128, 0.458);
   transition: 0.2s;
@@ -506,3 +481,32 @@ body,
   
 }
 
+[data-theme="dark"] .countText{
+  background: #1f1f1f;
+  color: #fff;
+}
+
+[data-theme="dark"] .ant-card .ant-card-head-title {
+  background: #1f1f1f;
+  color: #fff;
+}
+[data-theme="dark"] .ant-card{
+  background: #1f1f1f;
+  color: #fff;
+}
+[data-theme="dark"] .ant-form-item{
+  background: #1f1f1f;
+  color: #fff;
+}
+[data-theme="dark"] .wrapper header{
+  background: #1f1f1f;
+  color: #fff;
+}
+[data-theme="dark"] .calendar li {
+  /* background: #1f1f1f; */
+  color: #fff;
+}
+[data-theme="dark"] .days li:not(.active):hover::before  {
+  background: #5a5959;
+ 
+}

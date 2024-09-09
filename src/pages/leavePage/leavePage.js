@@ -15,7 +15,7 @@ import {
   EditFilled,
   DeleteOutlined,
 } from "@ant-design/icons";
-import PageTitle from "../../components/Title_Page/TitlePage";
+// import PageTitle from "../../components/Title_Page/TitlePage";
 const { RangePicker } = DatePicker;
 
 const onChange = (value) => {
