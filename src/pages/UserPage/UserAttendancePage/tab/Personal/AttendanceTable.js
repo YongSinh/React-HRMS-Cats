@@ -197,9 +197,14 @@ const AttendanceTable = ({ data }) => {
           ]}
           style={{ borderRadius: "8px" }} // Optional: rounded corners for the modal
         >
-          <Row gutter={16} style={{ marginBottom: 16 }}>
+          <div  style={{
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px",
+              }}>
+          <Row gutter={16} style={{ marginBottom: 16, }}>
             <Col
-              span={8}
+              span={12}
               style={{
                 display: "flex",
                 justifyContent: "center",
@@ -213,12 +218,12 @@ const AttendanceTable = ({ data }) => {
                   borderRadius: "50%", // Ensures the avatar is round
                   border: "2px solid #f0f0f0", // Optional: adds a border around the avatar
                   boxShadow: "0 4px 8px rgba(0,0,0,0.2)", // Optional: adds a shadow effect
-                  marginBottom: 16,
+                  // marginBottom: 16,
                 }}
               />
             </Col>
             <Col
-              span={16}
+              span={12}
               style={{
                 display: "flex",
                 flexDirection: "column",
@@ -329,6 +334,7 @@ const AttendanceTable = ({ data }) => {
               <Text>{viewingRecord.remark}</Text>
             </Col>
           </Row>
+          </div>
         </Modal>
       )}
     </div>

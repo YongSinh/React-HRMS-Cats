@@ -7,8 +7,8 @@ import {
   SettingOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import MenuItems from "..//MenuItems/MenuItems";
-
+// import MenuItems from "../MenuItems/MenuItems";
+import UserMenuItems from "./UserMenuItems/UserMenuItems";
 const { Header, Content, Footer, Sider } = Layout;
 
 function getItem(label, key, icon, children) {
@@ -40,7 +40,7 @@ const breadcrumbNameMap = {
 };
 
 const UserLayout = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [siderKey, setSiderKey] = useState(Date.now());
   const navigate = useNavigate();
@@ -115,7 +115,7 @@ const UserLayout = () => {
           </Button>
           <div className="header-title">Human Resource Management System</div>
         </div>
-        <MenuItems darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+        <UserMenuItems darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       </Header>
       <Layout>
         <Sider

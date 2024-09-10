@@ -85,7 +85,7 @@ const breadcrumbNameMap = {
 };
 
 const MainLayout = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [siderKey, setSiderKey] = useState(Date.now());
   const navigate = useNavigate();
