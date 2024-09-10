@@ -4,8 +4,8 @@ import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import DynamicCalendar from "./DynamicCalendar";
 import "./Userinfo.css";
 const Userinfo = () => {
-  const [hideSalary, setHideSalary] = useState(false);
-
+  // Set default hide salary to true
+  const [hideSalary, setHideSalary] = useState(true);
   const toggleSalaryVisibility = () => {
     setHideSalary(!hideSalary);
   };
@@ -55,9 +55,15 @@ const Userinfo = () => {
               className="Hide-show"
               type="text"
               onClick={toggleSalaryVisibility}
-              icon={hideSalary ? < EyeOutlined style={{fontSize:"1.5rem"}}/> : <EyeInvisibleOutlined style={{fontSize:"1.5rem"}} />}
+              icon={
+                hideSalary ? (
+                  <EyeOutlined style={{ fontSize: "1.5rem" }} />
+                ) : (
+                  <EyeInvisibleOutlined style={{ fontSize: "1.5rem" }} />
+                )
+              }
               style={{
-                color:"#4096ff",
+                color: "#4096ff",
                 width: "32px",
                 height: "32px",
                 display: "flex",
@@ -175,10 +181,20 @@ const Userinfo = () => {
               borderRadius: "6px",
             }}
           >
-            <span style={{textAlign:"center",display:"flex"}}>
+            <span style={{ textAlign: "center", display: "flex" }}>
               <b>Total for this month Salary:</b>
             </span>
-            <div style={{textAlign:"center",fontWeight: "bold",display:"flex",flexDirection:"column-reverse",color:"#4096ff"}}>${renderAmount(totalSalaryThisMonth) }</div>
+            <div
+              style={{
+                textAlign: "center",
+                fontWeight: "bold",
+                display: "flex",
+                flexDirection: "column-reverse",
+                color: "#4096ff",
+              }}
+            >
+              ${renderAmount(totalSalaryThisMonth)}
+            </div>
           </p>
         </Card>
       </Col>
