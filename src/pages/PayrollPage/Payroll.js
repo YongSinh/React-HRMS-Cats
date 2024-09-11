@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
 //Componets form antd
@@ -6,7 +6,6 @@ import {
   DatePicker,
   Space,
   Table,
-  Tag,
   Button,
   Form,
   Select,
@@ -16,10 +15,19 @@ import {
   Typography,
   Input,
   Card,
+  Popconfirm,
 } from "antd";
 import dayjs from "dayjs";
-import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
+import { request } from "../../share/request";
+import {
+  SendOutlined,
+  EyeFilled,
+  EditFilled,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { isEmptyOrNull } from "../../share/helper";
 import { useParams, Link } from "react-router-dom";
+import Swal from "sweetalert2";
 const { Search } = Input;
 const { Title } = Typography;
 
@@ -47,217 +55,330 @@ function useSelectAllOption(options) {
 
   return [getValueFromEvent, optionsWithAllOption];
 }
-const columns = [
-  {
-    title: "Employee ID",
-    dataIndex: "name",
-    key: "name",
-    fixed: 'left',
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "RefNo",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Date Form",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Date To",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Type",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Status",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Create Date",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: "Action",
-    key: "action",
-    fixed: 'right',
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
-const { Option } = Select;
 
-const generateDateRanges = (year) => {
-  const ranges = [];
-  for (let month = 0; month < 12; month++) {
-    const firstHalfStart = new Date(year, month, 1);
-    const firstHalfEnd = new Date(year, month, 15);
-    const secondHalfStart = new Date(year, month, 16);
-    const secondHalfEnd = new Date(year, month + 1, 0); // Last day of the month
-
-    ranges.push(
-      `${firstHalfStart.toISOString().split("T")[0]} To ${
-        firstHalfEnd.toISOString().split("T")[0]
-      }`,
-      `${secondHalfStart.toISOString().split("T")[0]} To ${
-        secondHalfEnd.toISOString().split("T")[0]
-      }`
-    );
-  }
-  return ranges;
-};
 const PayrollPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
-  const today = dayjs(now)
-  const dateFormat = 'YYYY';
-  const [year,setYear] = useState("2024")
+  const today = dayjs(now);
+  const [year, setYear] = useState("2024");
   const [salaryCycle, setSalaryCycle] = useState("1");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const handleMonthChange = (date) => {
-    if (date) {
-      const start = date.startOf('month');
-      const end = date.endOf('month');
-      setStartDate(dayjs(start).format('YYYY-MM-DD'));
-      setEndDate(dayjs(end).format('YYYY-MM-DD'));
-      console.log('Start Date:', dayjs(start).format('YYYY-MM-DD'));
-      console.log('End Date:', dayjs(end).format('YYYY-MM-DD'));
-    }
+  const [loading, setLoading] = useState(false);
+  const [department, setDepartment] = useState([]);
+  const [emp, setEmp] = useState([]);
+  const [data, setData] = useState([]);
+  const [edit, setEdit] = useState(false);
+  const [item, setItem] = useState();
+  const [empList, setEmpList] = useState([]);
+  const [status, setStatus] = useState("");
+  const onChangeStatus = (value) =>{
+    setStatus(value)
+    console.log(value)
+  }
+  const onChangeType = (value) =>{
+    setSalaryCycle(value)
+    console.log(value)
+  }
+  const typeOption = [
+    {
+      value: "1",
+      label: "Monthly",
+    },
+    {
+      value: "2",
+      label: "Semi-Monthly",
+    },
+  ];
+
+  const statusOption = [
+    {
+      value: "1",
+      label: "New",
+    },
+    {
+      value: "2",
+      label: "Completed",
+    },
+  ];
+  const onDelete = (Item) => {
+    setLoading(true);
+    request("payrolls/deletePayroll?id=" + Item.id, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getList();
+          setLoading(false);
+        }
+      }
+    );
+  };
+
+  const getEmpInfo = (value) => {
+    request(`info/employee/getEmployeeById/${value}`, "get", {}).then((res) => {
+      if (res) {
+        var data = res.data;
+        form.setFieldsValue({
+          department: data.depId,
+        });
+        // console.log(res.data);
+      }
+    });
+  };
+
+  const handleClickView = (Item) => {
+    //console.log("Failed:", Item);
+    getEmpInfo(Item.empId);
+    setStatus(Item.status)
+    //console.log(Item.fromDate);
+    setItem(Item);
+    setEdit(true);
+    form.setFieldsValue({
+      employees: Item.empId,
+      endDate: dayjs(Item.toDate),
+      startDate: dayjs(Item.fromDate),
+      salary: Item.salary,
+      selectType: Item.type === 1 ? "Monthly" : "Semi-Monthly",
+      status: Item.status === 1 ? "New" : "Computed",
+    });
   };
 
   const onFinish = (values) => {
-    console.log("Success:", values);
+    var format = "YYYY-MM-DD";
+    var startDate = dayjs(values.startDate).format(format);
+    var endDate = dayjs(values.endDate).format(format);
+    var today = dayjs(now).format(format);
+
+    const param = {
+      empId: item.empId,
+      empIds: empList,
+      dateFrom: startDate,
+      dateTo: endDate,
+      type: salaryCycle,
+      status: status,
+      dateCreate: today,
+    };
+    console.log(param);
+
+    let url = "payrolls/addPayroll";
+    let method = "post";
+    // case update
+    if (edit) {
+      url = "payrolls/updatePayroll?id=" + item.id;
+      method = "put";
+    }
+    // setLoading(true);
+
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        setEdit(false);
+        //onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+        setEdit(false);
+      }
+    });
+  };
+
+  const getListEmp = (value) => {
+    if (!isEmptyOrNull(value)) {
+      request(`info/employee/listEmployeeByDep?depId=${value}`, "get", {}).then(
+        (res) => {
+          if (res) {
+            //console.log(res.data);
+            const arrTmpP = res.data.map((emp) => ({
+              label: emp.empId.toString(),
+              value: emp.empId,
+            }));
+            setEmp(arrTmpP);
+            //setDepartment(arrTmpP);
+          }
+        }
+      );
+    } else {
+      setEmp(" ");
+    }
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
   const onChange = (value) => {
-    setSalaryCycle(value);
+    //setSalaryCycle(value);
+    setEmpList(value);
     console.log(`selected ${value}`);
   };
+
+  const onChangeDep = (value) => {
+    getListEmp(value);
+  };
+
+  const onReset = () => {
+    form.resetFields();
+    setEdit(false);
+  };
+
   const onSearch = (value) => {
-    console.log("search:", value);
+    if (!isEmptyOrNull(value)) {
+      setLoading(true);
+      request("payrolls/payrollByEmId?emId=" + value, "get", {}).then((res) => {
+        if (res) {
+          setData(res.data);
+          setLoading(false);
+          //console.log(res.data);
+        }
+      });
+    } else {
+      getList();
+    }
   };
-  const onChangeYear = (date, dateString) => {
-    console.log(date, dateString);
-    setYear(dateString)
+
+  const onEdit = (Item) => {
+    handleClickView(Item);
+    setItem(Item);
+    setEdit(true);
   };
-  const dateRanges = generateDateRanges(year);
-  const options = [
-    { label: "one", value: "one" },
-    { label: "two", value: "two" },
-    { label: "three", value: "three" },
+
+  useEffect(() => {
+    getListDep();
+    getList();
+  }, [empList]);
+
+  const columns = [
+    {
+      title: "Employee ID",
+      dataIndex: "empId",
+      key: "empId",
+      fixed: "left",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "RefNo",
+      dataIndex: "refNo",
+      key: "refNo",
+    },
+    {
+      title: "Date Form",
+      dataIndex: "dateFrom",
+      key: "dateFrom",
+    },
+    {
+      title: "Date To",
+      dataIndex: "dateTo",
+      key: "dateTo",
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
+      render: (type) => `${type === 1 ? "Monthly" : "Semi-Monthly"}`,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => `${status === 1 ? "New" : "Computed"}`,
+    },
+    {
+      title: "Create Date",
+      key: "dateCreate",
+      dataIndex: "dateCreate",
+    },
+    {
+      title: "Action",
+      key: "action",
+      fixed: "right",
+      render: (_, record) => (
+        <Space>
+          <Button
+            type="info"
+            icon={<EyeFilled />}
+            onClick={() => handleClickView(record)}
+          />
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            onClick={() => onEdit(record)}
+          />
+          <Popconfirm
+            title="Delete the Employee Salary"
+            description="Are you sure to delete this Employee Salary?"
+            onConfirm={() => onDelete(record)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      ),
+    },
   ];
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
+
+  const getList = () => {
+    setLoading(true);
+    request("payrolls/payroll", "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
+  const getListDep = () => {
+    request("info/department/department", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res.data);
+        const arrTmpP = res.data.map((dep) => ({
+          label: dep.depName,
+          value: dep.depId,
+        }));
+        setDepartment(arrTmpP);
+      }
+    });
+  };
+
+  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(emp);
   const { productId } = useParams();
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-  ];
-
-  const handleDateRangeChange = (value) => {
-    const [startDate, endDate] = value.split(' To ');
-    console.log('Start Date:', startDate);
-    console.log('End Date:', endDate);
-  };
-
 
   return (
     <>
       <PageTitle PageTitle="Payroll" />
-      <Link to={`/product/1`}>Hello</Link>
-      <Space.Compact block>
-        <DatePicker onChange={onChangeYear} defaultValue={dayjs(today, dateFormat)} picker="year"  />
-        <Select
-          placeholder="Select a Salary Cycle"
-          optionFilterProp="label"
-          onChange={onChange}
-          allowClear
-          options={[
-            {
-              value: "1",
-              label: "Monthly",
-            },
-            {
-              value: "2",
-              label: "Semi-Monthly",
-            },
-          ]}
-        />
-        {salaryCycle === "1" ? (
-          <DatePicker picker="month"  onChange={handleMonthChange}/>
-        ) : (
-          <Select 
-          style={{ width: 300 }} 
-          onChange={handleDateRangeChange}
-          placeholder="Select Range">
-            {dateRanges.map((range, index) => (
-              <Option key={index} value={range}>
-                {range}
-              </Option>
-            ))}
-          </Select>
-        )}
-         <Search style={{ width: 300 }} placeholder="input search text" onSearch={onSearch} enterButton />
-      </Space.Compact>
-      <br />
+      {/* <Link to={`/product/1`}>Hello</Link> */}
       <Card style={{ width: "100%" }}>
         <Title level={2}>Generate Payroll</Title>
         <Divider dashed />
         <Form
           name="basic"
+          form={form}
           initialValues={{
             remember: false,
           }}
           layout={"vertical"}
-          onFinish={onFinish}
+          onFinish={(item) => {
+            form.resetFields();
+            onFinish(item);
+          }}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
@@ -277,56 +398,132 @@ const PayrollPage = () => {
                   showSearch
                   placeholder="Select a Department"
                   optionFilterProp="label"
-                  onChange={onChange}
-                  onSearch={onSearch}
+                  onChange={onChangeDep}
+                  //onSearch={onSearch}
                   allowClear
-                  options={[
-                    {
-                      value: "jack",
-                      label: "Jack",
-                    },
-                    {
-                      value: "lucy",
-                      label: "Lucy",
-                    },
-                    {
-                      value: "tom",
-                      label: "Tom",
-                    },
-                  ]}
+                  options={department}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 label="Employees"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                //getValueFromEvent={getValueFromEvent}
+                name="employees"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Employees!",
+                  },
+                ]}
               >
                 <Select
+                  onChange={onChange}
                   showSearch
                   placeholder="Select a Employees"
                   allowClear
                   mode="multiple"
-                  options={optionsWithAllOption}
+                  options={emp}
                 />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={"selectType"}
+                label="Select Cycle"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Select a Type"
+                  optionFilterProp="label"
+                  onChange={onChangeType}
+                  value={salaryCycle}
+                  allowClear
+                  options={typeOption}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={"status"}
+                label="Select Status"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Select a Salary Cycle"
+                  optionFilterProp="label"
+                   onChange={onChangeStatus}
+                  value={status}
+                  allowClear
+                  options={statusOption}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                name={"startDate"}
+                label="From Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={"endDate"}
+                label="To Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
+              >
+                <DatePicker style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>
           <Form.Item>
-            <Button icon={<SendOutlined />} type="primary" htmlType="submit">
-              Generate
-            </Button>
+            <Space>
+              <Button icon={<SendOutlined />} type="primary" htmlType="submit">
+                Generate
+              </Button>
+              <Button type="primary" danger onClick={onReset}>
+                Clear
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Card>
       <Divider dashed />
       <Card style={{ width: "100%" }}>
-        <Table 
-         scroll={{
-          x: 'max-content',
-        }}
-        columns={columns} dataSource={data} />
+        <Space style={{ marginBottom: 20 }}>
+          <Search placeholder="Employees ID" onSearch={onSearch} enterButton />
+        </Space>
+        <Table
+          scroll={{
+            x: "max-content",
+          }}
+          loading={loading}
+          columns={columns}
+          dataSource={data}
+        />
       </Card>
     </>
   );

@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
+import getColumnSearchProps from "../../share/ColumnSearchProps";
 //Componets form antd
 import {
   Space,
@@ -27,64 +28,17 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
-const { Search } = Input;
+
 const { Title } = Typography;
-const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
-function useSelectAllOption(options) {
-  const optionsWithAllOption = useMemo(
-    () => [SELECT_ALL_OPTION, ...options],
-    [options]
-  );
+
 
   /** pass this to Form.Item's getValueFromEvent prop */
-  const getValueFromEvent = useCallback(
-    (value, selections) => {
-      if (!selections?.length) return selections;
-      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-        return selections;
-      }
-      const labelInValue = typeof value[0]?.label === "string";
-      // if "Select All" option selected, set value to all options
-      // also keep labelInValue in consideration
-      return labelInValue ? options : options.map((o) => o.value);
-    },
-    [options]
-  );
 
-  return [getValueFromEvent, optionsWithAllOption];
-}
-
-const { Option } = Select;
-
-const generateDateRanges = (year) => {
-  const ranges = [];
-  for (let month = 0; month < 12; month++) {
-    const firstHalfStart = new Date(year, month, 1);
-    const firstHalfEnd = new Date(year, month, 15);
-    const secondHalfStart = new Date(year, month, 16);
-    const secondHalfEnd = new Date(year, month + 1, 0); // Last day of the month
-
-    ranges.push(
-      `${firstHalfStart.toISOString().split("T")[0]} To ${
-        firstHalfEnd.toISOString().split("T")[0]
-      }`,
-      `${secondHalfStart.toISOString().split("T")[0]} To ${
-        secondHalfEnd.toISOString().split("T")[0]
-      }`
-    );
-  }
-  return ranges;
-};
 
 const SalaryPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
   const today = dayjs(now);
-  const dateFormat = "YYYY";
-  const [year, setYear] = useState("2024");
-  const [salaryCycle, setSalaryCycle] = useState("1");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(false);
   const [data, setData] = useState([]);
@@ -95,16 +49,6 @@ const SalaryPage = () => {
   const [tax, setTax] = useState([]);
   const [taxRate, setTaxRate] = useState("");
   const [emp, setEmp] = useState([]);
-  const handleMonthChange = (date) => {
-    if (date) {
-      const start = date.startOf("month");
-      const end = date.endOf("month");
-      setStartDate(dayjs(start).format("YYYY-MM-DD"));
-      setEndDate(dayjs(end).format("YYYY-MM-DD"));
-      // console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
-      // console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
-    }
-  };
 
   const getListEmp = (value) => {
     if (!isEmptyOrNull(value)) {
@@ -113,7 +57,7 @@ const SalaryPage = () => {
           if (res) {
             //console.log(res.data);
             const arrTmpP = res.data.map((emp) => ({
-              label: emp.firstName + " " + emp.lastName,
+              label: emp.empId.toString(),
               value: emp.empId,
             }));
             setEmp(arrTmpP);
@@ -127,36 +71,51 @@ const SalaryPage = () => {
   };
   const handleClickView = (Item) => {
     //console.log("Failed:", Item);
-    getEmpInfo(Item.empId)
-    console.log(Item.fromDate)
+    getEmpInfo(Item.empId);
+    //console.log(Item.fromDate);
+    setEdit(true);
     form.setFieldsValue({
-      emp:Item.empId,
-      endDate:dayjs(Item.toDate),
-      startDate:dayjs(Item.fromDate),
+      emp: Item.empId,
+      endDate: dayjs(Item.toDate),
+      startDate: dayjs(Item.fromDate),
       salary: Item.salary,
       khmerRate: khRate,
       taxRate: Item.tax * 100 + "%",
     });
   };
 
-
-  const getEmpInfo = (value) =>{
-    request(`info/employee/getEmployeeById/${value}`, "get", {}).then(
-      (res) => {
-        if (res) {
-          var data = res.data
-          form.setFieldsValue({
-            depId:data.depId
-          });
-          console.log(res.data);
-        }
+  const getEmpInfo = (value) => {
+    request(`info/employee/getEmployeeById/${value}`, "get", {}).then((res) => {
+      if (res) {
+        var data = res.data;
+        form.setFieldsValue({
+          depId: data.depId,
+        });
+       // console.log(res.data);
       }
-    );
-  }
+    });
+  };
 
   const onChangeDep = (value) => {
     getListEmp(value);
   };
+
+  const filterByDep = (value) => {
+    if(!isEmptyOrNull(value)){
+      setLoading(true);
+      request("payrolls/salary/getSalaryByDepId?depId="+value, "get", {}).then((res) => {
+        if (res) {
+          setData(res.data);
+          setLoading(false);
+         //console.log(res.data);
+        }
+      });
+    }else{
+      getList()
+    }
+    
+  };
+
 
   const onChangeStart = (date, dateString) => {
     console.log("Start: " + dateString);
@@ -179,11 +138,32 @@ const SalaryPage = () => {
     });
   };
 
+  const onDelete = (Item) => {
+    request(
+      "payrolls/salary/deleteSalaryById?id=" + Item.id,
+      "delete",
+      {}
+    ).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been deleted",
+          icon: "success",
+          showConfirmButton: true,
+          //timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+      }
+    });
+  };
+
   const onChangeSalary = (e) => {
     const salary = e.target.value;
-    
+
     form.setFieldsValue({
-      khmerRate:khRate
+      khmerRate: khRate,
     });
     //console.log("salary: " + salary);
     setSalary(salary); // Update salary state
@@ -207,9 +187,9 @@ const SalaryPage = () => {
           setTaxRate(data.rate * 100 + "%");
           setLoading(false);
           form.setFieldsValue({
-            taxRate:data.rate * 100 + "%"
+            taxRate: data.rate * 100 + "%",
           });
-          console.log(data)
+          console.log(data);
           //console.log(data.rate * 100+"%"); // You can handle the response data here
         }
       })
@@ -244,34 +224,65 @@ const SalaryPage = () => {
   }, []);
 
   const onFinish = (values) => {
-    console.log("Success:", values);
-    var startDate= dayjs(values.startDate).format("YYYY-MM-DD");
-    var endDate= dayjs(values.endDate).format("YYYY-MM-DD");
-    var param ={
-      "empId": values.emp,
-      "salary": values.salary,
-      "fromDate": startDate,
-      "toDate": endDate,
-      "taxId": tax.id
+    // console.log("Success:", values);
+    var startDate = dayjs(values.startDate).format("YYYY-MM-DD");
+    var endDate = dayjs(values.endDate).format("YYYY-MM-DD");
+    var param = {
+      empId: values.emp,
+      salary: values.salary,
+      fromDate: startDate,
+      toDate: endDate,
+      taxId: tax.id,
+    };
+    //console.log(param);
+    let url = "payrolls/salary/addSalary";
+    let method = "post";
+    // case update
+    if (edit) {
+      url = "payrolls/salary/editSalary?id=" + item.id;
+      method = "put";
     }
-    console.log(param)
+    //console.log(param);
+    //setLoading(false)
+
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        setEdit(false);
+        onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+      }
+    });
   };
 
-  const onChange = (value) => {
-    setSalaryCycle(value);
-    console.log(`selected ${value}`);
-  };
-  const onSearch = (value) => {
-    console.log("search:", value);
+  const onEdit = (Item) => {
+    handleClickView(Item);
+    setItem(Item);
+    setEdit(true);
   };
 
-  const onChangeYear = (date, dateString) => {
-    console.log(date, dateString);
-    setYear(dateString);
+  const onReset = () => {
+    form.resetFields();
+    setEdit(false);
   };
-  const dateRanges = generateDateRanges(year);
 
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(emp);
+
   const columns = [
     {
       title: "Employee ID",
@@ -313,12 +324,12 @@ const SalaryPage = () => {
           <Button
             type="primary"
             icon={<EditFilled />}
-            //onClick={() => onEdit(item)}
+            onClick={() => onEdit(item)}
           />
           <Popconfirm
-            title="Delete the department"
-            description="Are you sure to delete this department?"
-            //onConfirm={() => onDelete(item)}
+            title="Delete the Employee Salary"
+            description="Are you sure to delete this Employee Salary?"
+            onConfirm={() => onDelete(item)}
             //onCancel={cancel}
             okText="Yes"
             cancelText="No"
@@ -351,7 +362,7 @@ const SalaryPage = () => {
             form.resetFields();
             onFinish(item);
           }}
-         // onFinishFailed={onFinishFailed}
+          // onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Row gutter={16}>
@@ -431,14 +442,15 @@ const SalaryPage = () => {
                   },
                 ]}
               >
-                <Input onChange={onChangeKhRate} value={khRate} placeholder="Khmer Rate" />
+                <Input
+                  onChange={onChangeKhRate}
+                  value={khRate}
+                  placeholder="Khmer Rate"
+                />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item 
-              name={"taxRate"}
-              label="Tax Rate"
-              >
+              <Form.Item name={"taxRate"} label="Tax Rate">
                 <Input value={taxRate} placeholder="Tax Rate" />
               </Form.Item>
             </Col>
@@ -475,56 +487,36 @@ const SalaryPage = () => {
             </Col>
           </Row>
           <Form.Item>
-            <Button icon={<SendOutlined />} type="primary" htmlType="submit">
-              Generate
-            </Button>
+            <Space>
+              <Button icon={<SendOutlined />} type="primary" htmlType="submit">
+                {!edit ? "Generate" : "Update"}
+              </Button>
+              <Button type="primary" danger onClick={onReset}>
+                Clear
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Card>
       <Divider dashed />
       <Space.Compact block>
-        <DatePicker
-          onChange={onChangeYear}
-          defaultValue={dayjs(today, dateFormat)}
-          picker="year"
-        />
         <Select
-          placeholder="Select a Salary Cycle"
-          optionFilterProp="label"
-          onChange={onChange}
+          showSearch
+          // style={{
+          //   width: "100%",
+          // }}
           allowClear
-          options={[
-            {
-              value: "1",
-              label: "Monthly",
-            },
-            {
-              value: "2",
-              label: "Semi-Monthly",
-            },
-          ]}
+          onChange={filterByDep}
+          placeholder="Search to Select"
+          optionFilterProp="label"
+          filterSort={(optionA, optionB) =>
+            (optionA?.label ?? "")
+              .toLowerCase()
+              .localeCompare((optionB?.label ?? "").toLowerCase())
+          }
+          options={department}
         />
-        {salaryCycle === "1" ? (
-          <DatePicker picker="month" onChange={handleMonthChange} />
-        ) : (
-          <Select
-            style={{ width: 300 }}
-            onChange={handleDateRangeChange}
-            placeholder="Select Range"
-          >
-            {dateRanges.map((range, index) => (
-              <Option key={index} value={range}>
-                {range}
-              </Option>
-            ))}
-          </Select>
-        )}
-        <Search
-          style={{ width: 300 }}
-          placeholder="input search text"
-          onSearch={onSearch}
-          enterButton
-        />
+
       </Space.Compact>
       <br />
       <Card style={{ width: "100%" }}>

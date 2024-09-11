@@ -28,10 +28,10 @@ export const request = async (url, method, param) => {
     url: config.base_server + url,
     method: method,
     data: param,
-    // headers: {
-    //   ...header,
-    //   Authorization: "Bearer " + getLocalAccessToken(),
-    // },
+    headers: {
+      ...header,
+     // Authorization: "Bearer " + getLocalAccessToken(),
+    },
   })
     .then((res) => {
       return res.data;
