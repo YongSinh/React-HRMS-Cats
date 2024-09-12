@@ -31,9 +31,7 @@ import { isEmptyOrNull } from "../../share/helper";
 
 const { Title } = Typography;
 
-
-  /** pass this to Form.Item's getValueFromEvent prop */
-
+/** pass this to Form.Item's getValueFromEvent prop */
 
 const SalaryPage = () => {
   const [form] = Form.useForm();
@@ -91,7 +89,7 @@ const SalaryPage = () => {
         form.setFieldsValue({
           depId: data.depId,
         });
-       // console.log(res.data);
+        // console.log(res.data);
       }
     });
   };
@@ -101,19 +99,22 @@ const SalaryPage = () => {
   };
 
   const filterByDep = (value) => {
-    if(!isEmptyOrNull(value)){
+    if (!isEmptyOrNull(value)) {
       setLoading(true);
-      request("payrolls/salary/getSalaryByDepId?depId="+value, "get", {}).then((res) => {
+      request(
+        "payrolls/salary/getSalaryByDepId?depId=" + value,
+        "get",
+        {}
+      ).then((res) => {
         if (res) {
           setData(res.data);
           setLoading(false);
-         //console.log(res.data);
+          //console.log(res.data);
         }
       });
-    }else{
-      getList()
+    } else {
+      getList();
     }
-    
   };
 
 
@@ -281,7 +282,6 @@ const SalaryPage = () => {
     form.resetFields();
     setEdit(false);
   };
-
 
   const columns = [
     {
@@ -516,7 +516,6 @@ const SalaryPage = () => {
           }
           options={department}
         />
-
       </Space.Compact>
       <br />
       <Card style={{ width: "100%" }}>

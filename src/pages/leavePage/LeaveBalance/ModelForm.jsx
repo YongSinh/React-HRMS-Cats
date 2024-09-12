@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState} from "react";
 import {
   Button,
   Modal,
@@ -12,34 +12,8 @@ import {
   Input,
 } from "antd";
 import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
-
-const SELECT_ALL_OPTION = {
-  label: "Select All",
-  value: "_SELECT_ALL_OPTION",
-};
-function useSelectAllOption(options) {
-  const optionsWithAllOption = useMemo(
-    () => [SELECT_ALL_OPTION, ...options],
-    [options]
-  );
-
-  /** pass this to Form.Item's getValueFromEvent prop */
-  const getValueFromEvent = useCallback(
-    (value, selections) => {
-      if (!selections?.length) return selections;
-      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-        return selections;
-      }
-      const labelInValue = typeof value[0]?.label === "string";
-      // if "Select All" option selected, set value to all options
-      // also keep labelInValue in consideration
-      return labelInValue ? options : options.map((o) => o.value);
-    },
-    [options]
-  );
-
-  return [getValueFromEvent, optionsWithAllOption];
-}
+import { isEmptyOrNull } from "../../../share/helper";
+import { request } from "../../../share/request";
 
 export default function ModelForm({
   open = false,
@@ -47,19 +21,36 @@ export default function ModelForm({
   onFinish,
   title,
   handleOk,
-  conutry,
+  department,
   items,
   view,
   status,
   disabled = false,
 }) {
-  const options = [
-    { label: "one", value: "one" },
-    { label: "two", value: "two" },
-    { label: "three", value: "three" },
-  ];
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
   const [form] = Form.useForm();
+  const [emp, setEmp] = useState([]);
+
+  
+  const getListEmp = (value) => {
+    if (!isEmptyOrNull(value)) {
+      request(`info/employee/listEmployeeByDep?depId=${value}`, "get", {}).then(
+        (res) => {
+          if (res) {
+            //console.log(res.data);
+            const arrTmpP = res.data.map((emp) => ({
+              label: emp.empId.toString(),
+              value: emp.empId,
+            }));
+            setEmp(arrTmpP);
+            //setDepartment(arrTmpP);
+          }
+        }
+      );
+    } else {
+      setEmp(" ");
+    }
+  };
+
 
   const onFinish2 = (values) => {
     console.log("Success:", values);
@@ -68,7 +59,8 @@ export default function ModelForm({
     console.log("Failed:", errorInfo);
   };
   const onChange = (value) => {
-    console.log(`selected ${value}`);
+    console.log("Dep:", value);
+    getListEmp(value);
   };
   const onSearch = (value) => {
     console.log("search:", value);
@@ -113,22 +105,8 @@ export default function ModelForm({
                   placeholder="Select a Department"
                   optionFilterProp="label"
                   onChange={onChange}
-                  onSearch={onSearch}
                   allowClear
-                  options={[
-                    {
-                      value: "jack",
-                      label: "Jack",
-                    },
-                    {
-                      value: "lucy",
-                      label: "Lucy",
-                    },
-                    {
-                      value: "tom",
-                      label: "Tom",
-                    },
-                  ]}
+                  options={department}
                 />
               </Form.Item>
             </Col>
@@ -141,15 +119,15 @@ export default function ModelForm({
                     },
                   ]}
                 label="Employees"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                name="employee"
               >
                 <Select
                   showSearch
                   placeholder="Select a Employees"
                   allowClear
+                  //onChange={getListEmp}
                   mode="multiple"
-                  options={optionsWithAllOption}
+                  options={emp}
                 />
               </Form.Item>
             </Col>
@@ -169,7 +147,7 @@ export default function ModelForm({
                   placeholder="Select a Leave Type"
                   allowClear
                   mode="multiple"
-                  options={optionsWithAllOption}
+                  options={""}
                 />
               </Form.Item>
             </Col>

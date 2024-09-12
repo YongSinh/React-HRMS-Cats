@@ -24,11 +24,16 @@ import {
   EyeFilled,
   EditFilled,
   DeleteOutlined,
+  SearchOutlined,
+  ClearOutlined,
+  FileDoneOutlined
 } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 import { useParams, Link } from "react-router-dom";
+import ModalForm from "./ModelForm";
 import Swal from "sweetalert2";
 const { Search } = Input;
+const { RangePicker } = DatePicker;
 const { Title } = Typography;
 
 const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
@@ -60,7 +65,8 @@ const PayrollPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
   const today = dayjs(now);
-  const [year, setYear] = useState("2024");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [salaryCycle, setSalaryCycle] = useState("1");
   const [loading, setLoading] = useState(false);
   const [department, setDepartment] = useState([]);
@@ -69,15 +75,25 @@ const PayrollPage = () => {
   const [edit, setEdit] = useState(false);
   const [item, setItem] = useState();
   const [empList, setEmpList] = useState([]);
+  const [empId, setEmpId] = useState("");
   const [status, setStatus] = useState("");
-  const onChangeStatus = (value) =>{
-    setStatus(value)
-    console.log(value)
-  }
-  const onChangeType = (value) =>{
-    setSalaryCycle(value)
-    console.log(value)
-  }
+  const [visibleModal, setVisibleModal] = useState(false);
+  const format = "YYYY-MM-DD";
+  const handleOpenModal = () => {
+    setVisibleModal(true);
+  };
+
+  const onCloseModal= () => {
+    setVisibleModal(false);
+  };
+  const onChangeStatus = (value) => {
+    setStatus(value);
+    console.log(value);
+  };
+  const onChangeType = (value) => {
+    setSalaryCycle(value);
+    console.log(value);
+  };
   const typeOption = [
     {
       value: "1",
@@ -134,7 +150,7 @@ const PayrollPage = () => {
   const handleClickView = (Item) => {
     //console.log("Failed:", Item);
     getEmpInfo(Item.empId);
-    setStatus(Item.status)
+    setStatus(Item.status);
     //console.log(Item.fromDate);
     setItem(Item);
     setEdit(true);
@@ -149,7 +165,7 @@ const PayrollPage = () => {
   };
 
   const onFinish = (values) => {
-    var format = "YYYY-MM-DD";
+
     var startDate = dayjs(values.startDate).format(format);
     var endDate = dayjs(values.endDate).format(format);
     var today = dayjs(now).format(format);
@@ -238,18 +254,68 @@ const PayrollPage = () => {
     setEdit(false);
   };
 
-  const onSearch = (value) => {
-    if (!isEmptyOrNull(value)) {
-      setLoading(true);
-      request("payrolls/payrollByEmId?emId=" + value, "get", {}).then((res) => {
-        if (res) {
-          setData(res.data);
-          setLoading(false);
-          //console.log(res.data);
-        }
-      });
+  const onSearch = (e) => {
+    setEmpId(e.target.value);
+    console.log(e.target.value);
+  };
+
+  const onRangeChange = (dates, dateStrings) => {
+    if (dates) {
+      setStartDate(dateStrings[0]);
+      setEndDate(dateStrings[1]);
+      //console.log("From: ", dates[0], ", to: ", dates[1]);
+      console.log("From: ", dateStrings[0], ", to: ", dateStrings[1]);
     } else {
-      getList();
+      console.log("Clear");
+    }
+  };
+  const getPayrollByEmId = (value) => {
+    setLoading(true);
+    request("payrolls/payrollByEmId?emId=" + value, "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
+
+  const getPayrollByCreateDate = () => {
+    setLoading(true);
+    request(
+      `payrolls/payrollByDateBetween?fromDate=${startDate}&toDate=${endDate}`,
+      "get",
+      {}
+    ).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
+  const getPayrollByEmpIdAndDate = () => {
+    setLoading(true);
+    request(
+      `payrolls/payrollByEmIdAndDateBetween?fromDate=${startDate}&toDate=${endDate}&emId=${empId}`,
+      "get",
+      {}
+    ).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
+
+  const onClickSearch = () => {
+    if (!isEmptyOrNull(empId) && !isEmptyOrNull(startDate)) {
+      getPayrollByEmpIdAndDate();
+    } else if (!isEmptyOrNull(empId)) {
+      getPayrollByEmId(empId);
+    } else {
+      getPayrollByCreateDate();
     }
   };
 
@@ -357,6 +423,44 @@ const PayrollPage = () => {
       }
     });
   };
+  const onClickClear = () => {
+    setEmpId("");
+    getList();
+  };
+
+  const onFinish2 = (values) => {
+    var date = dayjs(values.date).format(format);
+    let url;
+    let method;
+    url = "payrolls/updateStatusPayroll/"+date ;
+    method = "put";
+    //console.log(date)
+    setLoading(true);
+
+    request(url, method, {}).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been updated Status",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        setVisibleModal(false)
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+      }
+    });
+  };
 
   const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(emp);
   const { productId } = useParams();
@@ -364,6 +468,12 @@ const PayrollPage = () => {
   return (
     <>
       <PageTitle PageTitle="Payroll" />
+      <ModalForm
+        open={visibleModal}
+        title={"Update status"}
+        onCancel={onCloseModal}
+        onFinish={onFinish2}
+      />
       {/* <Link to={`/product/1`}>Hello</Link> */}
       <Card style={{ width: "100%" }}>
         <Title level={2}>Generate Payroll</Title>
@@ -462,7 +572,7 @@ const PayrollPage = () => {
                 <Select
                   placeholder="Select a Salary Cycle"
                   optionFilterProp="label"
-                   onChange={onChangeStatus}
+                  onChange={onChangeStatus}
                   value={status}
                   allowClear
                   options={statusOption}
@@ -514,7 +624,32 @@ const PayrollPage = () => {
       <Divider dashed />
       <Card style={{ width: "100%" }}>
         <Space style={{ marginBottom: 20 }}>
-          <Search placeholder="Employees ID" onSearch={onSearch} enterButton />
+          {/* <Search placeholder="Employees ID" onSearch={onSearch} enterButton /> */}
+          <Input placeholder="Employees ID" value={empId} onChange={onSearch} />
+
+          <RangePicker onChange={onRangeChange} />
+          <Button
+            type="primary"
+            icon={<SearchOutlined />}
+            onClick={onClickSearch}
+          >
+            Search
+          </Button>
+          <Button
+            type="primary"
+            icon={<ClearOutlined />}
+            onClick={onClickClear}
+            danger
+          >
+            Clear
+          </Button>
+          <Button
+            type="primary"
+            icon={<FileDoneOutlined />}
+            onClick={handleOpenModal}
+          >
+            update Status
+          </Button>
         </Space>
         <Table
           scroll={{
