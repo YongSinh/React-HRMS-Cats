@@ -1,7 +1,7 @@
 
          .parent {
             display: grid;
-            grid-template-columns: 500px 1fr 2fr 180px 1fr; /* Adjusted for custom widths */
+            grid-template-columns: 350px 1fr 2fr 180px 1fr; /* Adjusted for custom widths */
             grid-template-rows: repeat( 1fr);
             gap: 6px;
             /* justify-content: center; */
@@ -10,7 +10,7 @@
         .div1 {
             grid-column: 1 / span 1; /* Stays in the first column */
             grid-row: span 5; /* Spans 5 rows */
-            width: 500px; /* Set a fixed width for UserProfile */
+            width: 350px; /* Set a fixed width for UserProfile */
         }
         
         .div2 {
