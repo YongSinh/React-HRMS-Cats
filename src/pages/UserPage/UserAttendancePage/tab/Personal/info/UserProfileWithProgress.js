@@ -6,6 +6,8 @@ import ButtonLeaveRequest from "./ButtonLeaveRequest";
 import LeaveRequestDrawer from "../LeaveRequestDrawer";
 import UserProfile from "./UserProfile";
 import UserInfo from "./Userinfo";
+import "./UserProfileWithProgress..css";
+import DynamicCalendar from "./DynamicCalendar";
 
 const { Content } = Layout;
 
@@ -54,27 +56,17 @@ const UserProfileWithProgress = () => {
         onClose={closeLeaveDrawer}
         onSubmit={handleLeaveSubmit}
       />
-      
-      {/* Row containing both buttons */}
-      <Row gutter={16}  justify="end" style={{ marginBottom: "6px", }}>
-        <Col>
-          <ButtonMarkAttendance showDrawer={showAttendanceDrawer} />
-        </Col>
-        <Col>
-          <ButtonLeaveRequest showDrawer={showLeaveDrawer} />
-        </Col>
-      </Row>
-      
-      <Content style={{ padding: "12px" }}>
-        <Row gutter={16}>
-          <Col span={8}>
-            <UserProfile />
-          </Col>
-          <Col span={16}>
-            <UserInfo />
-          </Col>
-        </Row>
-      </Content>
+
+<div class="parent">
+    <div class="div1" > <UserProfile /></div>
+    <div class="div2"><DynamicCalendar /></div>
+    <div class="div3"><UserInfo /> </div>
+    <div class="div4" ><ButtonMarkAttendance showDrawer={showAttendanceDrawer} />
+    <ButtonLeaveRequest showDrawer={showLeaveDrawer} />
+    </div>
+</div>
+
+
     </Layout>
   );
 };

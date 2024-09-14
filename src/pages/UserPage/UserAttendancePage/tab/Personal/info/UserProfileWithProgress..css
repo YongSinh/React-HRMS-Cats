@@ -1,0 +1,36 @@
+
+         .parent {
+            display: grid;
+            grid-template-columns: 500px 1fr 2fr 180px 1fr; /* Adjusted for custom widths */
+            grid-template-rows: repeat( 1fr);
+            gap: 6px;
+            /* justify-content: center; */
+        }
+        
+        .div1 {
+            grid-column: 1 / span 1; /* Stays in the first column */
+            grid-row: span 5; /* Spans 5 rows */
+            width: 500px; /* Set a fixed width for UserProfile */
+        }
+        
+        .div2 {
+            grid-column: 2 / span 1;
+            grid-row: span 5; /* Spans 5 rows */
+        }
+        
+        .div3 {
+            grid-column: 3 / span 2; /* Spans 2 columns to increase width */
+            grid-row: span 5; /* Spans 5 rows */
+        }
+        
+        .div4 {
+            grid-column:5; /* ButtonMarkAttendance in the last column */
+            grid-row:1; /* Positioned at the top */
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            justify-items: center;
+          
+        }
+        

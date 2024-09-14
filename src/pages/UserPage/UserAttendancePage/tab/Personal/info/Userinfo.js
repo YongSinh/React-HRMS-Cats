@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Row, Col, Card, Button } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
-import DynamicCalendar from "./DynamicCalendar";
 import "./Userinfo.css";
 const Userinfo = () => {
   // Set default hide salary to true
@@ -43,11 +42,9 @@ const Userinfo = () => {
     nonTaxSeniority;
 
   return (
-    <Row gutter={[12, 12]} style={{ marginBottom: 5 }}>
-      <Col span={12.5}>
-        <DynamicCalendar />
-      </Col>
-      <Col span={9}>
+    <Row gutter={[8]} style={{ marginBottom: 5 }}>
+    
+      <Col span={24}>
         <Card
           title="Your Salary"
           extra={
