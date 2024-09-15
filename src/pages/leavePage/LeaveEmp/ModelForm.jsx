@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Modal,
@@ -8,17 +8,19 @@ import {
   Col,
   Row,
   DatePicker,
+  Input,
 } from "antd";
 import { SaveFilled } from "@ant-design/icons";
 import { request } from "../../../share/request";
-
+import dayjs from "dayjs";
 export default function ModelForm({
   open = false,
   handleClose,
   onFinish,
   handleOk,
-  department,
+  item,
   leaveType,
+  edit = false,
 }) {
   const [form] = Form.useForm();
   const [emp, setEmp] = useState([]);
@@ -26,31 +28,6 @@ export default function ModelForm({
   const handleCancel = () => {
     form.resetFields(); // clear data in form
     handleClose();
-  };
-
-  const onChange = (value) => {
-    request(`info/employee/listEmployeeByDep?depId=${value}`, "get", {}).then(
-      (res) => {
-        if (res) {
-          //console.log(res.data);
-          const arrTmpP = res.data.map((emp) => ({
-            label: emp.empId.toString(),
-            value: emp.empId,
-          }));
-          setEmp(arrTmpP);
-        }
-      }
-    );
-  };
-
-  const sharedProps = {
-    mode: "multiple",
-    style: {
-      width: "100%",
-    },
-    emp,
-    placeholder: "Select Item...",
-    maxTagCount: "responsive",
   };
 
   const typeProps = {
@@ -63,6 +40,15 @@ export default function ModelForm({
     maxTagCount: "responsive",
   };
 
+  useEffect(() => {
+    if (item != null) {
+      form.setFieldsValue({
+        type: item.leaveType,
+        balance: item.balanceAmount,
+        date: dayjs(item.lastUpdateDate),
+      });
+    }
+  }, [item]);
 
   const onOk = (value) => {
     console.log("onOk: ", value);
@@ -70,7 +56,7 @@ export default function ModelForm({
   return (
     <>
       <Modal
-        title="Add Leave Balance"
+        title="Update User Leave Balance"
         open={open}
         onOk={handleOk}
         onCancel={handleClose}
@@ -85,55 +71,12 @@ export default function ModelForm({
             //form.resetFields();
             onFinish(item);
           }}
-          initialValues={{
-            status: 1,
-          }}
         >
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Department"
-                name="department"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select department!",
-                  },
-                ]}
-              >
-                <Select
-                  showSearch
-                  placeholder="Select a Department"
-                  optionFilterProp="label"
-                  onChange={onChange}
-                  allowClear
-                  options={department}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Employees!",
-                  },
-                ]}
-                label="Employees"
-                name="employee"
-              >
-                <Select
-                  showSearch
-                  placeholder="Select a Employees"
-                  allowClear
-                  {...sharedProps}
-                  //onChange={getListEmp}
-                  // mode="multiple"
-                  options={emp}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
+            <Col span={24}>
+              {/* <Form.Item label="Leave Type" name={"type"}>
+                <Input />
+              </Form.Item> */}
               <Form.Item
                 label="Leave Type"
                 name={"type"}
@@ -154,7 +97,25 @@ export default function ModelForm({
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            {edit ? (
+              <Col span={12}>
+                <Form.Item
+                  label="Leave Balance"
+                  name={"balance"}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please Input Balance!",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+            ) : (
+              <></>
+            )}
+            <Col span={edit ? 12:24 }>
               <Form.Item
                 label="Date"
                 name={"date"}
@@ -177,15 +138,17 @@ export default function ModelForm({
               </Form.Item>
             </Col>
           </Row>
-            <Form.Item style={{ textAlign: "right" }}>
-              <Space>
-                <Button type="primary" onClick={handleCancel} danger >Cancel</Button>
-                <Button type="primary" htmlType="submit">
-                  <SaveFilled />
-                  submit
-                </Button>
-              </Space>
-            </Form.Item>
+          <Form.Item style={{ textAlign: "right" }}>
+            <Space>
+              <Button type="primary" onClick={handleCancel} danger>
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit">
+                <SaveFilled />
+                submit
+              </Button>
+            </Space>
+          </Form.Item>
         </Form>
       </Modal>
     </>

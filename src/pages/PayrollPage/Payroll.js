@@ -88,12 +88,13 @@ const PayrollPage = () => {
   };
   const onChangeStatus = (value) => {
     setStatus(value);
-    console.log(value);
+    //console.log(value);
   };
   const onChangeType = (value) => {
     setSalaryCycle(value);
-    console.log(value);
+    //console.log(value);
   };
+  
   const typeOption = [
     {
       value: "1",
