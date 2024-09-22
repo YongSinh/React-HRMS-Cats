@@ -37,6 +37,7 @@ const LeaveEmpPage = () => {
   const [leaveType, setLeaveType] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [dataLeave, setDataLeave] = useState([]);
   const [empInfo, setEmpInfo] = useState([]);
   const [item, setItem] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,6 +68,20 @@ const LeaveEmpPage = () => {
       }
     );
   };
+  const getListLeave = () => {
+    setLoading(true);
+    request("attendanceLeave/leave/getLeaveByEmId/" + id, "get", {}).then(
+      (res) => {
+        if (res) {
+          //console.log(res);
+          setDataLeave(res.data);
+          setLoading(false);
+        }
+      }
+    );
+  };
+
+  //attendanceLeave/leave/getLeaveByEmId/1000'
 
   const getListLeaveType = () => {
     setLoading(true);
@@ -228,46 +243,45 @@ const LeaveEmpPage = () => {
 
   const columns = [
     {
-      title: "Leave Type ID",
-      dataIndex: "name",
-      key: "name",
+      title: "Employee ID",
+      dataIndex: "empId",
+      key: "empId",
       fixed: "left",
-      render: (text) => <a>{text}</a>,
     },
     {
       title: "Leave Title",
-      dataIndex: "age",
-      key: "age",
+      dataIndex: "leaveType",
+      key: "leaveType",
     },
     {
-      title: "Leave Description",
-      dataIndex: "address",
-      key: "address",
+      title: "Reason",
+      dataIndex: "reason",
+      key: "reason",
     },
     {
       title: "Total Leave",
-      dataIndex: "address",
-      key: "address",
+      dataIndex: "dayOfLeave",
+      key: "dayOfLeave",
+    },
+    {
+      title: "From Date",
+      key: "startDate",
+      dataIndex: "startDate"
+    },
+    {
+      title: "To Date",
+      key: "endDate",
+      dataIndex: "endDate"
     },
     {
       title: "Create Date",
-      key: "tags",
-      dataIndex: "tags",
-      render: (_, { tags }) => (
-        <>
-          {tags.map((tag) => {
-            let color = tag.length > 5 ? "geekblue" : "green";
-            if (tag === "loser") {
-              color = "volcano";
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
+      key: "createdAt",
+      dataIndex: "createdAt"
+    },
+    {
+      title: "Approved",
+      key: "approved",
+      dataIndex: "approved  "
     },
     {
       title: "Action",
@@ -285,6 +299,7 @@ const LeaveEmpPage = () => {
     getList();
     getListEmpInfo();
     getListLeaveType();
+    getListLeave();
   }, []);
 
   const data1 = [
@@ -417,7 +432,7 @@ const LeaveEmpPage = () => {
                   x: "max-content",
                 }}
                 columns={columns}
-                dataSource={data1}
+                dataSource={dataLeave}
               />
             </Card>
           </Col>

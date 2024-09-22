@@ -1,32 +1,30 @@
 import { Component } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-// import ImageResize from 'quill-image-resize-module-react';
 import './editor.css';
 
-// Quill.register('modules/imageResize', ImageResize);
-
-/*
- * Simple editor component that takes placeholder text as a prop
- */
 class Editor extends Component {
   constructor(props) {
     super(props);
-    this.state = { editorHtml: '' };
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(html) {
-    this.setState({ editorHtml: html });
-    console.log(html);
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const plainText = div.textContent || div.innerText || "";
+    // Call the onChange prop passed from the parent
+    if (this.props.onChange) {
+      this.props.onChange(plainText);
+    }
   }
 
   render() {
     return (
       <ReactQuill
-        theme={this.state.theme}
+        theme={this.state?.theme}
         onChange={this.handleChange}
-        value={this.state.editorHtml}
+        value={this.props.value}  // Use the value prop passed from the parent
         modules={Editor.modules}
         formats={Editor.formats}
         bounds={'#root'}
@@ -36,10 +34,6 @@ class Editor extends Component {
   }
 }
 
-/*
- * Quill modules to attach to editor
- * See https://quilljs.com/docs/modules/ for complete options
- */
 Editor.modules = {
   toolbar: [
     [{ header: '1' }, { header: '2' }, { font: [] }],
@@ -55,19 +49,10 @@ Editor.modules = {
     ['clean']
   ],
   clipboard: {
-    // toggle to add extra line breaks when pasting HTML:
     matchVisual: false
-  },
-//   imageResize: {
-//     parchment: Quill.import('parchment'),
-//     modules: ['Resize', 'DisplaySize']
-//   }
+  }
 };
 
-/*
- * Quill editor formats
- * See https://quilljs.com/docs/formats/
- */
 Editor.formats = [
   'header',
   'font',
