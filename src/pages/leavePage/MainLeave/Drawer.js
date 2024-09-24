@@ -50,7 +50,7 @@ const Drawerleave = ({ open = false, onClose, items }) => {
   };
 
   const handleViewFile = (value) => {
-    window.open(value.filePreviewUri, "_blank", "noopener,noreferrer");
+    window.open(value.url, "_blank", "noopener,noreferrer");
   };
   useEffect(() => {
     getListFile();
@@ -138,7 +138,7 @@ const Drawerleave = ({ open = false, onClose, items }) => {
 
             <Col span={24}>
               <Form.Item name="upload" label="Upload">
-                {isEmptyOrNull(data) ? (
+                {data.length !== 0  ? (
                   <Space wrap>
                     {data.map((items) => (
                       <Tooltip title={items.name}>
