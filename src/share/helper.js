@@ -1,11 +1,8 @@
-import { useEffect, useState, useCallback, useMemo  } from "react";
+import { useEffect, useState } from "react";
 
 export const isEmptyOrNull = (value) => {
     return (value === "" || value === null || value === undefined) ? true : false
 }
-
-
-
 
 export const WindowSize = () => {
     const [windowSize, setWindowSize] = useState({

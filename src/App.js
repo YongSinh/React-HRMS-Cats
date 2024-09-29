@@ -4,7 +4,7 @@ import MainLayoutLayout from './components/layout/Layout';
 import DashboardPage from './pages/Dashboard/dashboard';
 import LeavePage from './pages/leavePage/MainLeave/leavePage';
 import InfoPage from './pages/infoPage/info';
-import LeaveRequest from './pages/leavePage/UserLeavePage/myleave';
+import LeaveRequest from './pages/leavePage/UserLeavePage/leaveRequest';
 import DepartmentPage from './pages/DepartmentPage/Department';
 import Staff from './pages/StaffPage/Staff';
 import Report from './pages/Report/Tabs_report';

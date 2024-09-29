@@ -1,194 +1,230 @@
-import React, { useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { message, Upload } from 'antd';
-import Editor from '../Editor/Editor';
-const props = {
-  name: 'file',
-  action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-  headers: {
-    authorization: 'authorization-text',
-  },
-  onChange(info) {
-    if (info.file.status !== 'uploading') {
-      console.log(info.file, info.fileList);
+import React, { useState } from "react";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Drawer,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  InputNumber,
+  TimePicker,
+} from "antd";
+import { InboxOutlined, SaveFilled } from "@ant-design/icons";
+import { message, Upload } from "antd";
+import Editor from "../Editor/Editor";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat);
+const { Dragger } = Upload;
+
+const Drawerleave = ({ open = false, onClose, onFinish, leaevType }) => {
+  const [file, setFile] = useState(null);
+  const [isHalfDay, setIsHalfDay] = useState(false);
+  const [duration, setDuration] = useState(0.5);
+  const [form] = Form.useForm();
+
+  const onChangeDuration = (value) => {
+    setDuration(value);
+    if (value % 1 === 0.5) {
+      setIsHalfDay(true);
+    } else {
+      setIsHalfDay(false);
     }
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
-const { Option } = Select;
-const Drawerleave = ({
-    open=false,
-    onClose
-}) => {
+  };
+
+  const props = {
+    name: "file",
+    multiple: false, // Disable multiple uploads, can be enabled if needed
+    beforeUpload: (file) => {
+      // Before the file is uploaded, store it in the state
+      setFile(file);
+      console.log(file);
+      message.success(`${file.name} file is ready for upload.`);
+      return false;
+    },
+    onChange(info) {
+      const { status } = info.file;
+      if (status === "removed") {
+        setFile(null);
+        message.info("File removed.");
+      }
+    },
+    onDrop(e) {
+      console.log("Dropped files", e.dataTransfer.files);
+    },
+  };
+
+  const handleEditorChange = (content) => {
+    console.log(content); // Log the plain text content
+  };
+
+  const handleCancel = () => {
+    onClose();
+    form.resetFields(); // clear data in form
+  };
+
+  const onChangeDate = (value, dataSrting) => {
+    console.log(dataSrting[0]);
+    console.log(dataSrting[1]);
+  };
+
+  const onChangeTime = (time, timeString) => {
+    console.log(time, timeString);
+  };
   return (
     <>
-      {/* <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-        New account
-      </Button> */}
       <Drawer
         title="Create Request Leave"
         width={720}
         onClose={onClose}
         open={open}
-        styles={{
-          body: {
-            paddingBottom: 80,
-          },
-        }}
-        extra={
-          <Space>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onClose} type="primary">
-              Submit
-            </Button>
-          </Space>
-        }
       >
-        <Form layout="vertical" hideRequiredMark>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={(item) => {
+            //form.resetFields();
+            onFinish(item);
+          }}
+          initialValues={{
+            status: 1,
+          }}
+        >
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name="name"
-                label="Name"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please enter user name',
-                  },
-                ]}
-              >
-                <Input placeholder="Please enter user name" />
+              <Form.Item name="emId" label="Employee ID">
+                <Input placeholder="Employee ID" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Leave Type"
+                name="leaveType"
                 label="Leave Type"
                 rules={[
                   {
                     required: true,
-                    message: 'Leave Type',
+                    message: "Leave Type",
                   },
                 ]}
               >
-                <Select placeholder="Please select Leave Type">
-                  <Option value="al">AL</Option>
-                  <Option value="sl">SL</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-          <Col span={12}>
-              <Form.Item
-                name="dateTime"
-                label="DateTime"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please choose the dateTime',
-                  },
-                ]}
-              >
-                <DatePicker.RangePicker
-                  style={{
-                    width: '100%',
-                  }}
-                  getPopupContainer={(trigger) => trigger.parentElement}
+                <Select
+                  Select
+                  placeholder="Leave Type"
+                  optionFilterProp="children"
+                  options={leaevType}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Leave Duration:"
-                label="Leave Duration:"
+                name="date"
+                label="Date"
                 rules={[
                   {
                     required: true,
-                    message: 'Please choose the type',
+                    message: "Please choose the date",
                   },
                 ]}
               >
-                <Select placeholder=" ">
-                 
-                </Select>
+                <DatePicker.RangePicker
+                  onChange={onChangeDate}
+                  style={{
+                    width: "100%",
+                  }}
+                />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="approver"
-                label="Approver"
+                name="time"
+                label="Time"
                 rules={[
                   {
-                    required: true,
-                    message: 'Please choose the approver',
+                    required: isHalfDay,
+                    message: "Please choose the date",
                   },
                 ]}
               >
-                <Select placeholder="Please choose the approver">
-                  <Option value="jack">Jack Ma</Option>
-                  <Option value="tom">Tom Liu</Option>
-                </Select>
+                <TimePicker
+                  style={{ width: "100%" }}
+                  disabled={!isHalfDay}
+                  onChange={onChangeTime}
+                  defaultOpenValue={dayjs("00:00:00", "HH:mm:ss")}
+                />
               </Form.Item>
             </Col>
-           
-          </Row>
-          <Form.Item
-                name="remark"
-                label="Remark"
-                
-              >
-          <Editor>
-          <Row gutter={16}>
-            <Col span={24}>
-            
-               
-              
-            </Col>
 
-          </Row>
-          </Editor>
-          </Form.Item>
-          <Form.Item
-                name="reason"
-                label="Reason"
-                
+            <Col span={12}>
+              <Form.Item
+                name="duration"
+                label="Leave Duration"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please choose the Duration",
+                  },
+                ]}
               >
-          <Editor>
-          <Row gutter={16}>
-            <Col span={24}>
-            
-                
+                <InputNumber
+                  style={{ width: "100%" }}
+                  value={duration}
+                  min={0.5}
+                  max={10}
+                  step={0.5} // Increment by 0.5
+                  onChange={onChangeDuration}
+                />
+              </Form.Item>
             </Col>
-
+            <Form.Item 
+            name={"reason"} 
+            label="Reason"
+            rules={[
+              {
+                required: true,
+                message: "Please Input the reason",
+              },
+            ]}
+            >
+              <Editor
+                // value={editorContent}
+                // onChange={handleEditorChange}
+                placeholder="Start typing..."
+              />
+            </Form.Item>
+            <Form.Item name={"remark"} label="Remark">
+              <Editor
+                //value={editorContent}
+                // onChange={handleEditorChange}
+                placeholder="Start typing..."
+              />
+            </Form.Item>
+            <Form.Item name="upload" label="Upload">
+              <Dragger {...props}>
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p className="ant-upload-text">
+                  Click or drag file to this area to upload
+                </p>
+                <p className="ant-upload-hint">
+                  Support for a single or bulk upload. Strictly prohibited from
+                  uploading company data or other banned files.
+                </p>
+              </Dragger>
+            </Form.Item>
+            <Form.Item style={{ textAlign: "right" }}>
+              <Space>
+                <Button onClick={handleCancel}>Cancel</Button>
+                <Button type="primary" htmlType="submit">
+                  <SaveFilled />
+                  submit
+                </Button>
+              </Space>
+            </Form.Item>
           </Row>
-          </Editor>
-          </Form.Item>
-          <Form.Item
-                name="upload"
-                label="Upload"
-               
-              >
-          
-          <Row gutter={16}>
-            <Col span={24}>
-            <Upload {...props}>
-                 <Button icon={<UploadOutlined />}>Click to Upload</Button>
-            </Upload>
-              
-            </Col>
-
-          </Row>
-          
-          </Form.Item>
         </Form>
       </Drawer>
     </>

@@ -16,9 +16,9 @@ import Editor from "../Editor/Editor";
 import dayjs from "dayjs";
 import { FileOutlined } from "@ant-design/icons";
 import { request } from "../../../share/request";
-import { isEmptyOrNull } from "../../../share/helper";
 const { RangePicker } = DatePicker;
-const Drawerleave = ({ open = false, onClose, items }) => {
+
+const DrawerView = ({ open = false, onClose, items }) => {
   const [form] = Form.useForm();
   const dateFormat = "YYYY-MM-DD";
   const start = dayjs(items.startDate);
@@ -73,11 +73,8 @@ const Drawerleave = ({ open = false, onClose, items }) => {
   }, [items, open]);
   return (
     <>
-      {/* <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
-        New account
-      </Button> */}
       <Drawer
-        title="Create Request Leave"
+        title="View Request Leave"
         width={720}
         onClose={onClose}
         open={open}
@@ -179,4 +176,4 @@ const Drawerleave = ({ open = false, onClose, items }) => {
     </>
   );
 };
-export default Drawerleave;
+export default DrawerView;

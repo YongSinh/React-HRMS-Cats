@@ -60,8 +60,6 @@ const LeaveTypePage = () => {
     );
   };
   const onFinish = (Item) => {
-    console.log("Success:", Item);
-
     var param = {
       id: Item.id,
       leaveTitle: Item.title,

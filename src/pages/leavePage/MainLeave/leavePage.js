@@ -1,5 +1,5 @@
 import "./leavePage.css";
-import { Button, Space, DatePicker, Table, Select, Badge } from "antd";
+import { Button, Space, DatePicker, Table, Select, Badge, Row, Col } from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
@@ -299,20 +299,6 @@ const LeavePage = () => {
           ]}
         />
         <RangePicker />
-        <Select
-          style={{
-            width: 180,
-            height: 30,
-          }}
-          Select
-          showSearch
-          placeholder="Department"
-          optionFilterProp="children"
-          onChange={onChange}
-          onSearch={onSearch}
-          filterOption={filterOption}
-          options={department}
-        />
         <Button icon={<SearchOutlined />} type="primary">
           Search
         </Button>
@@ -336,7 +322,6 @@ const LeavePage = () => {
         dataSource={data}
         columns={columns}
       />
-      ;
     </>
   );
 };
