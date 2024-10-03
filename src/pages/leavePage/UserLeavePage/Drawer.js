@@ -20,7 +20,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat);
 const { Dragger } = Upload;
 
-const Drawerleave = ({ open = false, onClose, onFinish, leaevType }) => {
+const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false }) => {
   const [file, setFile] = useState(null);
   const [isHalfDay, setIsHalfDay] = useState(false);
   const [duration, setDuration] = useState(0.5);
@@ -37,11 +37,11 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType }) => {
 
   const props = {
     name: "file",
+    maxCount:1,
     multiple: false, // Disable multiple uploads, can be enabled if needed
     beforeUpload: (file) => {
       // Before the file is uploaded, store it in the state
       setFile(file);
-      console.log(file);
       message.success(`${file.name} file is ready for upload.`);
       return false;
     },
@@ -74,10 +74,12 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType }) => {
   const onChangeTime = (time, timeString) => {
     console.log(time, timeString);
   };
+
+
   return (
     <>
       <Drawer
-        title="Create Request Leave"
+        title="Request Leave"
         width={720}
         onClose={onClose}
         open={open}

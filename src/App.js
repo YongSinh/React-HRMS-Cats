@@ -8,7 +8,7 @@ import LeaveRequest from './pages/leavePage/UserLeavePage/leaveRequest';
 import DepartmentPage from './pages/DepartmentPage/Department';
 import Staff from './pages/StaffPage/Staff';
 import Report from './pages/Report/Tabs_report';
-import AttendancePage from './pages/AttendancePage/Tabs_Attendance';
+import AttendancePage from './pages/AttendancePage/TabsAttendance';
 import AllowancePage from './pages/AllowancePage/Allowance';
 import DeductionPage from './pages/DeductionPage/DeductionPage';
 import PayrollPage from './pages/PayrollPage/Payroll';

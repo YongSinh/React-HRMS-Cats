@@ -1,16 +1,16 @@
 import React from "react";
 import { Tabs } from "antd";
 import PageTitle from "../../components/Title_Page/TitlePage";
-import All_Attendance from "./tab/All_Attendance";
+import AllAttendance from "./tab/AllAttendance";
 import Personal_Attendace from "./tab/Personal_Attendance";
 import './TabsAttendance.css';
 
-const Tabs_attendance = () => {
+const TabsAttendance = () => {
   const items = [
     {
       key: "1",
       label: "All Attendace",
-      children: <All_Attendance />,
+      children: <AllAttendance />,
     },
     {
       key: "2",
@@ -28,4 +28,4 @@ const Tabs_attendance = () => {
     </>
   );
 };
-export default Tabs_attendance;
+export default TabsAttendance;

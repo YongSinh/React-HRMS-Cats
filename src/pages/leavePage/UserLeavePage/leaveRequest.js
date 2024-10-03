@@ -6,6 +6,7 @@ import {
   EditFilled,
   CloseOutlined,
   PlusCircleOutlined,
+  SendOutlined,
 } from "@ant-design/icons";
 import PageTitle from "../../../components/Title_Page/TitlePage";
 import React, { useState, useEffect } from "react";
@@ -30,6 +31,7 @@ const LeaveRequest = () => {
   const [open2, setOpen2] = useState(false);
   const [items, setItems] = useState([]);
   const [leaveType, setLeaveType] = useState([]);
+  const [date, setDate] = useState([]);
   const today = new Date();
   const showDrawer = (value) => {
     setItems(value);
@@ -52,7 +54,6 @@ const LeaveRequest = () => {
     request("attendanceLeave/leave/getLeaveByEmId/1006", "get", {}).then(
       (res) => {
         if (res) {
-          //console.log(res);
           setData(res.data);
           setLoading(false);
         }
@@ -70,10 +71,35 @@ const LeaveRequest = () => {
           value: item.id,
         }));
         setLeaveType(arrTmpP);
-        // setData(res.data);
         setLoading(false);
       }
     });
+  };
+
+  const onChangeDate = (value, dataSrting) => {
+    setDate(dataSrting);
+    console.log(dataSrting[0]);
+    console.log(dataSrting[1]);
+  };
+
+  const onSeacrh = () => {
+    console.log(isEmptyOrNull(date[0]))
+    if (!isEmptyOrNull(date[0])) {
+      setLoading(true);
+      var filter = `?emId=1006&startDate=${date[0]}&endDate=${date[1]}`;
+      request(
+        "attendanceLeave/leave/getLeaveByDateBetweenAndEmId" + filter,
+        "get",
+        {}
+      ).then((res) => {
+        if (res) {
+          setData(res.data);
+          setLoading(false);
+        }
+      });
+    } else {
+      getList();
+    }
   };
 
   useEffect(() => {
@@ -196,22 +222,28 @@ const LeaveRequest = () => {
     {
       title: " Action",
       dataIndex: "action",
-      width: 150,
+      width: 180,
       fixed: "right",
       render: (_, record) => (
         <Space>
           <Button onClick={() => showDrawer2(record)} icon={<EyeFilled />} />
           <Button
+            onClick={() => onApply(record)}
+            type="primary"
+            disabled={record.status}
+            icon={<SendOutlined />}
+          />
+          <Button
             // onClick={() => onApprove(record)}
             type="primary"
-            disabled={record.approved && !record.cancel}
+            disabled={record.status}
             icon={<EditFilled />}
           />
           <Button
             type="primary"
-            //onClick={() => onReject(record)}
+            onClick={() => onCancel(record)}
             icon={<CloseOutlined />}
-            disabled={record.cancel}
+            disabled={record.status}
             danger
           />
         </Space>
@@ -256,31 +288,98 @@ const LeaveRequest = () => {
     let url = "attendanceLeave/leave/add";
     let method = "post";
 
-    // request(url, method, formData).then((res) => {
-    //   if (res.code === 200) {
-    //     Swal.fire({
-    //       title: "Success!",
-    //       text: "Your has been saved",
-    //       icon: "success",
-    //       showConfirmButton: false,
-    //       timer: 1500,
-    //       // confirmButtonText: "Confirm",
-    //     });
-    //     getListLeaveType();
-    //     setLoading(false);
-    //     // setEdit(false);
-    //   } else {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Something went wrong, please check in error detail!",
-    //       text: res.message,
-    //     });
-    //     setLoading(false);
-    //     getListLeaveType();
-    //   }
-    // });
-    console.log(body);
-    console.log(items);
+    request(url, method, formData).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getListLeaveType();
+        setLoading(false);
+        // setEdit(false);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getListLeaveType();
+      }
+    });
+  };
+
+  const onApply = (items) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Apply it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        request(
+          `attendanceLeave/leave/apply?id=${items.id}&reject=false`,
+          "put",
+          {}
+        ).then((res) => {
+          if (res) {
+            Swal.fire({
+              title: "Apply Leave!",
+              text: "Leave has been send.",
+              icon: "success",
+            });
+            getList();
+            setLoading(false);
+          }
+        });
+      }
+    });
+  };
+
+  const onCancel = (items) => {
+    Swal.fire({
+      title: "Are you sure want to cancel?",
+      text: "You won't be able to revert this!",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, cancel it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        request(
+          `attendanceLeave/leave/cancelLeave?id=${items.id}`,
+          "delete",
+          {}
+        ).then((res) => {
+          if (res.code === 200) {
+            Swal.fire({
+              title: "Cancel Leave!",
+              text: "Leave has been cancelled.",
+              icon: "success",
+            });
+            console.log(res)
+            getList();
+            setLoading(false);
+          }else {
+            Swal.fire({
+              icon: "error",
+              title: "Something went wrong!",
+              text: res.message,
+            });
+            setLoading(false);
+            getList();
+          }
+        });
+      }
+    });
   };
 
   return (
@@ -290,8 +389,8 @@ const LeaveRequest = () => {
       <Row>
         <Col span={12}>
           <Space>
-            <RangePicker />
-            <Button icon={<SearchOutlined />} type="primary">
+            <RangePicker onChange={onChangeDate} />
+            <Button icon={<SearchOutlined />} onClick={onSeacrh} type="primary">
               Search
             </Button>
             <div>

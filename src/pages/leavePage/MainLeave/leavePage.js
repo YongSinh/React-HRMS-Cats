@@ -11,6 +11,7 @@ import {
 import PageTitle from "../../../components/Title_Page/TitlePage";
 import React, { useState, useEffect } from "react";
 import { request } from "../../../share/request";
+import { isEmptyOrNull } from "../../../share/helper";
 import Swal from "sweetalert2";
 import Drawerleave from "./Drawer";
 import getColumnSearchProps from "../../../share/ColumnSearchProps";
@@ -28,7 +29,7 @@ const LeavePage = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
-  const [department, setDepartment] = useState([]);
+  const [date, setDate] = useState([]);
   const [items, setItems] = useState([])
   const showDrawer = (value) => {
     setItems(value)
@@ -48,18 +49,7 @@ const LeavePage = () => {
     });
   };
 
-  const getListDep = () => {
-    request("info/department/department", "get", {}).then((res) => {
-      if (res) {
-        //console.log(res.data);
-        const arrTmpP = res.data.map((dep) => ({
-          label: dep.depName,
-          value: dep.depId,
-        }));
-        setDepartment(arrTmpP);
-      }
-    });
-  };
+
   const onReject = (value) => {
     Swal.fire({
       title: "Are you sure?",
@@ -122,8 +112,33 @@ const LeavePage = () => {
 
   useEffect(() => {
     getList();
-    getListDep()
   }, []);
+
+  const onChangeDate = (value, dataSrting) => {
+    setDate(dataSrting);
+    console.log(dataSrting[0]);
+    console.log(dataSrting[1]);
+  };
+
+  const onSeacrh = () => {
+    console.log(isEmptyOrNull(date[0]))
+    if (!isEmptyOrNull(date[0])) {
+      setLoading(true);
+      var filter = `?startDate=${date[0]}&endDate=${date[1]}`;
+      request(
+        "attendanceLeave/leave/getLeaveByDateBetween" + filter,
+        "get",
+        {}
+      ).then((res) => {
+        if (res) {
+          setData(res.data);
+          setLoading(false);
+        }
+      });
+    } else {
+      getList();
+    }
+  };
 
   const columns = [
     {
@@ -263,43 +278,13 @@ const LeavePage = () => {
     },
   ];
 
-  const onChange = (pagination, filters, sorter, extra) => {
-    console.log("params", pagination, filters, sorter, extra);
-  };
 
   return (
     <>
       <PageTitle PageTitle="Leave" />
       <Space>
-        <Select
-          style={{
-            width: 180,
-            height: 30,
-          }}
-          Select
-          showSearch
-          placeholder="Approve"
-          optionFilterProp="children"
-          onChange={onChange}
-          onSearch={onSearch}
-          filterOption={filterOption}
-          options={[
-            {
-              value: "jack",
-              label: "Jack",
-            },
-            {
-              value: "lucy",
-              label: "Lucy",
-            },
-            {
-              value: "tom",
-              label: "Tom",
-            },
-          ]}
-        />
-        <RangePicker />
-        <Button icon={<SearchOutlined />} type="primary">
+        <RangePicker onChange={onChangeDate} />
+        <Button icon={<SearchOutlined />} onClick={onSeacrh} type="primary">
           Search
         </Button>
         <div>
