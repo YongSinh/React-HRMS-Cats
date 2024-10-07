@@ -17,6 +17,7 @@ import { message, Upload } from "antd";
 import Editor from "../Editor/Editor";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import UserService from "../../../UserService/UserService";
 dayjs.extend(customParseFormat);
 const { Dragger } = Upload;
 
@@ -97,8 +98,8 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
         >
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="emId" label="Employee ID">
-                <Input placeholder="Employee ID" />
+              <Form.Item label="Employee ID">
+                <Input placeholder="Employee ID"  value={UserService.getUsername()}/>
               </Form.Item>
             </Col>
             <Col span={12}>

@@ -1,63 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  EyeFilled,
-  DeleteOutlined,
-  EditFilled,
-  ExclamationCircleOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import { Select, Table,  Space, Button, Modal, Input } from "antd";
+import { DeleteOutlied, SyncOutlined } from "@ant-design/icons";
+import { Select, Table, Space, Button, Row, Input, Col, Badge } from "antd";
 import { request } from "../../../share/request";
-
-const { confirm } = Modal;
-
-const AllAttendance = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+import getColumnSearchProps from "../../../share/ColumnSearchProps";
+import Swal from "sweetalert2";
+const AllAttendance = ({ activeKey }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState(null);
-  const [editValues, setEditValues] = useState({});
-
-  const showDeleteConfirm = (ID) => {
-    confirm({
-      title: "Are you sure you want to delete this record?",
-      icon: <ExclamationCircleOutlined />,
-      content: "This action cannot be undone.",
-      okText: "Yes",
-      okType: "danger",
-      cancelText: "No",
-      onOk() {
-        handleDelete(ID);
-      },
-      onCancel() {
-        console.log("Cancel");
-      },
-    });
-  };
-
-  const handleDelete = (ID) => {
-    setData((prevData) => prevData.filter((item) => item.ID !== ID));
-  };
-
-  const showEditModal = (record) => {
-    setCurrentRecord(record);
-    setEditValues(record);
-    setIsEditModalVisible(true);
-  };
-
-  const handleEdit = () => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.key === currentRecord.key ? { ...item, ...editValues } : item
-      )
-    );
-    setIsEditModalVisible(false);
-  };
-
-  const handleInputChange = (field, value) => {
-    setEditValues((prevValues) => ({ ...prevValues, [field]: value }));
-  };
 
   const getList = () => {
     setLoading(true);
@@ -71,14 +20,81 @@ const AllAttendance = () => {
     );
   };
 
+  const asyncTimeOut = () => {
+    Swal.fire({
+      title: "Are you sure async time-out?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, async it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setLoading(true);
+        request(
+          "attendanceLeave/attendance/manualAsyncTimeOut",
+          "post",
+          {}
+        ).then((res) => {
+          if (res) {
+            Swal.fire({
+              title: "Success!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1500,
+              text: res.message,
+            });
+            setLoading(false);
+          }
+        });
+      }
+    });
+  };
+
+  const asyncTimeIn = () => {
+    Swal.fire({
+      title: "Are you sure async time -n?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, async it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setLoading(true);
+        request(
+          "attendanceLeave/attendance/manualAsyncTimeIn",
+          "post",
+          {}
+        ).then((res) => {
+          if (res) {
+            Swal.fire({
+              title: "Success!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1500,
+              text: res.message,
+            });
+            setLoading(false);
+          }
+        });
+      }
+    });
+  };
+
   useEffect(() => {
-    getList();
-  }, []);
+    if (activeKey === "1") {
+      getList(); // Only fetch data when this tab is active
+    }
+  }, [activeKey]);
 
   const columns = [
     {
       title: "Employee ID",
       dataIndex: "emId",
+      ...getColumnSearchProps("emId"),
     },
     {
       title: "Time In",
@@ -90,7 +106,7 @@ const AllAttendance = () => {
     },
     {
       title: "Time Out",
-      dataIndex: "timeout",
+      dataIndex: "timeOut",
     },
     {
       title: "Date Out",
@@ -103,63 +119,20 @@ const AllAttendance = () => {
       ellipsis: true,
     },
     {
-      title: "Action",
-      key: "Action",
-      render: (_, record) => (
-        <Space>
-          <Button
-            type="primary"
-            icon={<DeleteOutlined />}
-            style={{ backgroundColor: "#F44336", borderColor: "#F44336" }}
-            onClick={() => showDeleteConfirm(record.ID)}
-          />
-        </Space>
-      ),
+      title: "On Leave",
+      dataIndex: "onLeave",
+      width: 150,
+      render: (_, record) => {
+        let status = record.onLeave ? "error" : "success";
+        let text = record.onLeave ? "on Leave" : "Present";
+        return (
+          <>
+            <Badge status={status} text={text} />
+          </>
+        );
+      },
     },
   ];
-
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-    selections: [
-      Table.SELECTION_ALL,
-      Table.SELECTION_INVERT,
-      Table.SELECTION_NONE,
-      {
-        key: "odd",
-        text: "Select Odd Row",
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return false;
-            }
-            return true;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-      {
-        key: "even",
-        text: "Select Even Row",
-        onSelect: (changeableRowKeys) => {
-          let newSelectedRowKeys = [];
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-            if (index % 2 !== 0) {
-              return true;
-            }
-            return false;
-          });
-          setSelectedRowKeys(newSelectedRowKeys);
-        },
-      },
-    ],
-  };
 
   const onChange = (value) => {
     console.log(`selected ${value}`);
@@ -174,64 +147,35 @@ const AllAttendance = () => {
 
   return (
     <>
-      <Select
-        showSearch
-        style={{ marginBottom: 15, marginTop: 7 }}
-        placeholder="Select Position"
-        optionFilterProp="children"
-        onChange={onChange}
-        onSearch={onSearch}
-        filterOption={filterOption}
-        options={[
-          {
-            value: "jack",
-            label: "Jack",
-          },
-          {
-            value: "lucy",
-            label: "Lucy",
-          },
-          {
-            value: "tom",
-            label: "Tom",
-          },
-        ]}
+      <Row gutter={16}>
+        <Col span={12}>
+          {/* <Input /> */}
+        </Col>
+        <Col span={12} style={{ textAlign: "right" }}>
+          <Space>
+            <Button
+              icon={<SyncOutlined />}
+              onClick={asyncTimeIn}
+              type="primary"
+            >
+              Async-Time-In
+            </Button>
+            <Button
+              icon={<SyncOutlined />}
+              onClick={asyncTimeOut}
+              type="primary"
+            >
+              Async-Time-Out
+            </Button>
+          </Space>
+        </Col>
+      </Row>
+      <Table
+        style={{ marginTop: 14 }}
+        loading={loading}
+        columns={columns}
+        dataSource={data}
       />
-      <Select
-        showSearch
-        style={{ marginBottom: 15, marginTop: 7, marginLeft: 10 }}
-        placeholder="Select Department"
-        optionFilterProp="children"
-        onChange={onChange}
-        onSearch={onSearch}
-        filterOption={filterOption}
-        options={[
-          {
-            value: "iT",
-            label: "IT",
-          },
-          {
-            value: "deverloper",
-            label: "Deverloper",
-          },
-          {
-            value: "ui/ux",
-            label: "UI/UX",
-          },
-        ]}
-      />
-      <Button
-        icon={<SearchOutlined />}
-        type="primary"
-        style={{
-          backgroundColor: "green",
-          borderColor: "green",
-          marginLeft: 10,
-        }}
-      >
-        Search
-      </Button>
-      <Table loading={loading} columns={columns} dataSource={data} />
     </>
   );
 };

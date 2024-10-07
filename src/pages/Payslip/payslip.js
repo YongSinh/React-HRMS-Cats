@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
 import "./paySlip.css";
+import { Link } from "react-router-dom";
 //Componets form antd
 import {
   DatePicker,
@@ -19,7 +20,9 @@ import {
   Card,
 } from "antd";
 import dayjs from "dayjs";
-import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
+import { SendOutlined, EditFilled } from "@ant-design/icons";
+import { isEmptyOrNull } from "../../share/helper";
+import { request } from "../../share/request";
 const { Search } = Input;
 const { Title } = Typography;
 const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
@@ -46,80 +49,7 @@ function useSelectAllOption(options) {
 
   return [getValueFromEvent, optionsWithAllOption];
 }
-const columns = [
-  {
-    title: "Employee ID",
-    dataIndex: "name",
-    key: "name",
-    fixed: "left",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "RefNo",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Salary",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Allownace",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Allownace Amount",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Deductios",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Deduction Amount",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Net Pay",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Create Date",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
+
 const { Option } = Select;
 
 const generateDateRanges = (year) => {
@@ -146,10 +76,21 @@ const PayslipPage = () => {
   const now = Date.now();
   const today = dayjs(now);
   const dateFormat = "YYYY";
+  const [empList, setEmpList] = useState([]);
+  const [allowances, setAllowances] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [department, setDepartment] = useState([]);
+  const [emp, setEmp] = useState([]);
+  const [data, setData] = useState([]);
   const [year, setYear] = useState("2024");
   const [salaryCycle, setSalaryCycle] = useState("1");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  const onChangeType = (value) => {
+    setSalaryCycle(value);
+    //console.log(value);
+  };
   const handleMonthChange = (date) => {
     if (date) {
       const start = date.startOf("month");
@@ -160,6 +101,149 @@ const PayslipPage = () => {
       console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
     }
   };
+  
+  const getListDeductions = () => {
+    setLoading(true);
+    request("payrolls/deductions", "get", {}).then((res) => {
+      if (res) {
+        setLoading(false);
+        console.log(res.data);
+      }
+    });
+  };
+
+  const getListAllowances = () => {
+    setLoading(true);
+    request("payrolls/allowances", "get", {}).then((res) => {
+      if (res) {
+        setLoading(false);
+        const arrTmpP = res.data.map((items) => ({
+          label: items.allowances,
+          value: items.allid,
+        }));
+        setAllowances(arrTmpP)
+      }
+    });
+  };
+
+  const getList = () => {
+    setLoading(true);
+    request("payrolls/payslips", "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
+
+  const getListEmp = (value) => {
+    if (!isEmptyOrNull(value)) {
+      request(`info/employee/listEmployeeByDep?depId=${value}`, "get", {}).then(
+        (res) => {
+          if (res) {
+            //console.log(res.data);
+            const arrTmpP = res.data.map((emp) => ({
+              label: emp.empId.toString(),
+              value: emp.empId,
+            }));
+            setEmp(arrTmpP);
+            //setDepartment(arrTmpP);
+          }
+        }
+      );
+    } else {
+      setEmp(" ");
+    }
+  };
+  const onChangeDep = (value) => {
+    getListEmp(value);
+  };
+  const getListDep = () => {
+    request("info/department/department", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res.data);
+        const arrTmpP = res.data.map((dep) => ({
+          label: dep.depName,
+          value: dep.depId,
+        }));
+        setDepartment(arrTmpP);
+      }
+    });
+  };
+  useEffect(() => {
+    getListDep();
+    getList();
+    getListAllowances();
+    getListDeductions();
+  }, [empList]);
+
+  const columns = [
+    {
+      title: "Employee ID",
+      dataIndex: "empId",
+      key: "empId",
+      fixed: "left",
+    },
+    {
+      title: "Payment Type",
+      dataIndex: "payType",
+      key: "payType",
+    },
+    {
+      title: "Salary",
+      dataIndex: "salary",
+      key: "salary",
+    },
+    {
+      title: "Allownace",
+      dataIndex: "allowances",
+      key: "allowances",
+    },
+    {
+      title: "Allownace Amount",
+      dataIndex: "allowanceAmount",
+      key: "allowanceAmount",
+    },
+    {
+      title: "Deductios",
+      dataIndex: "deductions",
+      key: "deductions",
+    },
+    {
+      title: "Deduction Amount",
+      dataIndex: "deductionAmount",
+      key: "deductionAmount",
+    },
+    {
+      title: "Net Pay",
+      dataIndex: "net",
+      key: "net",
+    },
+    {
+      title: "Create Date",
+      key: "tadateCreatedgs",
+      dataIndex: "dateCreated",
+    },
+    {
+      title: "Action",
+      key: "action",
+      fixed: "right",
+      render: (_, record) => (
+        <Space size="middle">
+         
+         <Link to={`/edit-payslip/${record.id}`}>
+            <Button
+              //onClick={() => handleClickView(record)}
+              type="info"
+              icon={<EditFilled />}
+            />
+          </Link>
+         
+        </Space>
+      ),
+    },
+  ];
 
   const onFinish = (values) => {
     console.log("Success:", values);
@@ -186,40 +270,26 @@ const PayslipPage = () => {
   ];
   const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
 
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-  ];
-
   const handleDateRangeChange = (value) => {
     const [startDate, endDate] = value.split(" To ");
     console.log("Start Date:", startDate);
     console.log("End Date:", endDate);
   };
 
+  const typeOption = [
+    {
+      value: "1",
+      label: "First Payment",
+    },
+    {
+      value: "2",
+      label: "Second Payment",
+    },
+  ];
   return (
     <>
       <PageTitle PageTitle="Payslip" />
-      <Space.Compact block>
+      {/* <Space.Compact block>
         <DatePicker
           onChange={onChangeYear}
           defaultValue={dayjs(today, dateFormat)}
@@ -263,19 +333,20 @@ const PayslipPage = () => {
           enterButton
         />
       </Space.Compact>
-      <br />
+      <br /> */}
       <Card style={{ width: "100%" }}>
         <Title level={2}>Generate Payslips</Title>
         <Divider dashed />
         <Form
-          name="basic"
+          form={form}
           initialValues={{
             remember: false,
           }}
           layout={"vertical"}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
+          onFinish={(item) => {
+            form.resetFields();
+            onFinish(item);
+          }}
         >
           <Row gutter={16}>
             <Col span={12}>
@@ -293,38 +364,23 @@ const PayslipPage = () => {
                   showSearch
                   placeholder="Select a Department"
                   optionFilterProp="label"
-                  onChange={onChange}
-                  onSearch={onSearch}
+                  onChange={onChangeDep}
                   allowClear
-                  options={[
-                    {
-                      value: "jack",
-                      label: "Jack",
-                    },
-                    {
-                      value: "lucy",
-                      label: "Lucy",
-                    },
-                    {
-                      value: "tom",
-                      label: "Tom",
-                    },
-                  ]}
+                  options={department}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 label="Employees"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                name="employees"
               >
                 <Select
                   showSearch
                   placeholder="Select a Employees"
                   allowClear
                   mode="multiple"
-                  options={optionsWithAllOption}
+                  options={emp}
                 />
               </Form.Item>
             </Col>
@@ -336,48 +392,19 @@ const PayslipPage = () => {
             <Col span={12}>
               <Form.Item
                 label="Payment Type"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                name="paymentType"
               >
                 <Select
-                  showSearch
-                  placeholder="Select a Payment Type"
+                  placeholder="Select a Type"
+                  optionFilterProp="label"
+                  onChange={onChangeType}
+                  value={salaryCycle}
                   allowClear
-                  mode="multiple"
-                  options={optionsWithAllOption}
+                  options={typeOption}
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Allownace"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
-              >
-                <Select
-                  showSearch
-                  placeholder="Select a Allownace"
-                  allowClear
-                  mode="multiple"
-                  options={optionsWithAllOption}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Deductions"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
-              >
-                <Select
-                  showSearch
-                  placeholder="Select a Deductions"
-                  allowClear
-                  mode="multiple"
-                  options={optionsWithAllOption}
-                />
-              </Form.Item>
-            </Col>
+            
           </Row>
           <Form.Item>
             <Button icon={<SendOutlined />} type="primary" htmlType="submit">

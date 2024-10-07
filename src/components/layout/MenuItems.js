@@ -114,7 +114,7 @@ const MenuItems = () => (
             src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${1}`}
             size="large"
           />
-          YongSinh
+          {UserService.getLastname()}
           <DownOutlined style={{ marginLeft: '8px' }} />
         </div>
       </Dropdown>

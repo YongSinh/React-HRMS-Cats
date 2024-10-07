@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
-//Componets form MUI
-import PageTitle from "../../../components/Title_Page/TitlePage";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ModelForm from "./ModelForm";
 import "./leaveType.css";

@@ -30,7 +30,7 @@ export const request = async (url, method, param) => {
     data: param,
     headers: {
       ...header,
-     // Authorization: "Bearer " + getLocalAccessToken(),
+    Authorization: "Bearer " + getLocalAccessToken(),
     },
   })
     .then((res) => {

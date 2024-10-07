@@ -4,8 +4,6 @@ import { Breadcrumb, Layout, Menu, Button, theme } from "antd";
 import "./Layout.css";
 import MenuItems from "./MenuItems";
 import {
-  DesktopOutlined,
-  FileOutlined,
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
@@ -47,11 +45,12 @@ const items = [
   ]),
   getItem("Hr Payroll", "Setting", <SettingOutlined />, [
     getItem("Payroll", "/payroll"),
+    getItem("Payroll Report", "/payroll-report"),
     getItem("Payslips", "/payslip"),
     getItem("Allowances", "/allowance"),
     getItem("Deductions", "/deduction"),
-    getItem("Salary","/salary"),
-    getItem("Tax","/tax")
+    getItem("Salary", "/salary"),
+    getItem("Tax", "/tax"),
   ]),
 ];
 

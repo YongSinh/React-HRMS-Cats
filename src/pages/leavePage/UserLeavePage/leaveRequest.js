@@ -33,6 +33,7 @@ const LeaveRequest = () => {
   const [leaveType, setLeaveType] = useState([]);
   const [date, setDate] = useState([]);
   const today = new Date();
+  const userId = UserService.getUsername()
   const showDrawer = (value) => {
     setItems(value);
     setOpen(true);
@@ -51,7 +52,7 @@ const LeaveRequest = () => {
   };
   const getList = () => {
     setLoading(true);
-    request("attendanceLeave/leave/getLeaveByEmId/1006", "get", {}).then(
+    request("attendanceLeave/leave/getLeaveByEmId/"+userId, "get", {}).then(
       (res) => {
         if (res) {
           setData(res.data);
@@ -86,7 +87,7 @@ const LeaveRequest = () => {
     console.log(isEmptyOrNull(date[0]))
     if (!isEmptyOrNull(date[0])) {
       setLoading(true);
-      var filter = `?emId=1006&startDate=${date[0]}&endDate=${date[1]}`;
+      var filter = `?emId=${userId}&startDate=${date[0]}&endDate=${date[1]}`;
       request(
         "attendanceLeave/leave/getLeaveByDateBetweenAndEmId" + filter,
         "get",
@@ -265,7 +266,7 @@ const LeaveRequest = () => {
     remarkDiv.innerHTML = items.remark;
     const plainTextRemark = remarkDiv.textContent || remarkDiv.innerText || "";
     const body = {
-      empId: 1006,
+      empId: userId,
       startDate: dayjs(items.date[0]).format(format),
       endDate: dayjs(items.date[1]).format(format),
       timeOfHaftDay: time,
@@ -301,6 +302,7 @@ const LeaveRequest = () => {
         getListLeaveType();
         setLoading(false);
         // setEdit(false);
+        getList()
       } else {
         Swal.fire({
           icon: "error",
@@ -309,6 +311,7 @@ const LeaveRequest = () => {
         });
         setLoading(false);
         getListLeaveType();
+        getList()
       }
     });
   };

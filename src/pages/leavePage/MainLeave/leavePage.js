@@ -1,5 +1,5 @@
 import "./leavePage.css";
-import { Button, Space, DatePicker, Table, Select, Badge, Row, Col } from "antd";
+import { Button, Space, DatePicker, Table, Badge} from "antd";
 import {
   SearchOutlined,
   ExportOutlined,

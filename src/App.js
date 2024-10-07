@@ -19,6 +19,7 @@ import LeaveTypePage from './pages/leavePage/LeaveType/leaveType';
 import LeaveBalancePage from './pages/leavePage/LeaveBalance/leaveBalance';
 import LeaveEmpPage from './pages/leavePage/LeaveEmp/LeaveEmp';
 import PositionPage from './pages/PositionPage/Position';
+import EidtPayslipPage from './pages/Payslip/edtPayslipPage';
 import './App.css';
 import "antd/dist/antd"; // or 'antd/dist/antd.less'
 import "antd-button-color/dist/css/style.css"; // or 'antd-button-color/dist/css/style.less'
@@ -48,6 +49,7 @@ function App() {
             <Route path="/salary" element={<SalaryPage />} />
             <Route path="/tax" element={<TaxPage />} />
             <Route path="/leave-employee/:id" element={<LeaveEmpPage />} />
+            <Route path="/edit-payslip/:id" element={<EidtPayslipPage />} />
           </Route>
         </Routes>
         
