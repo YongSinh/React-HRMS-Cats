@@ -20,57 +20,14 @@ import {
   Card,
 } from "antd";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
 import { SendOutlined, EditFilled } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 import { request } from "../../share/request";
 const { Search } = Input;
 const { Title } = Typography;
-const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
-function useSelectAllOption(options) {
-  const optionsWithAllOption = useMemo(
-    () => [SELECT_ALL_OPTION, ...options],
-    [options]
-  );
 
-  /** pass this to Form.Item's getValueFromEvent prop */
-  const getValueFromEvent = useCallback(
-    (value, selections) => {
-      if (!selections?.length) return selections;
-      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-        return selections;
-      }
-      const labelInValue = typeof value[0]?.label === "string";
-      // if "Select All" option selected, set value to all options
-      // also keep labelInValue in consideration
-      return labelInValue ? options : options.map((o) => o.value);
-    },
-    [options]
-  );
 
-  return [getValueFromEvent, optionsWithAllOption];
-}
-
-const { Option } = Select;
-
-const generateDateRanges = (year) => {
-  const ranges = [];
-  for (let month = 0; month < 12; month++) {
-    const firstHalfStart = new Date(year, month, 1);
-    const firstHalfEnd = new Date(year, month, 15);
-    const secondHalfStart = new Date(year, month, 16);
-    const secondHalfEnd = new Date(year, month + 1, 0); // Last day of the month
-
-    ranges.push(
-      `${firstHalfStart.toISOString().split("T")[0]} To ${
-        firstHalfEnd.toISOString().split("T")[0]
-      }`,
-      `${secondHalfStart.toISOString().split("T")[0]} To ${
-        secondHalfEnd.toISOString().split("T")[0]
-      }`
-    );
-  }
-  return ranges;
-};
 const PayslipPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
@@ -91,17 +48,8 @@ const PayslipPage = () => {
     setSalaryCycle(value);
     //console.log(value);
   };
-  const handleMonthChange = (date) => {
-    if (date) {
-      const start = date.startOf("month");
-      const end = date.endOf("month");
-      setStartDate(dayjs(start).format("YYYY-MM-DD"));
-      setEndDate(dayjs(end).format("YYYY-MM-DD"));
-      console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
-      console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
-    }
-  };
-  
+
+
   const getListDeductions = () => {
     setLoading(true);
     request("payrolls/deductions", "get", {}).then((res) => {
@@ -121,7 +69,7 @@ const PayslipPage = () => {
           label: items.allowances,
           value: items.allid,
         }));
-        setAllowances(arrTmpP)
+        setAllowances(arrTmpP);
       }
     });
   };
@@ -231,15 +179,13 @@ const PayslipPage = () => {
       fixed: "right",
       render: (_, record) => (
         <Space size="middle">
-         
-         <Link to={`/edit-payslip/${record.id}`}>
+          <Link to={`/edit-payslip/${record.id}`}>
             <Button
               //onClick={() => handleClickView(record)}
               type="info"
               icon={<EditFilled />}
             />
           </Link>
-         
         </Space>
       ),
     },
@@ -247,33 +193,50 @@ const PayslipPage = () => {
 
   const onFinish = (values) => {
     console.log("Success:", values);
-  };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-  const onChange = (value) => {
-    setSalaryCycle(value);
-    console.log(`selected ${value}`);
-  };
-  const onSearch = (value) => {
-    console.log("search:", value);
-  };
-  const onChangeYear = (date, dateString) => {
-    console.log(date, dateString);
-    setYear(dateString);
-  };
-  const dateRanges = generateDateRanges(year);
-  const options = [
-    { label: "one", value: "one" },
-    { label: "two", value: "two" },
-    { label: "three", value: "three" },
-  ];
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
+    var date = dayjs(values.payrollDate).format("YYYY-MM-DD");
+    var param = {
+      dateCreated: dayjs(values.createdDate),
+      khmerRate: values.khrate,
+      payrollDate: date,
+      paymentType: values.paymentType,
+      emId: values.employees,
+    };
 
-  const handleDateRangeChange = (value) => {
-    const [startDate, endDate] = value.split(" To ");
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
+    let url = "payrolls/payslips/add";
+    let method = "post";
+    // case update
+    setLoading(true);
+
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        //onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+      }
+    });
+    console.log("param", param);
+  };
+
+
+  const onReset = () => {
+    form.resetFields();
+
   };
 
   const typeOption = [
@@ -285,55 +248,16 @@ const PayslipPage = () => {
       value: "2",
       label: "Second Payment",
     },
+    {
+      value: "3",
+      label: "once",
+    },
   ];
+
   return (
     <>
       <PageTitle PageTitle="Payslip" />
-      {/* <Space.Compact block>
-        <DatePicker
-          onChange={onChangeYear}
-          defaultValue={dayjs(today, dateFormat)}
-          picker="year"
-        />
-        <Select
-          placeholder="Select a Salary Cycle"
-          optionFilterProp="label"
-          onChange={onChange}
-          allowClear
-          options={[
-            {
-              value: "1",
-              label: "Monthly",
-            },
-            {
-              value: "2",
-              label: "Semi-Monthly",
-            },
-          ]}
-        />
-        {salaryCycle === "1" ? (
-          <DatePicker picker="month" onChange={handleMonthChange} />
-        ) : (
-          <Select
-            style={{ width: 300 }}
-            onChange={handleDateRangeChange}
-            placeholder="Select Range"
-          >
-            {dateRanges.map((range, index) => (
-              <Option key={index} value={range}>
-                {range}
-              </Option>
-            ))}
-          </Select>
-        )}
-        <Search
-          style={{ width: 300 }}
-          placeholder="input search text"
-          onSearch={onSearch}
-          enterButton
-        />
-      </Space.Compact>
-      <br /> */}
+
       <Card style={{ width: "100%" }}>
         <Title level={2}>Generate Payslips</Title>
         <Divider dashed />
@@ -344,7 +268,7 @@ const PayslipPage = () => {
           }}
           layout={"vertical"}
           onFinish={(item) => {
-            form.resetFields();
+            //form.resetFields();
             onFinish(item);
           }}
         >
@@ -374,6 +298,12 @@ const PayslipPage = () => {
               <Form.Item
                 label="Employees"
                 name="employees"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select employees!",
+                  },
+                ]}
               >
                 <Select
                   showSearch
@@ -385,15 +315,21 @@ const PayslipPage = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Khmer Rate">
+              <Form.Item
+                label="Khmer Rate"
+                name="khrate"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input Khmer Rate!",
+                  },
+                ]}
+              >
                 <Input placeholder="Khmer Riel" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="Payment Type"
-                name="paymentType"
-              >
+              <Form.Item label="Payment Type" name="paymentType">
                 <Select
                   placeholder="Select a Type"
                   optionFilterProp="label"
@@ -404,18 +340,51 @@ const PayslipPage = () => {
                 />
               </Form.Item>
             </Col>
-            
+            <Col span={12}>
+              <Form.Item
+                name={"payrollDate"}
+                label="Payroll Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Payroll Date!",
+                  },
+                ]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={"createdDate"}
+                label="Create Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Create  Date!",
+                  },
+                ]}
+              >
+                <DatePicker showTime style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
           </Row>
           <Form.Item>
-            <Button icon={<SendOutlined />} type="primary" htmlType="submit">
-              Generate
-            </Button>
+            <Space>
+              <Button icon={<SendOutlined />} type="primary" htmlType="submit">
+                Generate
+              </Button>
+              <Button type="primary" danger onClick={onReset}>
+                Clear
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Card>
       <Divider dashed />
       <Card style={{ width: "100%" }}>
         <Table
+          loading={loading}
           scroll={{
             x: "max-content",
           }}

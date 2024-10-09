@@ -10,17 +10,18 @@ import {
 } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 import { request, config } from "../../share/request";
-import getColumnSearchProps from "../../share/ColumnSearchProps";
-function Report({ activeKey }) {
+import UserService from "../../UserService/UserService";
+
+function PersonalReport({ activeKey }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+    const userId = UserService.getUsername();
   const columns = [
     {
       title: "Employee ID",
       dataIndex: "empId",
       key: "empId",
       fixed: "left",
-      ...getColumnSearchProps("empId"),
     },
     {
       title: "Ref No",
@@ -68,7 +69,7 @@ function Report({ activeKey }) {
       dataIndex: "total_earning",
       key: "ntotal_earninget",
     },
-
+    
     {
       title: "Net Pay",
       dataIndex: "net",
@@ -79,36 +80,26 @@ function Report({ activeKey }) {
       key: "date",
       dataIndex: "date",
     },
-
     {
-      title: "Action",
-      key: "action",
-      fixed: "right",
-      render: (_, record) => (
-        <Space>
-          <Button
-            onClick={() => handleDownloadFile(record)}
-            type="primary"
-            icon={<DownloadOutlined />}
-          />
-        </Space>
-      ),
-    },
+        title: "Action",
+        key: "action",
+        fixed: "right",
+        render: (_, record) => (
+          <Space>
+            <Button
+              onClick={() => handleDownloadFile(record)}
+              type="primary"
+              icon={<DownloadOutlined />}
+            />
+          </Space>
+        ),
+      },
   ];
-  const getList = () => {
-    setLoading(true);
-    request("payrolls/payslips/report", "get", {}).then((res) => {
-      if (res) {
-        setData(res.data);
-        setLoading(false);
-        //console.log(res.data);
-      }
-    });
-  };
+
+
   const handleDownloadFile = (value) => {
-    var url =
-      config.base_server + "payrolls/report/payslip?refNo=" + value.ref_no;
-    request("payrolls/report/payslip?refNo=" + value.ref_no, "get", {}).then(
+    var url = config.base_server+"payrolls/report/payslip?refNo="+value.ref_no;
+    request("payrolls/report/payslip?refNo="+value.ref_no, "get", {}).then(
       (res) => {
         if (res) {
           window.open(url, "_blank");
@@ -116,12 +107,24 @@ function Report({ activeKey }) {
       }
     );
   };
+  const getList = () => {
+    setLoading(true);
+    request("payrolls/payslips/reportByEmId?emId="+userId, "get", {}).then(
+      (res) => {
+        if (res) {
+          setData(res.data);
+          setLoading(false);
+          //console.log(res.data);
+        }
+      }
+    );
+  };
+
   useEffect(() => {
-    if (activeKey === "1") {
+    if (activeKey === "2") {
       getList(); // Only fetch data when this tab is active
     }
   }, [activeKey]);
-
   return (
     <>
       <Table
@@ -137,4 +140,4 @@ function Report({ activeKey }) {
   );
 }
 
-export default Report;
+export default PersonalReport;

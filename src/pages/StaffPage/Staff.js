@@ -1,32 +1,103 @@
-import React, { useState } from "react";
-import {SearchOutlined} from '@ant-design/icons';
-import { Button, Select, Space, Form } from "antd";
-import StaffTable from "./StaffTable";
+import React, { useState, useEffect } from "react";
+import { SearchOutlined } from "@ant-design/icons";
+import { Button, Select, Space, Form, Table, Tag } from "antd";
+import { EyeFilled, EditFilled, DeleteOutlined } from "@ant-design/icons";
 import StaffDrawer from "./StaffDrawer";
+import { request, config } from "../../share/request";
+import { Link } from "react-router-dom";
 import "./Staff.css";
 
-const initialData = [];
-for (let i = 1; i < 28; i++) {
-  initialData.push({
-    key: i,
-    name: `Edward King ${i}`,
-    age: 32,
-    Status: `Active`,
-    ID: `KH007${i.toString().padStart(2, "0")}`,
-    department: `Department ${i % 5}`,
-    position: `Position ${i % 3}`,
-  });
-}
-
 const Staff = () => {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [form] = Form.useForm();
 
   const handleSelectChange = (value, type) => {
     console.log(`selected ${value} for ${type}`);
   };
+  const getList = () => {
+    setLoading(true);
+    request("info/employee/listEmployee", "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
 
+  const columns = [
+    {
+      title: "Employee ID",
+      dataIndex: "empId",
+      fixed: "left",
+    },
+    {
+      title: "First Name",
+      dataIndex: "firstName",
+    },
+    {
+      title: "Last Name",
+      dataIndex: "lastName",
+    },
+    {
+      title: "Gender",
+      dataIndex: "sex",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Date Join",
+      dataIndex: "joinDate",
+    },
+    {
+      title: "Department",
+      dataIndex: "depId",
+    },
+    {
+      title: "Position",
+      dataIndex: "posId",
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+    },
+    {
+      title: "Remark",
+      dataIndex: "remark",
+    },
+    {
+      title: "Action",
+      key: "Action",
+      fixed: "right",
+      render: () => (
+        <Space>
+          <Button
+            type="primary"
+            icon={<EyeFilled />}
+            style={{ backgroundColor: "#4CAF50", borderColor: "#4CAF50" }}
+          ></Button>
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            style={{ backgroundColor: "#2196F3", borderColor: "#2196F3" }}
+          ></Button>
+          <Button
+            type="primary"
+            icon={<DeleteOutlined />}
+            danger
+            style={{ backgroundColor: "#F44336", borderColor: "#F44336" }}
+          ></Button>
+        </Space>
+      ),
+    },
+  ];
+  useEffect(() => {
+    getList(); // Only fetch data when this tab is active
+  }, []);
   const handleSearch = (value) => {
     console.log("search:", value);
   };
@@ -40,70 +111,6 @@ const Staff = () => {
 
   const handleDrawerClose = () => {
     setDrawerVisible(false);
-  };
-
-  const handleSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        form.resetFields();
-
-        const newEntry = {
-          key: data.length + 1,
-          employeeId: values.employeeId,
-          firstName: values.firstName,
-          lastName: values.lastName,
-          fullName: `${values.firstName} ${values.lastName}`,
-          gender: values.gender,
-          phone: values.phone,
-          email: values.email,
-          workType: values.workType,
-          department: values.department,
-          workingSite: values.workingSite,
-          section: values.section,
-          position: values.position,
-          startWork: values.startWork
-            ? values.startWork.format("YYYY-MM-DD")
-            : null,
-          endWork: values.endWork ? values.endWork.format("YYYY-MM-DD") : null,
-          address: values.address,
-          liveIn: values.liveIn,
-          dateOfBirth: values.dateOfBirth
-            ? values.dateOfBirth.format("YYYY-MM-DD")
-            : null,
-          height: values.height,
-          weight: values.weight,
-          race: values.race,
-          nationality: values.nationality,
-          religion: values.religion,
-          placeOfBirth: values.placeOfBirth,
-          idCardNo: values.idCardNo,
-          issuedPlace: values.issuedPlace,
-          issuedDate: values.issuedDate
-            ? values.issuedDate.format("YYYY-MM-DD")
-            : null,
-          expDate: values.expDate ? values.expDate.format("YYYY-MM-DD") : null,
-          drivingLicense: values.drivingLicense,
-          passportId: values.passportId,
-          passportExpDate: values.passportExpDate
-            ? values.passportExpDate.format("YYYY-MM-DD")
-            : null,
-          emergencyContactFirstName: values.emergencyContactFirstName,
-          emergencyContactLastName: values.emergencyContactLastName,
-          emergencyContactGender: values.emergencyContactGender,
-          emergencyContactAge: values.emergencyContactAge,
-          emergencyContactEducation: values.emergencyContactEducation,
-          emergencyContactOccupation: values.emergencyContactOccupation,
-          emergencyContactPosition: values.emergencyContactPosition,
-          emergencyContactOffice: values.emergencyContactOffice,
-        };
-
-        setData([...data, newEntry]);
-        setDrawerVisible(false);
-      })
-      .catch((info) => {
-        console.log("Validate Failed:", info);
-      });
   };
 
   return (
@@ -136,21 +143,30 @@ const Staff = () => {
           filterOption={filterOption}
           options={[{ value: "Department 1", label: "Department 1" }]}
         />
-        <Button icon={<SearchOutlined />}
+        <Button
+          icon={<SearchOutlined />}
           type="primary"
           style={{ backgroundColor: "green", borderColor: "green" }}
         >
           Search
         </Button>
-        <Button type="primary" onClick={showDrawer}>
-          Add
-        </Button>
+        <Link to={`/add-employee`}>
+          <Button type="primary">Add</Button>
+        </Link>
       </Space>
-      <StaffTable data={data} setData={setData} />
+      <Table
+        scroll={{
+          x: "max-content",
+        }}
+        columns={columns}
+        loading={loading}
+        //pagination={false}
+        dataSource={data}
+      />
       <StaffDrawer
         visible={drawerVisible}
         onClose={handleDrawerClose}
-        onSave={handleSave}
+        //onSave={handleSave}
         form={form}
       />
     </>

@@ -8,11 +8,9 @@ import {
   Col,
   Row,
   DatePicker,
-  Input,
   InputNumber,
 } from "antd";
 import { SaveFilled } from "@ant-design/icons";
-import dayjs from "dayjs";
 
 export default function DeductionModel({
   open = false,
@@ -22,30 +20,43 @@ export default function DeductionModel({
   item,
   deduction,
   edit = false,
+  handleDeduction,
+  handleType,
+  detValue,
   typeOption,
+  type
 }) {
   const [form] = Form.useForm();
-  const [type, setType] = useState();
 
   const handleCancel = () => {
     form.resetFields(); // clear data in form
     handleClose();
   };
 
+
   useEffect(() => {
-    if (item != null) {
-      form.setFieldsValue({});
+    if (edit) {
+      form.setFieldsValue({
+        deduction:item.deductions,
+        type:item.type,
+        amount:item.amount,
+        effectiveDate:item.effectiveDate
+      });
     }
   }, [item]);
 
   const onChangeTyep = (value) => {
-    console.log("onOk: ", value);
-    setType(value);
+    handleType(value)
+  };
+
+  const onChangeDeduction = (value) => {
+    //console.log(value)
+    handleDeduction(value); // Call the parent handler to update allowances state
   };
   return (
     <>
       <Modal
-        title="Add Deduction"
+        title={edit ? "Edit Deduction" : "Add Deduction"}
         open={open}
         onOk={handleOk}
         onCancel={handleClose}
@@ -79,6 +90,8 @@ export default function DeductionModel({
                   allowClear
                   optionFilterProp="label"
                   //mode="multiple"
+                  value={detValue}
+                  onChange={onChangeDeduction}
                   options={deduction}
                 />
               </Form.Item>
@@ -100,6 +113,7 @@ export default function DeductionModel({
                   allowClear
                   optionFilterProp="label"
                   //mode="multiple"
+                  value={type}
                   onChange={onChangeTyep}
                   options={typeOption}
                 />
@@ -122,7 +136,7 @@ export default function DeductionModel({
             <Col span={24}>
               <Form.Item label="Effective Date" name={"effectiveDate"}>
                 <DatePicker
-                  disabled={type != "3" ? true : false}
+                  disabled={type !== "3" ? true : false}
                   style={{ width: "100%" }}
                 />
               </Form.Item>

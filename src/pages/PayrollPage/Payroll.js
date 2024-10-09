@@ -32,6 +32,7 @@ import { isEmptyOrNull } from "../../share/helper";
 import { useParams, Link } from "react-router-dom";
 import ModalForm from "./ModelForm";
 import Swal from "sweetalert2";
+import UserService from "../../UserService/UserService";
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -169,10 +170,10 @@ const PayrollPage = () => {
 
     var startDate = dayjs(values.startDate).format(format);
     var endDate = dayjs(values.endDate).format(format);
-    var today = dayjs(now).format(format);
+    var today = dayjs(values.createDate).format(format);
 
     const param = {
-      empId: item.empId,
+      empId: UserService.getUsername(),
       empIds: empList,
       dateFrom: startDate,
       dateTo: endDate,
@@ -180,7 +181,7 @@ const PayrollPage = () => {
       status: status,
       dateCreate: today,
     };
-    console.log(param);
+    //onsole.log(param);
 
     let url = "payrolls/addPayroll";
     let method = "post";
@@ -487,10 +488,9 @@ const PayrollPage = () => {
           }}
           layout={"vertical"}
           onFinish={(item) => {
-            form.resetFields();
+            // form.resetFields();
             onFinish(item);
           }}
-          onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Row gutter={16}>
@@ -581,7 +581,7 @@ const PayrollPage = () => {
               </Form.Item>
             </Col>
 
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name={"startDate"}
                 label="From Date"
@@ -595,10 +595,24 @@ const PayrollPage = () => {
                 <DatePicker style={{ width: "100%" }} />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 name={"endDate"}
                 label="To Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name={"createDate"}
+                label="Create Date"
                 rules={[
                   {
                     required: true,

@@ -28,17 +28,16 @@ import {
   DeleteOutlined,
   IdcardOutlined,
 } from "@ant-design/icons";
+import Swal from "sweetalert2";
 import { isEmptyOrNull } from "../../share/helper";
 import { request } from "../../share/request";
 import AllowncesModel from "./AllowncesModel";
 import DeductionModel from "./DeductionModel";
-const { Search } = Input;
 const { Title } = Typography;
 
-const { Option } = Select;
+
 
 const EidtPayslipPage = () => {
-  const [form] = Form.useForm();
   const now = Date.now();
   const today = dayjs(now);
   const dateFormat = "YYYY";
@@ -49,15 +48,45 @@ const EidtPayslipPage = () => {
   const [empAllowances, setEmpAllowances] = useState([]);
   const [empDeduction, setEmpDeduction] = useState([]);
   const [data, setData] = useState([]);
-  const [year, setYear] = useState("2024");
+  const [allValue, setAllValue] = useState("");
+  const [dedValue, setDedValue] = useState("");
+  const [allItem, setAllItem] = useState("");
+  const [dedItem, setdedItem] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpen2, setIsModalOpen2] = useState(false);
-  const [salaryCycle, setSalaryCycle] = useState("1");
+  const [type, setType] = useState("");
   const [edit, setEdit] = useState(false);
   const { id } = useParams();
 
-  const handleOk = () => {
-    setIsModalOpen(false);
+  const handleAllowances = (value) => {
+    console.log(value)
+    setAllValue(value)
+  };
+
+  const handleDeduction = (value) => {
+    console.log(value)
+    setDedValue(value)
+  };
+
+   const handleType = (value) => {
+    console.log(value)
+    setType(value)
+  };
+  
+  const handleEditAllowances = (value) => {
+    handleType(value.type)
+    handleAllowances(value.allowances)
+    setAllItem(value)
+    setIsModalOpen(true);
+    setEdit(true);
+  };
+
+  const handleEditDeduction = (value) => {
+    handleType(value.type)
+    handleDeduction(value.deductions)
+    setdedItem(value)
+    setIsModalOpen2(true);
+    setEdit(true);
   };
 
   const handleOpen = () => {
@@ -101,6 +130,7 @@ const EidtPayslipPage = () => {
           label: items.allowances,
           value: items.allid,
         }));
+        //console.log(arrTmpP)
         setAllowances(arrTmpP);
       }
     });
@@ -236,7 +266,7 @@ const EidtPayslipPage = () => {
       render: (_, record) => (
         <Space>
           <Button
-            //onClick={() => onEdit(record)}
+            onClick={() => handleEditAllowances(record)}
             type="primary"
             icon={<EditOutlined />}
           />
@@ -244,7 +274,7 @@ const EidtPayslipPage = () => {
           <Popconfirm
             title="Delete the Type"
             description="Are you sure to delete this type?"
-            // onConfirm={() => onDelete(record)}
+            onConfirm={() => onDelete(record)}
             //onCancel={cancel}
             okText="Yes"
             cancelText="No"
@@ -291,7 +321,7 @@ const EidtPayslipPage = () => {
       render: (_, record) => (
         <Space>
           <Button
-            //onClick={() => onEdit(record)}
+            onClick={() => handleEditDeduction(record)}
             type="primary"
             icon={<EditOutlined />}
           />
@@ -313,32 +343,179 @@ const EidtPayslipPage = () => {
 
   const typeOption = [
     {
-      value: "1",
+      value: 1,
       label: "Monthly",
     },
     {
-      value: "2",
+      value: 2,
       label: "Semi-Monthly",
     },
     {
-      value: "3",
+      value: 3,
       label: "once",
     },
   ];
+  const onDelete = (Item) => {
+    request(
+      "payrolls/empAllowances/delete?id=" + Item.empAllId,
+      "delete",
+      {}
+    ).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been deleted",
+          icon: "success",
+          showConfirmButton: true,
+          //timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        getListEmpAllowances()
+        getListEmpDeduction()
+      }
+    });
+  };
+  const onFinish = (values) => {
+    console.log("Success:", values);
+    const result = allowances.find(item => item.label === allValue || item.value === allValue) ;
+    const resultType = typeOption.find(item => item.label === type || item.value === type) ;
+    var eDate = isEmptyOrNull(values.effectiveDate) ? "": values.effectiveDate;
+    console.log(type)
+    var param = {
+      "allowances": result.value,
+      "type": resultType.value,
+      "amount": values.amount,
+      "effectiveDate": eDate,
+      "dateCreated": today,
+      "paySlipId": id
+    }
+    setIsModalOpen(false)
+    let url = "payrolls/empAllowances/add";
+    let method = "post";
+    if(edit){
+      url = "payrolls/empAllowances/update?id="+allItem.empAllId
+      method="put"
+    }
+    // case update
+    setLoading(true);
+    // empAllId
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        getListEmpAllowances()
+        getListEmpDeduction()
+        //onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+        getListEmpAllowances()
+        getListEmpDeduction()
+      }
+    });
+    
+  };
+
+
+  const onFinishDed = (values) => {
+    console.log("Success:", values);
+    const result = deduction.find(item => item.label === dedValue || item.value === dedValue) ;
+    const resultType = typeOption.find(item => item.label === type || item.value === type) ;
+    var eDate = isEmptyOrNull(values.effectiveDate) ? "": values.effectiveDate;
+    console.log(type)
+    var param = {
+      "deductions": result.value,
+      "type": resultType.value,
+      "amount": values.amount,
+      "effectiveDate": eDate,
+      "dateCreated": today,
+      "paySlipId": id
+    }
+    console.log(param)
+    setIsModalOpen2(false)
+    let url = "payrolls/empDeduction/addDeduction";
+    let method = "post";
+    if(edit){
+      url = "payrolls/empDeduction/updateDeduction?id="+dedItem.empDedId
+      method="put"
+    }
+    // case update
+    setLoading(true);
+    // empAllId
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        getListEmpAllowances()
+        getListEmpDeduction()
+        //onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+        getListEmpAllowances()
+        getListEmpDeduction()
+      }
+    });
+    
+  };
+
+
   return (
     <>
       {/* <PageTitle PageTitle="Payslip" /> */}
       <AllowncesModel
         open={isModalOpen}
         handleClose={handleCancel}
+        item={allItem}
+        edit={edit}
         allownces={allowances}
         typeOption={typeOption}
+        handleAllowances={handleAllowances}
+        onFinish={onFinish}
+        allValue={allValue}
+        type = {type}
+        handleType={handleType}
       />
       <DeductionModel
         open={isModalOpen2}
+        item={dedItem}
         handleClose={handleCancel2}
         deduction ={deduction}
         typeOption={typeOption}
+        type={type}
+        handleType={handleType}
+        handleDeduction={handleDeduction}
+        onFinish={onFinishDed}
+        detValue={dedValue}
+        edit={edit}
       />
       <Divider dashed />
       <Card style={{ width: "100%" }}>
@@ -346,6 +523,7 @@ const EidtPayslipPage = () => {
           scroll={{
             x: "max-content",
           }}
+          loading={loading}
           columns={columns}
           dataSource={data}
           pagination={false}
@@ -375,6 +553,7 @@ const EidtPayslipPage = () => {
                 x: "max-content",
               }}
               columns={columns2}
+              loading={loading}
               //pagination={false}
               dataSource={empAllowances}
             />
@@ -402,6 +581,7 @@ const EidtPayslipPage = () => {
                 x: "max-content",
               }}
               columns={columns3}
+              loading={loading}
               //pagination={false}
               dataSource={empDeduction}
             />

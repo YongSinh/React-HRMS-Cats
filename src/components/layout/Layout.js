@@ -30,7 +30,6 @@ const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 
 const items = [
   getItem("Dashboard", "Dashboard", <PieChartOutlined />),
-  getItem("Info & Management", "Info", <InfoCircleOutlined />),
   getItem("Attendance", "Attendance", <FieldTimeOutlined />),
   getItem("Leave Management", "/", <TeamOutlined />, [
     getItem("All Employee", "leave", <TeamOutlined />),
@@ -41,7 +40,7 @@ const items = [
   getItem("Info Management", "Management", <TeamOutlined />, [
     getItem("Department", "Department", <BankOutlined />),
     getItem("Position", "position", <BankOutlined />),
-    getItem("Staff", "Staff", <UserOutlined />),
+    getItem("Employees", "employee", <UserOutlined />),
   ]),
   getItem("Hr Payroll", "Setting", <SettingOutlined />, [
     getItem("Payroll", "/payroll"),

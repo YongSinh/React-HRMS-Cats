@@ -22,10 +22,13 @@ export default function AllowncesModel({
   item,
   allownces,
   edit = false,
+  handleAllowances,
+  handleType,
+  allValue,
   typeOption,
+  type
 }) {
   const [form] = Form.useForm();
-  const [type, setType] = useState();
 
   const handleCancel = () => {
     form.resetFields(); // clear data in form
@@ -33,19 +36,29 @@ export default function AllowncesModel({
   };
 
   useEffect(() => {
-    if (item != null) {
-      form.setFieldsValue({});
+    if (edit) {
+      form.setFieldsValue({
+        allownces:item.allowances,
+        type:item.type,
+        amount:item.amount,
+        effectiveDate:item.effectiveDate
+      });
     }
   }, [item]);
 
   const onChangeTyep = (value) => {
-    console.log("onOk: ", value);
-    setType(value);
+    handleType(value)
   };
+
+  const onChangeAllowances = (value) => {
+    //console.log(value)
+    handleAllowances(value); // Call the parent handler to update allowances state
+  };
+
   return (
     <>
       <Modal
-        title="Add Allownce"
+        title={edit ? "Edit Allowance" : "Add Allowance"}
         open={open}
         onOk={handleOk}
         onCancel={handleClose}
@@ -75,10 +88,12 @@ export default function AllowncesModel({
               >
                 <Select
                   showSearch
-                  placeholder="Select a allownces "
+                  placeholder="Select a allownces"
                   allowClear
                   optionFilterProp="label"
                   //mode="multiple"
+                  value={allValue}
+                  onChange={onChangeAllowances}
                   options={allownces}
                 />
               </Form.Item>
@@ -100,6 +115,7 @@ export default function AllowncesModel({
                   allowClear
                   optionFilterProp="label"
                   //mode="multiple"
+                  value={type}
                   onChange={onChangeTyep}
                   options={typeOption}
                 />

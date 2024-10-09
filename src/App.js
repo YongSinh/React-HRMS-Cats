@@ -7,7 +7,7 @@ import InfoPage from './pages/infoPage/info';
 import LeaveRequest from './pages/leavePage/UserLeavePage/leaveRequest';
 import DepartmentPage from './pages/DepartmentPage/Department';
 import Staff from './pages/StaffPage/Staff';
-import Report from './pages/Report/Tabs_report';
+import Report from './pages/Report/TabsReport';
 import AttendancePage from './pages/AttendancePage/TabsAttendance';
 import AllowancePage from './pages/AllowancePage/Allowance';
 import DeductionPage from './pages/DeductionPage/DeductionPage';
@@ -20,6 +20,7 @@ import LeaveBalancePage from './pages/leavePage/LeaveBalance/leaveBalance';
 import LeaveEmpPage from './pages/leavePage/LeaveEmp/LeaveEmp';
 import PositionPage from './pages/PositionPage/Position';
 import EidtPayslipPage from './pages/Payslip/edtPayslipPage';
+import StaffForm from './pages/StaffPage/StaffForm';
 import './App.css';
 import "antd/dist/antd"; // or 'antd/dist/antd.less'
 import "antd-button-color/dist/css/style.css"; // or 'antd-button-color/dist/css/style.less'
@@ -36,8 +37,8 @@ function App() {
             <Route path="/leave-request" element={<LeaveRequest />} />
             <Route path="/department" element={<DepartmentPage />} />
             <Route path="/position" element={<PositionPage />} />
-            <Route path="/staff" element={<Staff />} />
-            <Route path="/report" element={<Report />} />
+            <Route path="/employee" element={<Staff />} />
+            <Route path="/payroll-report" element={<Report />} />
             <Route path="/payroll" element={<PayrollPage />} />
             <Route path="/payslip" element={<PayslipPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
@@ -48,6 +49,7 @@ function App() {
             <Route path="/leave-balance" element={<LeaveBalancePage />} />
             <Route path="/salary" element={<SalaryPage />} />
             <Route path="/tax" element={<TaxPage />} />
+            <Route path="/add-employee" element={<StaffForm />} />
             <Route path="/leave-employee/:id" element={<LeaveEmpPage />} />
             <Route path="/edit-payslip/:id" element={<EidtPayslipPage />} />
           </Route>
