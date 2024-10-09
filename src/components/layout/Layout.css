@@ -1,9 +1,77 @@
-.header{
-    display: flex;
-    justify-content: space-between;
-    padding: 0px 30px;
+.header {
+  position: fixed;
+  width: 100%;
+  z-index: 100; /* Ensure header is above other content */
+  background: #001529;
+  color: white;
+  padding: 0px 30px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(146, 134, 134, 0.288); /* Optional: Add shadow */
+  justify-content: space-between;
 }
-.header-title{
-    font-size: 50px;
-    font-weight: 600;
+
+.title-logo {
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+ }
+
+.title-logo .logo {
+  height: 3rem; /* Adjust height as needed */
+  margin-right: 1rem; /* Adjust spacing as needed */
 }
+
+.header-title {
+  align-items: center;
+  color: #fff;
+  margin-left: 4rem;
+  font-size: 28px;
+  font-weight: bold;
+ 
+}
+
+
+.content {
+  margin: 24px 16px;
+}
+
+.breadcrumb {
+  margin: 16px 0;
+}
+
+.ant-layout {
+  background: #f0f2f5; /* Background color for main layout */
+}
+
+.ant-layout-sider {
+
+  background: #001529; /* Sider background color */
+  z-index: 1; /* Ensure sider is below header */
+}
+
+.site-layout-background {
+  background: #fff; /* Content area background */
+  padding: 24px;
+  min-height: 280px; /* Adjust minimum height as needed */
+  border-radius: 8px; /* Rounded corners */
+  border: 1px solid #e8e8e8; /* Optional: Add border */
+}
+
+
+.ant-layout-footer {
+  text-align: center; /* Center align footer text */
+  background: #fff; /* Footer background color */
+  position: fixed; /* Fixed position */
+  bottom: 0; /* Stick to the bottom */
+  width: 100%; /* Full width */
+  z-index: 2; /* Ensure footer is above content */
+  border-top: 1px solid #e8e8e8; /* Optional: Add border */
+  padding: 12px 0; /* Padding for footer content */
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-layout .ant-layout-sider-children {
+  height:auto;
+  margin-top: 85px;
+}
+
