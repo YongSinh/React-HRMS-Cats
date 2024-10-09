@@ -1,13 +1,14 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../../components/Title_Page/TitlePage";
 import "./leaveType.css";
+import Swal from "sweetalert2";
+
+// or via CommonJS
 //Componets form antd
 import {
-  DatePicker,
   Space,
   Table,
-  Tag,
   Button,
   Form,
   Select,
@@ -17,187 +18,173 @@ import {
   Typography,
   Input,
   Card,
+  Popconfirm,
 } from "antd";
-import dayjs from "dayjs";
-import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
-const { Search } = Input;
+import {
+  SendOutlined,
+  SaveOutlined,
+  DeleteFilled,
+  EditOutlined,
+  EyeFilled,
+} from "@ant-design/icons";
+import { request } from "../../../share/request";
 const { Title } = Typography;
-const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
-function useSelectAllOption(options) {
-  const optionsWithAllOption = useMemo(
-    () => [SELECT_ALL_OPTION, ...options],
-    [options]
-  );
-
-  /** pass this to Form.Item's getValueFromEvent prop */
-  const getValueFromEvent = useCallback(
-    (value, selections) => {
-      if (!selections?.length) return selections;
-      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-        return selections;
-      }
-      const labelInValue = typeof value[0]?.label === "string";
-      // if "Select All" option selected, set value to all options
-      // also keep labelInValue in consideration
-      return labelInValue ? options : options.map((o) => o.value);
-    },
-    [options]
-  );
-
-  return [getValueFromEvent, optionsWithAllOption];
-}
-const columns = [
-  {
-    title: "Leave Type ID",
-    dataIndex: "name",
-    key: "name",
-    fixed: "left",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Leave Title",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Leave Description",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Total Leave",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Create Date",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
-const { Option } = Select;
-
-const generateDateRanges = (year) => {
-  const ranges = [];
-  for (let month = 0; month < 12; month++) {
-    const firstHalfStart = new Date(year, month, 1);
-    const firstHalfEnd = new Date(year, month, 15);
-    const secondHalfStart = new Date(year, month, 16);
-    const secondHalfEnd = new Date(year, month + 1, 0); // Last day of the month
-
-    ranges.push(
-      `${firstHalfStart.toISOString().split("T")[0]} To ${
-        firstHalfEnd.toISOString().split("T")[0]
-      }`,
-      `${secondHalfStart.toISOString().split("T")[0]} To ${
-        secondHalfEnd.toISOString().split("T")[0]
-      }`
-    );
-  }
-  return ranges;
-};
-
-
 
 const LeaveTypePage = () => {
   const [form] = Form.useForm();
-  const now = Date.now();
-  const today = dayjs(now);
-  const dateFormat = "YYYY";
-  const [year, setYear] = useState("2024");
-  const [salaryCycle, setSalaryCycle] = useState("1");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const handleMonthChange = (date) => {
-    if (date) {
-      const start = date.startOf("month");
-      const end = date.endOf("month");
-      setStartDate(dayjs(start).format("YYYY-MM-DD"));
-      setEndDate(dayjs(end).format("YYYY-MM-DD"));
-      console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
-      console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
-    }
+  const [loading, setLoading] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [data, setData] = useState([]);
+ 
+  const onEdit = (Item) => {
+    handleClickView(Item);
+    setEdit(true);
   };
 
-  const onFinish = (values) => {
-    console.log("Success:", values);
+  const onDelete = (Item) => {
+    request(`attendanceLeave/deleteLeaveType/${Item.id}`, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getListLeaveType()
+          setLoading(false);
+        }
+      }
+    );
   };
+  const onFinish = (Item) => {
+    var param = {
+      id: Item.id,
+      leaveTitle: Item.title,
+      leaveDes: Item.description,
+      leaveDayPerYear: Item.days,
+    };
+    let url = "attendanceLeave/addLeaveType";
+    let method = "post";
+    // case update
+    if (edit) {
+      url = "attendanceLeave/editLeaveType/" + Item.id;
+      method = "put";
+    }
+
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getListLeaveType();
+        setLoading(false);
+        setEdit(false);
+        onReset()
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getListLeaveType();
+      }
+    });
+  };
+
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-  const onChange = (value) => {
-    setSalaryCycle(value);
-    console.log(`selected ${value}`);
-  };
-  const onSearch = (value) => {
-    console.log("search:", value);
-  };
-  const onChangeYear = (date, dateString) => {
-    console.log(date, dateString);
-    setYear(dateString);
-  };
-  const dateRanges = generateDateRanges(year);
-  const options = [
-    { label: "one", value: "one" },
-    { label: "two", value: "two" },
-    { label: "three", value: "three" },
-  ];
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
 
-  const data = [
+  const getListLeaveType = () => {
+    setLoading(true);
+    request("attendanceLeave/getListLeaveType", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res);
+        setData(res.data);
+        setLoading(false);
+      }
+    });
+  };
+
+  const handleClickView = (Item) => {
+    // console.log("Failed:", Item);
+    form.setFieldsValue({
+      id: Item.id,
+      title: Item.leaveTitle,
+      description: Item.leaveDes,
+      days: Item.leaveDayPerYear,
+    });
+  };
+  const onReset = () => {
+    form.resetFields();
+    setEdit(false);
+  };
+  useEffect(() => {
+    getListLeaveType();
+  }, []);
+
+  const columns = [
     {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      fixed: "left",
     },
     {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
+      title: "Leave Title",
+      dataIndex: "leaveTitle",
+      key: "leaveTitle",
     },
     {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
+      title: "Leave Description",
+      dataIndex: "leaveDes",
+      key: "leaveDes",
+    },
+    {
+      title: "Total Leave",
+      dataIndex: "leaveDayPerYear",
+      key: "leaveDayPerYear",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space>
+          <Button
+            onClick={() => handleClickView(record)}
+            type="info"
+            icon={<EyeFilled />}
+          />
+          <Button
+            onClick={() => onEdit(record)}
+            type="primary"
+            icon={<EditOutlined />}
+          />
+          <Popconfirm
+            title="Delete the Type"
+            description="Are you sure to delete this type?"
+            onConfirm={() =>onDelete(record)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button 
+            icon={<DeleteFilled />}
+            danger/>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
-
-  const handleDateRangeChange = (value) => {
-    const [startDate, endDate] = value.split(" To ");
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
-  };
 
   return (
     <>
@@ -207,6 +194,7 @@ const LeaveTypePage = () => {
         <Title level={2}>Create Or Update Leave Type</Title>
         <Divider dashed />
         <Form
+          form={form}
           name="basic"
           initialValues={{
             remember: false,
@@ -217,76 +205,79 @@ const LeaveTypePage = () => {
           autoComplete="off"
         >
           <Row gutter={16}>
-             
             <Col span={12}>
-              <Form.Item 
-              label="Leave ID"
-              name={"id"}
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input Leave Id!',
-                },
-              ]}
+              <Form.Item
+                label="Leave ID"
+                name={"id"}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input Leave Id!",
+                  },
+                ]}
               >
                 <Input placeholder="ID" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item 
-              label="Leave Title"
-              name={"title"}
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input Leave Title!',
-                },
-              ]}
+              <Form.Item
+                label="Leave Title"
+                name={"title"}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input Leave Title!",
+                  },
+                ]}
               >
                 <Input placeholder="Title" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item 
-              label="Leave Description"
-              name={"description"}
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input Leave Description!',
-                },
-              ]}
+              <Form.Item
+                label="Leave Description"
+                name={"description"}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input Leave Description!",
+                  },
+                ]}
               >
                 <Input placeholder="Description" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item 
-              label="Leave Per Year"
-              name={"id"}
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input Leave Per Year!',
-                },
-              ]}
+              <Form.Item
+                label="Leave Per Year"
+                name={"days"}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input Leave Per Year!",
+                  },
+                ]}
               >
                 <Input placeholder="Leave Per Year" />
               </Form.Item>
             </Col>
-    
-        
           </Row>
           <Form.Item>
-            <Button icon={<SendOutlined />} type="primary" htmlType="submit">
-              submit
-            </Button>
+            <Space>
+              <Button icon={<SendOutlined />} type="primary" htmlType="submit">
+                submit
+              </Button>
+              <Button type="primary" danger onClick={onReset}>
+                Clear
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Card>
       <Divider dashed />
       <Card style={{ width: "100%" }}>
         <Table
+          loading={loading}
           scroll={{
             x: "max-content",
           }}

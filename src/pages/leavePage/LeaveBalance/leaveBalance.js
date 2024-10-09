@@ -1,121 +1,43 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../../components/Title_Page/TitlePage";
 import "./leaveBalance.css";
 import ModelForm from "./ModelForm";
+import Swal from "sweetalert2";
+import {
+  EyeFilled,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  ClearOutlined,
+} from "@ant-design/icons";
 //Componets form antd
 import {
   Space,
   Table,
-  Tag,
   Button,
-  Form,
-  Select,
-  Typography,
   Input,
   Card,
+  Popconfirm,
+  Row,
+  Col,
 } from "antd";
 import dayjs from "dayjs";
-import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
-const { Search } = Input;
-const { Title } = Typography;
+import { request } from "../../../share/request";
 
-const columns = [
-  {
-    title: "Leave Type ID",
-    dataIndex: "name",
-    key: "name",
-    fixed: "left",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Leave Title",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Leave Description",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Total Leave",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Create Date",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
-const { Option } = Select;
+import { Link } from "react-router-dom";
 
-const generateDateRanges = (year) => {
-  const ranges = [];
-  for (let month = 0; month < 12; month++) {
-    const firstHalfStart = new Date(year, month, 1);
-    const firstHalfEnd = new Date(year, month, 15);
-    const secondHalfStart = new Date(year, month, 16);
-    const secondHalfEnd = new Date(year, month + 1, 0); // Last day of the month
-
-    ranges.push(
-      `${firstHalfStart.toISOString().split("T")[0]} To ${
-        firstHalfEnd.toISOString().split("T")[0]
-      }`,
-      `${secondHalfStart.toISOString().split("T")[0]} To ${
-        secondHalfEnd.toISOString().split("T")[0]
-      }`
-    );
-  }
-  return ranges;
-};
 
 const LeaveBalancePage = () => {
-
-  const now = Date.now();
-  const today = dayjs(now);
-  const dateFormat = "YYYY";
-  const [year, setYear] = useState("2024");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  // const now = Date.now();
+  // const today = dayjs(now);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleMonthChange = (date) => {
-    if (date) {
-      const start = date.startOf("month");
-      const end = date.endOf("month");
-      setStartDate(dayjs(start).format("YYYY-MM-DD"));
-      setEndDate(dayjs(end).format("YYYY-MM-DD"));
-      console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
-      console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
-    }
-  };
-
+  const [loading, setLoading] = useState(false);
+  //const [edit, setEdit] = useState(false);
+  const [data, setData] = useState([]);
+  const [leaveType, setLeaveType] = useState([]);
+  const [department, setDepartment] = useState([]);
+  const [emId, setEmId] = useState("");
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -126,42 +48,200 @@ const LeaveBalancePage = () => {
     setIsModalOpen(false);
   };
 
-  const onChangeYear = (date, dateString) => {
-    console.log(date, dateString);
-    setYear(dateString);
+  const getListDep = () => {
+    request("info/department/department", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res.data);
+        const arrTmpP = res.data.map((dep) => ({
+          label: dep.depName,
+          value: dep.depId,
+        }));
+        setDepartment(arrTmpP);
+      }
+    });
   };
-  const dateRanges = generateDateRanges(year);
+
+  const onDelete = (Item) => {
+    request(
+      "attendanceLeave/LeaveBalance/delete/" + Item.id,
+      "delete",
+      {}
+    ).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been deleted",
+          icon: "success",
+          showConfirmButton: true,
+          //timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+      }
+    });
+  };
 
 
-  const data = [
+  const getListLeaveType = () => {
+    setLoading(true);
+    request("attendanceLeave/getListLeaveType", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res);
+        const arrTmpP = res.data.map((item) => ({
+          label: item.leaveTitle,
+          value: item.id,
+        }));
+        setLeaveType(arrTmpP)
+        // setData(res.data);
+        setLoading(false);
+      }
+    });
+  };
+
+  const columns = [
     {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
+      title: "Employee ID",
+      dataIndex: "empId",
+      key: "empId",
     },
     {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
+      title: "Leave Balance",
+      dataIndex: "balanceAmount",
+      key: "balanceAmount",
     },
     {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
+      title: "Leave Type",
+      dataIndex: "leaveType",
+      key: "leaveType",
+    },
+    {
+      title: "Last Update Date",
+      key: "lastUpdateDate",
+      dataIndex: "lastUpdateDate",
+      render: (text) => `${dayjs(text).format("DD-MM-YYYY h:mm A")}`,
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space>
+          {/* <Link to={`/leave-employee/${record.empId}`}>
+            <Button type="success" size="small">
+              <EyeFilled />
+              view
+            </Button>
+          </Link> */}
+
+          <Link to={`/leave-employee/${record.empId}`}>
+            <Button
+              //onClick={() => handleClickView(record)}
+              type="info"
+              icon={<EyeFilled />}
+            />
+          </Link>
+          <Link to={`/leave-employee/${record.empId}`}>
+            <Button
+              //onClick={() => onEdit(record)}
+              type="primary"
+              icon={<EditOutlined />}
+            />
+          </Link>
+
+          <Popconfirm
+            title="Delete the Type"
+            description="Are you sure to delete this type?"
+            onConfirm={() =>onDelete(record)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
-  const handleDateRangeChange = (value) => {
-    const [startDate, endDate] = value.split(" To ");
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
+
+  useEffect(() => {
+    getList();
+    getListDep();
+    getListLeaveType();
+  }, []);
+
+  const getList = () => {
+    setLoading(true);
+    request("attendanceLeave/leaveBalance", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res);
+        setData(res.data);
+        setLoading(false);
+      }
+    });
   };
+
+  const onSearch = () =>{
+    setLoading(true);
+    request(`attendanceLeave/getLeaveBalanceByEmId?emId=${emId}`, "get", {}).then((res) => {
+      if (res) {
+        //console.log(res);
+        setData(res.data);
+        setLoading(false);
+      }
+    });
+  }
+
+  const onClickClear = () =>{
+    getList()
+    setEmId("")
+  }
+
+  const onChangeEmId = (e) =>{
+    setEmId(e.target.value)
+    console.log(e.target.value)
+  }
+
+  const onFinish = (value) =>{
+    //console.log(value)
+    var param = {
+      "empId": value.employee,
+      "balanceAmount": 0,
+      "lastUpdateDate": dayjs(value.date).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+      "leaveType": value.type
+    }
+   // console.log(param)
+    let url;
+    let method;
+    url = "attendanceLeave/LeaveBalance/add" ;
+    method = "post";
+    //console.log(date)
+    setLoading(true);
+
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been save!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        setIsModalOpen(false)
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+      }
+    });
+  }
 
   return (
     <>
@@ -169,18 +249,48 @@ const LeaveBalancePage = () => {
         handleClose={handleCancel}
         handleOk={handleOk}
         open={isModalOpen}
+        department={department}
+        leaveType={leaveType}
+        onFinish={onFinish}
       />
       <PageTitle PageTitle="Leave Balance" />
-
       <Card style={{ width: "100%" }}>
-        <Button type="primary" onClick={showModal}>
-          Add Balance
-        </Button>
-
+        <Row>
+          <Col span={20}>
+            <Space>
+              <Input
+                placeholder="Employees ID"
+                value={emId}
+                onChange={onChangeEmId}
+              />
+              <Button
+                type="primary"
+                icon={<SearchOutlined />}
+                onClick={onSearch}
+              >
+                Search
+              </Button>
+              <Button
+                type="primary"
+                icon={<ClearOutlined />}
+                onClick={onClickClear}
+                danger
+              >
+                Clear
+              </Button>
+            </Space>
+          </Col>
+          <Col style={{ textAlign: "right" }} span={4}>
+            <Button type="primary" onClick={showModal}>
+              Add Balance
+            </Button>
+          </Col>
+        </Row>
       </Card>
       {/* <Divider dashed /> */}
       <Card style={{ width: "100%", marginTop: 10 }}>
         <Table
+          loading={loading}
           scroll={{
             x: "max-content",
           }}

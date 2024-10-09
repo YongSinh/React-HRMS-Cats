@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
+import getColumnSearchProps from "../../share/ColumnSearchProps";
 //Componets form antd
 import {
   Space,
   Table,
-  Tag,
   Button,
   Form,
   Select,
@@ -16,335 +16,511 @@ import {
   Input,
   Card,
   DatePicker,
+  Popconfirm,
 } from "antd";
 import dayjs from "dayjs";
-import { SendOutlined, DownloadOutlined } from "@ant-design/icons";
-const { Search } = Input;
+import { request } from "../../share/request";
+import Swal from "sweetalert2";
+import {
+  SendOutlined,
+  EyeFilled,
+  EditFilled,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { isEmptyOrNull } from "../../share/helper";
+
 const { Title } = Typography;
-const { RangePicker } = DatePicker;
-const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
-function useSelectAllOption(options) {
-  const optionsWithAllOption = useMemo(
-    () => [SELECT_ALL_OPTION, ...options],
-    [options]
-  );
 
-  /** pass this to Form.Item's getValueFromEvent prop */
-  const getValueFromEvent = useCallback(
-    (value, selections) => {
-      if (!selections?.length) return selections;
-      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-        return selections;
-      }
-      const labelInValue = typeof value[0]?.label === "string";
-      // if "Select All" option selected, set value to all options
-      // also keep labelInValue in consideration
-      return labelInValue ? options : options.map((o) => o.value);
-    },
-    [options]
-  );
+/** pass this to Form.Item's getValueFromEvent prop */
 
-  return [getValueFromEvent, optionsWithAllOption];
-}
-const columns = [
-  {
-    title: "Employee ID",
-    dataIndex: "name",
-    key: "name",
-    fixed: "left",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Salary",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Form Date",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "To Date",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Tax",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
-const { Option } = Select;
-
-const generateDateRanges = (year) => {
-  const ranges = [];
-  for (let month = 0; month < 12; month++) {
-    const firstHalfStart = new Date(year, month, 1);
-    const firstHalfEnd = new Date(year, month, 15);
-    const secondHalfStart = new Date(year, month, 16);
-    const secondHalfEnd = new Date(year, month + 1, 0); // Last day of the month
-
-    ranges.push(
-      `${firstHalfStart.toISOString().split("T")[0]} To ${
-        firstHalfEnd.toISOString().split("T")[0]
-      }`,
-      `${secondHalfStart.toISOString().split("T")[0]} To ${
-        secondHalfEnd.toISOString().split("T")[0]
-      }`
-    );
-  }
-  return ranges;
-};
 const SalaryPage = () => {
   const [form] = Form.useForm();
   const now = Date.now();
   const today = dayjs(now);
-  const dateFormat = "YYYY";
-  const [year, setYear] = useState("2024");
-  const [salaryCycle, setSalaryCycle] = useState("1");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const handleMonthChange = (date) => {
-    if (date) {
-      const start = date.startOf("month");
-      const end = date.endOf("month");
-      setStartDate(dayjs(start).format("YYYY-MM-DD"));
-      setEndDate(dayjs(end).format("YYYY-MM-DD"));
-      console.log("Start Date:", dayjs(start).format("YYYY-MM-DD"));
-      console.log("End Date:", dayjs(end).format("YYYY-MM-DD"));
+  const [loading, setLoading] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [data, setData] = useState([]);
+  const [item, setItem] = useState();
+  const [khRate, setKhmRate] = useState(4100);
+  const [salary, setSalary] = useState("");
+  const [department, setDepartment] = useState([]);
+  const [tax, setTax] = useState([]);
+  const [taxRate, setTaxRate] = useState("");
+  const [emp, setEmp] = useState([]);
+
+  const getListEmp = (value) => {
+    if (!isEmptyOrNull(value)) {
+      request(`info/employee/listEmployeeByDep?depId=${value}`, "get", {}).then(
+        (res) => {
+          if (res) {
+            //console.log(res.data);
+            const arrTmpP = res.data.map((emp) => ({
+              label: emp.empId.toString(),
+              value: emp.empId,
+            }));
+            setEmp(arrTmpP);
+            //setDepartment(arrTmpP);
+          }
+        }
+      );
+    } else {
+      setEmp(" ");
+    }
+  };
+  const handleClickView = (Item) => {
+    //console.log("Failed:", Item);
+    getEmpInfo(Item.empId);
+    //console.log(Item.fromDate);
+    setEdit(true);
+    form.setFieldsValue({
+      emp: Item.empId,
+      endDate: dayjs(Item.toDate),
+      startDate: dayjs(Item.fromDate),
+      salary: Item.salary,
+      khmerRate: khRate,
+      taxRate: Item.tax * 100 + "%",
+    });
+  };
+
+  const getEmpInfo = (value) => {
+    request(`info/employee/getEmployeeById/${value}`, "get", {}).then((res) => {
+      if (res) {
+        var data = res.data;
+        form.setFieldsValue({
+          depId: data.depId,
+        });
+        // console.log(res.data);
+      }
+    });
+  };
+
+  const onChangeDep = (value) => {
+    getListEmp(value);
+  };
+
+  const filterByDep = (value) => {
+    if (!isEmptyOrNull(value)) {
+      setLoading(true);
+      request(
+        "payrolls/salary/getSalaryByDepId?depId=" + value,
+        "get",
+        {}
+      ).then((res) => {
+        if (res) {
+          setData(res.data);
+          setLoading(false);
+          //console.log(res.data);
+        }
+      });
+    } else {
+      getList();
     }
   };
 
-  const onFinish = (values) => {
-    console.log("Success:", values);
-  };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-  const onChange = (value) => {
-    setSalaryCycle(value);
-    console.log(`selected ${value}`);
-  };
-  const onSearch = (value) => {
-    console.log("search:", value);
-  };
-  const onChangeYear = (date, dateString) => {
-    console.log(date, dateString);
-    setYear(dateString);
-  };
-  const dateRanges = generateDateRanges(year);
-  const options = [
-    { label: "one", value: "one" },
-    { label: "two", value: "two" },
-    { label: "three", value: "three" },
-  ];
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(options);
 
-  const data = [
+  const onChangeStart = (date, dateString) => {
+    console.log("Start: " + dateString);
+  };
+
+  const onChangeEnd = (date, dateString) => {
+    console.log("End: " + dateString);
+  };
+
+  const getListDep = () => {
+    request("info/department/department", "get", {}).then((res) => {
+      if (res) {
+        //console.log(res.data);
+        const arrTmpP = res.data.map((dep) => ({
+          label: dep.depName,
+          value: dep.depId,
+        }));
+        setDepartment(arrTmpP);
+      }
+    });
+  };
+
+  const onDelete = (Item) => {
+    request(
+      "payrolls/salary/deleteSalaryById?id=" + Item.id,
+      "delete",
+      {}
+    ).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been deleted",
+          icon: "success",
+          showConfirmButton: true,
+          //timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+      }
+    });
+  };
+
+  const onChangeSalary = (e) => {
+    const salary = e.target.value;
+
+    form.setFieldsValue({
+      khmerRate: khRate,
+    });
+    //console.log("salary: " + salary);
+    setSalary(salary); // Update salary state
+  };
+
+  const onChangeKhRate = (e) => {
+    const rate = e.target.value;
+    //console.log("Khmer Rate: " + rate);
+    setKhmRate(rate); // Update Khmer rate state
+  };
+
+  const getTaxRate = () => {
+    setLoading(true);
+    var salaryKh = salary * khRate;
+    console.log("Calculated salary in Khmer Rate:", salaryKh);
+    request(`payrolls/tax/getTaxRateBySalary?salary=${salaryKh}`, "get", {})
+      .then((res) => {
+        if (res) {
+          var data = res.data;
+          setTax(data);
+          setTaxRate(data.rate * 100 + "%");
+          setLoading(false);
+          form.setFieldsValue({
+            taxRate: data.rate * 100 + "%",
+          });
+          console.log(data);
+          //console.log(data.rate * 100+"%"); // You can handle the response data here
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.error(err); // Handle any errors here
+      });
+  };
+
+  // Run getTaxRate when either khSalary or khRate changes
+  useEffect(() => {
+    if (salary && khRate) {
+      // Check if both values are available
+      getTaxRate();
+    }
+  }, [salary, khRate]); // Dependency array
+
+  const getList = () => {
+    setLoading(true);
+    request("payrolls/salary/getListSalary", "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        //console.log(res.data);
+      }
+    });
+  };
+
+  useEffect(() => {
+    getListDep();
+    getList();
+  }, []);
+
+  const onFinish = (values) => {
+    // console.log("Success:", values);
+    var startDate = dayjs(values.startDate).format("YYYY-MM-DD");
+    var endDate = dayjs(values.endDate).format("YYYY-MM-DD");
+    var param = {
+      empId: values.emp,
+      salary: values.salary,
+      fromDate: startDate,
+      toDate: endDate,
+      taxId: tax.id,
+    };
+    //console.log(param);
+    let url = "payrolls/salary/addSalary";
+    let method = "post";
+    // case update
+    if (edit) {
+      url = "payrolls/salary/editSalary?id=" + item.id;
+      method = "put";
+    }
+    //console.log(param);
+    //setLoading(false)
+
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+        setEdit(false);
+        onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getList();
+      }
+    });
+  };
+
+  const onEdit = (Item) => {
+    handleClickView(Item);
+    setItem(Item);
+    setEdit(true);
+  };
+
+  const onReset = () => {
+    form.resetFields();
+    setEdit(false);
+  };
+
+  const columns = [
     {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
+      title: "Employee ID",
+      dataIndex: "empId",
+      key: "empId",
+      fixed: "left",
     },
     {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
+      title: "Salary",
+      dataIndex: "salary",
+      key: "salary",
     },
     {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
+      title: "Form Date",
+      dataIndex: "fromDate",
+      key: "fromDate",
+    },
+    {
+      title: "To Date",
+      dataIndex: "toDate",
+      key: "toDate",
+    },
+    {
+      title: "Tax Rate",
+      dataIndex: "tax",
+      key: "tax",
+      render: (text) => `${text * 100}%`,
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, item) => (
+        <Space>
+          <Button
+            type="info"
+            icon={<EyeFilled />}
+            onClick={() => handleClickView(item)}
+          />
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            onClick={() => onEdit(item)}
+          />
+          <Popconfirm
+            title="Delete the Employee Salary"
+            description="Are you sure to delete this Employee Salary?"
+            onConfirm={() => onDelete(item)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
   const handleDateRangeChange = (value) => {
     const [startDate, endDate] = value.split(" To ");
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
   };
 
   return (
     <>
       <PageTitle PageTitle="Salary" />
-      <Space.Compact block>
-        <DatePicker
-          onChange={onChangeYear}
-          defaultValue={dayjs(today, dateFormat)}
-          picker="year"
-        />
-        <Select
-          placeholder="Select a Salary Cycle"
-          optionFilterProp="label"
-          onChange={onChange}
-          allowClear
-          options={[
-            {
-              value: "1",
-              label: "Monthly",
-            },
-            {
-              value: "2",
-              label: "Semi-Monthly",
-            },
-          ]}
-        />
-        {salaryCycle === "1" ? (
-          <DatePicker picker="month" onChange={handleMonthChange} />
-        ) : (
-          <Select
-            style={{ width: 300 }}
-            onChange={handleDateRangeChange}
-            placeholder="Select Range"
-          >
-            {dateRanges.map((range, index) => (
-              <Option key={index} value={range}>
-                {range}
-              </Option>
-            ))}
-          </Select>
-        )}
-        <Search
-          style={{ width: 300 }}
-          placeholder="input search text"
-          onSearch={onSearch}
-          enterButton
-        />
-      </Space.Compact>
-      <br />
       <Card style={{ width: "100%" }}>
         <Title level={2}>Generate Salary</Title>
         <Divider dashed />
         <Form
           name="basic"
+          form={form}
           initialValues={{
             remember: false,
           }}
           layout={"vertical"}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
+          onFinish={(item) => {
+            form.resetFields();
+            onFinish(item);
+          }}
+          // onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Department"
-                name="department"
+                name="depId"
+                label="Select Department"
                 rules={[
                   {
                     required: true,
-                    message: "Please select department!",
+                    message: "Please Select Department!",
                   },
                 ]}
               >
                 <Select
                   showSearch
-                  placeholder="Select a Department"
-                  optionFilterProp="label"
-                  onChange={onChange}
-                  onSearch={onSearch}
+                  style={{
+                    width: "100%",
+                  }}
                   allowClear
-                  options={[
-                    {
-                      value: "jack",
-                      label: "Jack",
-                    },
-                    {
-                      value: "lucy",
-                      label: "Lucy",
-                    },
-                    {
-                      value: "tom",
-                      label: "Tom",
-                    },
-                  ]}
+                  onChange={onChangeDep}
+                  placeholder="Search to Select"
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  options={department}
                 />
               </Form.Item>
             </Col>
+
             <Col span={12}>
               <Form.Item
                 label="Employees"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                // getValueFromEvent={getValueFromEvent}
+                name="emp"
               >
                 <Select
                   showSearch
                   placeholder="Select a Employees"
                   allowClear
-                  mode="multiple"
-                  options={optionsWithAllOption}
+                  optionFilterProp="label"
+                  filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? "")
+                      .toLowerCase()
+                      .localeCompare((optionB?.label ?? "").toLowerCase())
+                  }
+                  //mode="multiple"
+                  options={emp}
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item label="Salary">
-                <Input placeholder="Salary" />
+            <Col span={8}>
+              <Form.Item
+                name={"salary"}
+                label="Salary"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Input Salary!",
+                  },
+                ]}
+              >
+                <Input onChange={onChangeSalary} placeholder="Salary" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name={"khmerRate"}
+                label="Khmer Rate"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Input Khmer Rate!",
+                  },
+                ]}
+              >
+                <Input
+                  onChange={onChangeKhRate}
+                  value={khRate}
+                  placeholder="Khmer Rate"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name={"taxRate"} label="Tax Rate">
+                <Input value={taxRate} placeholder="Tax Rate" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                label="Tax Rate"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                name={"startDate"}
+                label="Start Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
               >
-                <Select
-                  showSearch
-                  placeholder="Select a Payment Type"
-                  allowClear
-                  mode="multiple"
-                  options={optionsWithAllOption}
+                <DatePicker
+                  onChange={onChangeStart}
+                  style={{ width: "100%" }}
                 />
               </Form.Item>
             </Col>
-            <Col span={24}>
+            <Col span={12}>
               <Form.Item
-                label="Date"
-                getValueFromEvent={getValueFromEvent}
-                name="selectWithAllOption"
+                name={"endDate"}
+                label="End Date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select Date!",
+                  },
+                ]}
               >
-                <RangePicker
-                  style={{width:"100%"}}
-                  id={{
-                    start: "startInput",
-                    end: "endInput",
-                  }}
-                  onFocus={(_, info) => {
-                    console.log("Focus:", info.range);
-                  }}
-                  onBlur={(_, info) => {
-                    console.log("Blur:", info.range);
-                  }}
-                />
+                <DatePicker onChange={onChangeEnd} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>
           <Form.Item>
-            <Button icon={<SendOutlined />} type="primary" htmlType="submit">
-              Generate
-            </Button>
+            <Space>
+              <Button icon={<SendOutlined />} type="primary" htmlType="submit">
+                {!edit ? "Generate" : "Update"}
+              </Button>
+              <Button type="primary" danger onClick={onReset}>
+                Clear
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Card>
       <Divider dashed />
+      <Space.Compact block>
+        <Select
+          showSearch
+          // style={{
+          //   width: "100%",
+          // }}
+          allowClear
+          onChange={filterByDep}
+          placeholder="Search to Select"
+          optionFilterProp="label"
+          filterSort={(optionA, optionB) =>
+            (optionA?.label ?? "")
+              .toLowerCase()
+              .localeCompare((optionB?.label ?? "").toLowerCase())
+          }
+          options={department}
+        />
+      </Space.Compact>
+      <br />
       <Card style={{ width: "100%" }}>
         <Table
+          loading={loading}
           scroll={{
             x: "max-content",
           }}

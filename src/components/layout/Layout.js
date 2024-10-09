@@ -4,8 +4,6 @@ import { Breadcrumb, Layout, Menu, Button, theme } from "antd";
 import "./Layout.css";
 import MenuItems from "./MenuItems";
 import {
-  DesktopOutlined,
-  FileOutlined,
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
@@ -32,7 +30,6 @@ const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 
 const items = [
   getItem("Dashboard", "Dashboard", <PieChartOutlined />),
-  getItem("Info & Management", "Info", <InfoCircleOutlined />),
   getItem("Attendance", "Attendance", <FieldTimeOutlined />),
   getItem("Leave Management", "/", <TeamOutlined />, [
     getItem("All Employee", "leave", <TeamOutlined />),
@@ -42,22 +39,17 @@ const items = [
   ]),
   getItem("Info Management", "Management", <TeamOutlined />, [
     getItem("Department", "Department", <BankOutlined />),
-    getItem("Position", "Position", <BankOutlined />),
-    getItem("Staff", "Staff", <UserOutlined />),
+    getItem("Position", "position", <BankOutlined />),
+    getItem("Employees", "employee", <UserOutlined />),
   ]),
   getItem("Hr Payroll", "Setting", <SettingOutlined />, [
     getItem("Payroll", "/payroll"),
+    getItem("Payroll Report", "/payroll-report"),
     getItem("Payslips", "/payslip"),
     getItem("Allowances", "/allowance"),
     getItem("Deductions", "/deduction"),
-    getItem("Salary","/salary"),
-    getItem("Tax","/tax")
-  ]),
-  getItem("Setting", "Setting", <SettingOutlined />, [
-    getItem("General", "2"),
-    getItem("Leave ", "3"),
-    getItem("Attendance ", "4"),
-    getItem("Payroll ", "4"),
+    getItem("Salary", "/salary"),
+    getItem("Tax", "/tax"),
   ]),
 ];
 

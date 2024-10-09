@@ -3,8 +3,6 @@ body {
   font-family: sans-serif;
 }
 
-
-
 #root .ql-container {
   border-bottom-left-radius: 0.5em;
   border-bottom-right-radius: 0.5em;
@@ -19,6 +17,7 @@ body {
   border-top-right-radius: 0.5em;
 }
 
-#root .ql-editor {
+#root p {
   min-height: 18em;
+  direction: ltr !important;  /* Ensures left-to-right text direction */
 }

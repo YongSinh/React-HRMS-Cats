@@ -1,5 +1,5 @@
-import { Space, Table,  Button, Form, Input } from "antd";
-import React, { useState } from "react";
+import { Space, Table, Button, Form, Input, Popconfirm } from "antd";
+import React, { useState, useEffect } from "react";
 import PageTitle from "../../components/Title_Page/TitlePage";
 import { Modal } from "antd";
 import {
@@ -7,76 +7,18 @@ import {
   DeleteOutlined,
   EditFilled,
   PlusOutlined,
-  PlusCircleOutlined,
+  SaveFilled,
 } from "@ant-design/icons";
-
-const columns = [
-  {
-    title: "ID",
-    dataIndex: "No",
-    render: (_, { No }) => {
-      return (
-        <>
-          <div>
-            <text style={{ fontSize: 13 }}>{No}</text>
-          </div>
-        </>
-      );
-    },
-  },
-  {
-    title: "Tax Able Salary",
-    dataIndex: "description",
-    key: "description",
-  },
-  {
-    title: "Rat",
-    dataIndex: "amount",
-    key: "aMount",
-  },
-  {
-    title: "Amout",
-    dataIndex: "amount",
-    key: "aMount",
-  },
-  {
-    title: "Lower Limit",
-    dataIndex: "amount",
-    key: "aMount",
-  },
-  {
-    title: "Upper Limit",
-    dataIndex: "amount",
-    key: "aMount",
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_) => (
-      <Space>
-        <Button type="primary" icon={<EditFilled />} />
-        <Button type="primary" icon={<DeleteOutlined />} danger />
-      </Space>
-    ),
-  },
-];
-const data = [
-  {
-    key: "description",
-    No: 1,
-    description: "John Brown",
-    amount: "150$",
-  },
-  {
-    key: "description",
-    No: 2,
-    description: "John Brown",
-    amount: "250$",
-  },
-];
+import { request } from "../../share/request";
+import Swal from "sweetalert2";
 
 const TaxPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [data, setData] = useState([]);
+  const [item, setItem] = useState();
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -86,6 +28,168 @@ const TaxPage = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  const onEdit = (Item) => {
+    handleClickView(Item);
+    setItem(Item);
+    setEdit(true);
+  };
+  const onDelete = (Item) => {
+    request("payrolls/tax/deleteTax/" + Item.id, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getListTax();
+          setLoading(false);
+        }
+      }
+    );
+  };
+
+  useEffect(()=>{
+    getListTax()
+  },[]);
+  const handleClickView = (Item) => {
+    //console.log("Failed:", Item);
+    setIsModalOpen(true);
+    form.setFieldsValue({
+      taxableSalary: Item.taxableSalary,
+      rate: Item.rate,
+      amount: Item.amount,
+      lowerLimit: Item.lowerLimit,
+      upperLimit:Item.upperLimit
+    });
+  };
+
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Tax Able Salary",
+      dataIndex: "taxableSalary",
+      key: "taxableSalary",
+    },
+    {
+      title: "Rat",
+      dataIndex: "rate",
+      key: "rate",
+    },
+    {
+      title: "Amout",
+      dataIndex: "amount",
+      key: "amount",
+    },
+    {
+      title: "Lower Limit",
+      dataIndex: "lowerLimit",
+      key: "lowerLimit",
+    },
+    {
+      title: "Upper Limit",
+      dataIndex: "upperLimit",
+      key: "upperLimit",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, item) => (
+        <Space>
+          <Button
+            type="primary"
+            icon={<EyeFilled />}
+            onClick={() => handleClickView(item)}
+          />
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            onClick={() => onEdit(item)}
+          />
+          <Popconfirm
+            title="Delete the department"
+            description="Are you sure to delete this department?"
+            onConfirm={() => onDelete(item)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+  const getListTax = () => {
+    setLoading(true);
+    request("payrolls/tax/listTax", "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+       // console.log(res.data);
+      }
+    });
+  };
+
+  const onFinish = (Item) => {
+    
+    var param = {
+      taxableSalary: Item.taxableSalary,
+      rate: Item.rate,
+      amount: Item.amount,
+      lowerLimit: Item.lowerLimit,
+      upperLimit:Item.upperLimit
+    };
+
+    let url = "payrolls/tax/addTax";
+    let method = "post";
+    // case update
+    if (edit) {
+      url = "payrolls/tax/editTax/" + item.id;
+      method = "put";
+    }
+    console.log(param);
+    //setLoading(false)
+
+    request(url, method, param).then((res) => {
+      if (res.code === 200) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been saved",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getListTax();
+        setLoading(false);
+        setEdit(false);
+        onReset();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong, please check in error detail!",
+          text: res.message,
+        });
+        setLoading(false);
+        getListTax()     
+       }
+    });
+  };
+
+  const onReset = () => {
+    form.resetFields();
+    setEdit(false);
+    setIsModalOpen(false);
+  };
+
 
   return (
     <>
@@ -99,29 +203,31 @@ const TaxPage = () => {
         Add Tax
       </Button>
       <Modal
-        title="Add Tax"
+        title={edit? "Edit Tax": "Add Tax" }
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
+        footer={false}
+        maskClosable={false}
       >
-        <Form layout="vertical" hideRequiredMark>
+        <Form
+          layout="vertical"
+          form={form}
+          initialValues={{
+            remember: false,
+          }}
+          onFinish={(item) => {
+            form.resetFields();
+            onFinish(item);
+          }}
+        >
           <Form.Item
-            name="Id"
-            label="Tax ID"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="taxAbleSalary"
+            name="taxableSalary"
             label="Tax Able Salary"
             rules={[
               {
                 required: true,
+                message: "Please Tax Able Salary!",
               },
             ]}
           >
@@ -133,6 +239,7 @@ const TaxPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please Tax Rate!",
               },
             ]}
           >
@@ -144,6 +251,7 @@ const TaxPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please Tax Amount!",
               },
             ]}
           >
@@ -156,6 +264,7 @@ const TaxPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please Lower Limit!",
               },
             ]}
           >
@@ -167,15 +276,26 @@ const TaxPage = () => {
             rules={[
               {
                 required: true,
+                message: "Please Upper Limit!",
               },
             ]}
           >
             <Input />
           </Form.Item>
+          <Form.Item>
+            <Space style={{ textAlign: "right" }}>
+              <Button icon={<SaveFilled />} type="primary" htmlType="submit">
+                submit
+              </Button>
+              <Button type="primary" danger onClick={onReset}>
+                Clear
+              </Button>
+            </Space>
+          </Form.Item>
         </Form>
       </Modal>
 
-      <Table columns={columns} dataSource={data} />
+      <Table loading={loading} columns={columns} dataSource={data} />
     </>
   );
 };
