@@ -265,6 +265,7 @@ const LeaveRequest = () => {
     const remarkDiv = document.createElement("div");
     remarkDiv.innerHTML = items.remark;
     const plainTextRemark = remarkDiv.textContent || remarkDiv.innerText || "";
+    var remark = isEmptyOrNull(plainTextRemark) ? " " : plainTextRemark;
     const body = {
       empId: userId,
       startDate: dayjs(items.date[0]).format(format),
@@ -272,7 +273,7 @@ const LeaveRequest = () => {
       timeOfHaftDay: time,
       reason: plainTextReason,
       leaveTypeId: items.leaveType,
-      remark: plainTextRemark,
+      remark: remark,
       dayOfLeave: items.duration,
       createdAt: today,
     };
@@ -315,6 +316,8 @@ const LeaveRequest = () => {
       }
     });
   };
+
+  
 
   const onApply = (items) => {
     Swal.fire({

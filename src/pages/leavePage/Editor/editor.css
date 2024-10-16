@@ -17,7 +17,3 @@ body {
   border-top-right-radius: 0.5em;
 }
 
-#root p {
-  min-height: 18em;
-  direction: ltr !important;  /* Ensures left-to-right text direction */
-}

@@ -124,19 +124,6 @@ const DepartmentPage = () => {
 
   const columns = [
     {
-      title: "No",
-      dataIndex: "No",
-      render: (items, item, index) => {
-        return (
-          <>
-            <div>
-              <text style={{ fontSize: 13 }}>{index + 1}</text>
-            </div>
-          </>
-        );
-      },
-    },
-    {
       title: "depId",
       dataIndex: "depId",
       key: "depId",

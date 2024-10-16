@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import dayjs from "dayjs";
 export const isEmptyOrNull = (value) => {
     return (value === "" || value === null || value === undefined) ? true : false
 }
@@ -8,6 +8,10 @@ export const config = {
   base_server: "https://localhost:8085/api/",
   image_path: "",
   version: 1,
+};
+const formatDate = "YYYY-MM-DD";
+export const dateFormat = (value) => {
+  return dayjs(value).format(formatDate);
 };
 
 export const WindowSize = () => {

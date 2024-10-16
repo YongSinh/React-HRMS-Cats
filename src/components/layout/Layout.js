@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Breadcrumb, Layout, Menu, Button, theme } from "antd";
 import "./Layout.css";
-import MenuItems from "./MenuItems";
+import MenuItems from './MenuItems'
 import {
   PieChartOutlined,
   TeamOutlined,
@@ -13,6 +13,7 @@ import {
   ControlOutlined,
   BankOutlined,
 } from "@ant-design/icons";
+import UserService from "../../UserService/UserService";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -69,6 +70,8 @@ const MainLayout = () => {
     navigate("/"); // Change the route as per your requirement
   };
 
+
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header className="header">
@@ -87,7 +90,7 @@ const MainLayout = () => {
           </Button>
           <div className="header-title">Human Resource Management System</div>
         </div>
-        <MenuItems />
+        <MenuItems/>
       </Header>
       <Layout>
         <Sider
