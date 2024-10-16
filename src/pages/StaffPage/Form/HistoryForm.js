@@ -9,6 +9,8 @@ import {
   Button,
   Space,
   DatePicker,
+  Table,
+  Divider
 } from "antd";
 import { isEmptyOrNull, dateFormat } from "../../../share/helper";
 import { request, request2 } from "../../../share/request";
@@ -19,6 +21,7 @@ const HistoryForm = ({ activeKey }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [empId, setEmpId] = useState("");
+  const [data, setData] = useState([]);
   const [submittedId, setSubmittedId] = useState(null);
   useEffect(() => {
     const storedId = localStorage.getItem("employeeId");
@@ -108,6 +111,28 @@ const HistoryForm = ({ activeKey }) => {
       }
     });
   };
+  const columns = [
+    {
+      title: "Department",
+      dataIndex: "department",
+      key: "department",
+    },
+    {
+      title: "Job Title",
+      dataIndex: "jobTitle",
+      key: "jobTitle",
+    },
+    {
+      title: "Start Date",
+      dataIndex: "startDate",
+      key: "startDate",
+    },
+    {
+      title: "End Date",
+      dataIndex: "endDate",
+      key: "endDate",
+    },
+  ];
 
   const onCancel = () => {
     form.resetFields();
@@ -221,6 +246,8 @@ const HistoryForm = ({ activeKey }) => {
             </Space>
           </Form.Item>
         </Form>
+        <Divider />
+        <Table dataSource={data} columns={columns} />
       </Spin>
     </>
   );

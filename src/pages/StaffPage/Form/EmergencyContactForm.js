@@ -20,6 +20,15 @@ const HistoryForm = ({ onSave, onCancel }) => {
   const [form] = Form.useForm();
   const [submittedId, setSubmittedId] = useState(null);
   const onFinish = (item) => {
+    var body ={
+        "fullName": item.fullName,
+        "relationship": item.relationship,
+        "address": item.address,
+        "tel": item.tel,
+        "officeAddress": item.officeAddress,
+        "officeTel": item.officeTel,
+        "empId": 0
+    }
     console.log(item);
   };
   return (
@@ -36,7 +45,7 @@ const HistoryForm = ({ onSave, onCancel }) => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              name="emergencyFullName"
+              name="fullName"
               label="Full Name"
               rules={[
                 {
@@ -64,7 +73,7 @@ const HistoryForm = ({ onSave, onCancel }) => {
           </Col>
           <Col span={12}>
             <Form.Item
-              name="emergencyAddress"
+              name="address"
               label="Address"
               rules={[
                 {
@@ -78,7 +87,7 @@ const HistoryForm = ({ onSave, onCancel }) => {
           </Col>
           <Col span={12}>
             <Form.Item
-              name="emergencyTel"
+              name="tel"
               label="Tel"
               rules={[
                 {
@@ -116,35 +125,6 @@ const HistoryForm = ({ onSave, onCancel }) => {
               ]}
             >
               <Input placeholder="Enter Office Tel" />
-            </Form.Item>
-          </Col>
-          <Divider> Residence in Google Map</Divider>
-          <Col span={12}>
-            <Form.Item
-              name="latitude"
-              label="Latitude"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the latitude!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Latitude" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="longitude"
-              label="Longitude"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the longitude!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Longitude" />
             </Form.Item>
           </Col>
         </Row>

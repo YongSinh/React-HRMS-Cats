@@ -5,7 +5,9 @@ import {
   Col,
   Button,
   Space,
-  DatePicker
+  DatePicker,
+  Divider,
+  Table
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { isEmptyOrNull, dateFormat } from "../../../share/helper";
@@ -14,6 +16,7 @@ import Swal from "sweetalert2";
 const HistoryForm = ({}) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const [data, setData] = useState([]);
   const [submittedId, setSubmittedId] = useState(null);
   const onFinish = (item) => {
     var body = {
@@ -58,7 +61,33 @@ const HistoryForm = ({}) => {
   const onCancel = () => {
     form.resetFields();
   };
-
+  const columns = [
+    {
+      title: "Institution",
+      dataIndex: "eduInstitution",
+      key: "eduInstitution",
+    },
+    {
+      title: "Level",
+      dataIndex: "eduLevel",
+      key: "eduLevel",
+    },
+    {
+      title: "Major",
+      dataIndex: "major",
+      key: "major",
+    },
+    {
+      title: "GPA",
+      dataIndex: "gpa",
+      key: "gpa",
+    },
+    {
+      title: "Year End",
+      dataIndex: "yearEnd",
+      key: "yearEnd",
+    },
+  ];
   return (
     <>
       <Form
@@ -149,6 +178,8 @@ const HistoryForm = ({}) => {
             </Space>
         </Form.Item>
       </Form>
+      <Divider />
+      <Table dataSource={data} columns={columns} />
     </>
   );
 };

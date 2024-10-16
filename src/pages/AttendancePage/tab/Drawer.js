@@ -26,9 +26,10 @@ const TimeInAndOut = ({ open = false, onClose, onFinish, edit = false }) => {
       form.setFieldsValue({
         time: dayjs(),
         date: dayjs(),
-      });
-    
+      })
   }, []);
+
+
   return (
     <>
       <Drawer
@@ -41,7 +42,11 @@ const TimeInAndOut = ({ open = false, onClose, onFinish, edit = false }) => {
           form={form}
           layout="vertical"
           onFinish={(item) => {
-            form.resetFields();
+            //form.resetFields();
+            form.setFieldsValue({
+              time: dayjs(),
+              date: dayjs(),
+            })
             onFinish(item);
           }}
         >

@@ -56,9 +56,9 @@ const HistoryForm = ({}) => {
     let body;
     if (isEmptyOrNull(submittedId)) {
       Swal.fire({
-        title: "Enter your IP address",
+        title: "Enter your Employee Id",
         input: "text",
-        inputLabel: "Your IP address",
+        inputLabel: "Employee Id",
         inputValue: "",
         showCancelButton: true,
         inputValidator: (value) => {
@@ -123,7 +123,7 @@ const HistoryForm = ({}) => {
       key: "reading",
     },
   ];
-  
+
   const onCancel = () => {
     form.resetFields();
     setData([]);
