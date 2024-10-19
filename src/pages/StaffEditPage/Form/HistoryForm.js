@@ -10,27 +10,28 @@ import {
   Space,
   DatePicker,
   Table,
-  Divider
+  Divider,
+  Popconfirm
 } from "antd";
+import {
+  EyeFilled,
+  DeleteOutlined,
+  EditFilled,
+} from "@ant-design/icons";
 import { isEmptyOrNull, dateFormat } from "../../../share/helper";
 import { request, request2 } from "../../../share/request";
 import Swal from "sweetalert2";
 const { Title } = Typography;
 
-const HistoryForm = ({ activeKey }) => {
+const HistoryForm = ({ activeKey ,id }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [empId, setEmpId] = useState("");
   const [data, setData] = useState([]);
   const [submittedId, setSubmittedId] = useState(null);
 
   useEffect(() => {
-    const storedId = localStorage.getItem("employeeId");
     if (activeKey === "2") {
-      if (storedId) {
-        setSubmittedId(storedId);
-        getEmpInfo(storedId);
-      }
+        getEmpHistory()
       //getListDep(); // Only fetch data when this tab is active
     }
        // Retrieve employee ID from local storage when the component mounts
@@ -128,6 +129,19 @@ const HistoryForm = ({ activeKey }) => {
     }
   };
 
+  
+
+  const getEmpHistory = () => {
+    setLoading(true);
+    request("info/jobHistory/getListJobHistoryByEmId?emId="+id, "get", {}).then((res) => {
+      if (res) {
+        console.log(res.data);
+        setLoading(false);
+        var result = res.data;
+        setData(result)
+      }
+    });
+  };
 
 
   const getEmpInfo = (value) => {
@@ -170,6 +184,30 @@ const HistoryForm = ({ activeKey }) => {
       dataIndex: "endDate",
       key: "endDate",
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, item) => (
+        <Space>
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            //onClick={() => onEdit(item)}
+          />
+          <Popconfirm
+            title="Delete the department"
+            description="Are you sure to delete this department?"
+            //onConfirm={() => onDelete(item)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+    
   ];
 
   const onCancel = () => {
@@ -179,6 +217,7 @@ const HistoryForm = ({ activeKey }) => {
   return (
     <>
       {/* <Button onClick={text}>Hello</Button> */}
+      <h1>{id}</h1>
       <Spin spinning={loading} tip="Loading" size="middle">
         <Title level={4}> History Imformation</Title>
         <Form

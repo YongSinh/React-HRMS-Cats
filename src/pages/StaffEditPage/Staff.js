@@ -73,21 +73,18 @@ const Staff = () => {
       title: "Action",
       key: "Action",
       fixed: "right",
-      render: (_, record) => (
+      render: () => (
         <Space>
           <Button
             type="primary"
             icon={<EyeFilled />}
             style={{ backgroundColor: "#4CAF50", borderColor: "#4CAF50" }}
-          />
-          <Link to={`/edit-employee/${record.empId}`}>
-            <Button
-              type="primary"
-              icon={<EditFilled />}
-              style={{ backgroundColor: "#2196F3", borderColor: "#2196F3" }}
-            />
-          </Link>
-
+          ></Button>
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            style={{ backgroundColor: "#2196F3", borderColor: "#2196F3" }}
+          ></Button>
           <Button
             type="primary"
             icon={<DeleteOutlined />}

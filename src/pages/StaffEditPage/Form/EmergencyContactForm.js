@@ -15,7 +15,7 @@ import { request, request2 } from "../../../share/request";
 import Swal from "sweetalert2";
 const { Title } = Typography;
 
-const HistoryForm = ({  }) => {
+const HistoryForm = ({id}) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [submittedId, setSubmittedId] = useState(null);
@@ -130,6 +130,7 @@ const HistoryForm = ({  }) => {
   };
   return (
     <>
+    <h1>{id}</h1>
       <Form
         name="basic"
         form={form}

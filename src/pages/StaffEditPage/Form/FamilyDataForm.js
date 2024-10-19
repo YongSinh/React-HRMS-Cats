@@ -15,7 +15,7 @@ import { request, request2 } from "../../../share/request";
 import Swal from "sweetalert2";
 const { Title } = Typography;
 
-const HistoryForm = ({ onSave }) => {
+const HistoryForm = ({ id }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [form2] = Form.useForm();
@@ -163,6 +163,7 @@ const HistoryForm = ({ onSave }) => {
   return (
     <>
       <Title level={4}>Family Information</Title>
+      <h1>{id}</h1>
       <Form
         name="basic"
         form={form}

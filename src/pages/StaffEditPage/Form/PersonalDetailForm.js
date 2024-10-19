@@ -23,13 +23,14 @@ import dayjs from "dayjs";
 const { TextArea } = Input;
 const { Title } = Typography;
 const { Dragger } = Upload;
-const PersonalDetailForm = ({ activeKey }) => {
+const PersonalDetailForm = ({ activeKey, id }) => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState([]);
   const [position, setPosition] = useState([]);
   const [position2, setPosition2] = useState([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
+  const [empInfor, setEmpInfor] = useState("");
 
   const formatDate = "YYYY-MM-DD";
   const getListDep = () => {
@@ -62,8 +63,8 @@ const PersonalDetailForm = ({ activeKey }) => {
   };
 
   const getListPos = (value) => {
-    setLoading(true);
     if (!isEmptyOrNull(value)) {
+      setLoading(true);
       request(
         "info/position/getPositionByDepId?depId=" + value,
         "get",
@@ -77,17 +78,86 @@ const PersonalDetailForm = ({ activeKey }) => {
           setPosition(arrTmpP);
           setPosition2(res.data);
           setLoading(false);
-          console.log(res.data);
         }
       });
     }
   };
 
+
+  const getEmpInfo = () => {
+    setLoading(true);
+    request("info/employee/getEmployeeById/"+id, "get", {}).then((res) => {
+      if (res) {
+        //console.log(res.data);
+        setLoading(false);
+        var result = res.data;
+        setEmpInfor(result)
+      }
+    });
+  };
+
+  const getEmpInfofile = () => {
+    setLoading(true);
+    request("info/employee/getEmployeeById/"+id, "get", {}).then((res) => {
+      if (res) {
+        //console.log(res.data);
+        setLoading(false);
+        var result = res.data;
+        setEmpInfor(result)
+      }
+    });
+  };
+
   useEffect(() => {
-    if (activeKey === "1") {
+      getEmpInfo()
       getListDep(); // Only fetch data when this tab is active
-    }
   }, [activeKey]);
+
+  useEffect(() => {
+    if (empInfor) {
+      const departmentMatch = department.find(item => item.label === empInfor.depId);
+      if (departmentMatch && !isEmptyOrNull(departmentMatch.value)) {
+        console.log(departmentMatch)
+        getListPos(departmentMatch.value);
+      }
+      // Setting form fields based on empInfor
+      form.setFieldsValue({
+        empId: empInfor.empId,
+        firstName: empInfor.firstName,
+        lastName: empInfor.lastName,
+        email: empInfor.email,
+        phone: empInfor.phone,
+        birthDate: empInfor.birthDate ? dayjs(empInfor.birthDate) : null,
+        placeOfBirth: empInfor.placeOfBirth,
+        age: empInfor.age,
+        gender: empInfor.sex,
+        height: empInfor.height,
+        address: empInfor.address,
+        empDate: empInfor.empDate ? dayjs(empInfor.empDate) : null,
+        joinDate: empInfor.joinDate ? dayjs(empInfor.joinDate) : null,
+        mangerId: empInfor.mangerId,
+        location: empInfor.location,
+        maritalStats: empInfor.maritalStats,
+        nationality: empInfor.nationality,
+        workType: empInfor.workType,
+        religion: empInfor.religion,
+        idCardNo: empInfor.idCard,
+        passportId: empInfor.passportId,
+        remark: empInfor.remark,
+        govOfficer: empInfor.govOfficer,
+        govTel: empInfor.govTel,
+        govAddress: empInfor.govAddress,
+        govPosition: empInfor.govPosition,
+        department: empInfor.depId,
+        position: empInfor.posId,
+        weight: empInfor.weight,
+        section:empInfor.section
+
+      });
+    }
+  }, [empInfor]);
+  
+  
 
   const props = {
     name: "file",
@@ -115,12 +185,16 @@ const PersonalDetailForm = ({ activeKey }) => {
     return dayjs(value).format(formatDate);
   };
 
+
+
   const onFinish = (item) => {
     console.log("success", item);
 
-    localStorage.setItem("employeeId", item.empId);
+    const result = department.find(items => items.label === item.department || items.value === item.department);
+    const result2 = position.find(items => items.label === item.position || items.value === item.position);
+    const posId = result2 && !isEmptyOrNull(result2.value)? result2.value: null
     const body = {
-      empId: item.empId,
+      empId: id,
       firstName: item.firstName,
       lastName: item.lastName,
       email: item.email,
@@ -132,23 +206,24 @@ const PersonalDetailForm = ({ activeKey }) => {
       height: item.height,
       address: item.address,
       empDate: dateFormat(item.empDate),
-      joinDate: dateFormat(item.joinDat),
+      joinDate: dateFormat(item.joinDate),
       mangerId: item.mangerId,
       location: item.location,
       maritalStats: item.maritalStats,
       nationality: item.nationality,
       workType: item.workType,
       religion: item.religion,
-      idCard: item.idCardNo,
-      passport: item.passportId,
+      idCard: item.idCard,
+      passport: item.passport,
       remark: item.remark,
       govOfficer: item.govOfficer,
       govTel: item.govTel,
       govAddress: item.govAddress,
       govPosition: item.govPosition,
-      depId: item.department,
-      posId: item.position,
+      depId: result.value,
+      posId: posId,
       weight: item.weight,
+      fileId:""
     };
     const formData = new FormData();
     const json = JSON.stringify(body);
@@ -157,9 +232,11 @@ const PersonalDetailForm = ({ activeKey }) => {
     });
 
     formData.append("body", blob);
-    formData.append("file", file);
+    if (item.upload != null) {
+      formData.append("file", item.upload.file);
+    }
 
-    let url = "info/employee/addEmployee";
+    let url = "info/employee/editEmployee";
     let method = "post";
 
     request(url, method, formData).then((res) => {
@@ -173,6 +250,7 @@ const PersonalDetailForm = ({ activeKey }) => {
           // confirmButtonText: "Confirm",
         });
         setLoading(false);
+        getEmpInfo()
       } else {
         Swal.fire({
           icon: "error",
@@ -186,6 +264,7 @@ const PersonalDetailForm = ({ activeKey }) => {
 
   return (
     <>
+      <h1>{id}</h1>
       <Spin spinning={loading} tip="Loading" size="middle">
         <Title level={4}>Personal Imformation:</Title>
         <Form
