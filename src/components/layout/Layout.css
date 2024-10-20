@@ -1,13 +1,12 @@
 .header {
-  position: fixed;
+  /* position: fixed; */
   width: 100%;
-  z-index: 100; /* Ensure header is above other content */
+  z-index: 100;
   background: #001529;
   color: white;
   padding: 0px 30px;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(146, 134, 134, 0.288); /* Optional: Add shadow */
   justify-content: space-between;
 }
 
@@ -30,48 +29,46 @@
   font-weight: bold;
  
 }
+/* .ant-layout-sider-trigger{
+ width: 230px !important;
+} */
 
-
-.content {
+/* .content {
   margin: 24px 16px;
-}
+} */
 
-.breadcrumb {
-  margin: 16px 0;
-}
 
-.ant-layout {
-  background: #f0f2f5; /* Background color for main layout */
-}
+/* .ant-layout-sider {
+  width: 230px !important;
+  flex: 0 0 230px !important;
+  max-width: 230px !important;
+} */
 
-.ant-layout-sider {
-
-  background: #001529; /* Sider background color */
-  z-index: 1; /* Ensure sider is below header */
-}
-
-.site-layout-background {
-  background: #fff; /* Content area background */
+/* .site-layout-background {
+  background: #fff; 
   padding: 24px;
-  min-height: 280px; /* Adjust minimum height as needed */
-  border-radius: 8px; /* Rounded corners */
-  border: 1px solid #e8e8e8; /* Optional: Add border */
-}
+  min-height: 280px; 
+  border-radius: 8px; 
+  border: 1px solid #e8e8e8;
+} */
 
 
-.ant-layout-footer {
-  text-align: center; /* Center align footer text */
-  background: #fff; /* Footer background color */
-  position: fixed; /* Fixed position */
-  bottom: 0; /* Stick to the bottom */
-  width: 100%; /* Full width */
-  z-index: 2; /* Ensure footer is above content */
-  border-top: 1px solid #e8e8e8; /* Optional: Add border */
-  padding: 12px 0; /* Padding for footer content */
-}
+/* .ant-layout-footer {
+  text-align: center;
+  background: #fff;
+  position: fixed; 
+  bottom: 0; 
+  width: 100%; 
+  z-index: 2;
+  border-top: 1px solid #e8e8e8; 
+  padding: 12px 0; 
+} */
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-layout .ant-layout-sider-children {
+/* :where(.css-dev-only-do-not-override-zg0ahe).ant-layout .ant-layout-sider-children {
   height:auto;
   margin-top: 85px;
 }
+ */
+
+
 

@@ -6,7 +6,7 @@ import StaffDrawer from "./StaffDrawer";
 import { request, config } from "../../share/request";
 import { Link } from "react-router-dom";
 import "./Staff.css";
-
+import getColumnSearchProps from "../../share/ColumnSearchProps";
 const Staff = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,6 +32,7 @@ const Staff = () => {
       title: "Employee ID",
       dataIndex: "empId",
       fixed: "left",
+      ...getColumnSearchProps("empId")
     },
     {
       title: "First Name",
@@ -56,6 +57,7 @@ const Staff = () => {
     {
       title: "Department",
       dataIndex: "depId",
+      ...getColumnSearchProps("depId")
     },
     {
       title: "Position",

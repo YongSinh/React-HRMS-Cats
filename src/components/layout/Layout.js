@@ -97,12 +97,7 @@ const MainLayout = () => {
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
-          style={{
-            overflow: "auto",
-            height: "100vh",
-            position: "fixed",
-            left: 0,
-          }}
+          style={{width:200}}
         >
           <Menu
             theme="dark"
@@ -112,20 +107,18 @@ const MainLayout = () => {
             onClick={onChange}
           />
         </Sider>
-        <Layout style={{ marginLeft: collapsed ? 80 : 200, marginTop: 64 }}>
-          <Content className="content">
-            <div
-              className="site-layout-background"
-              style={{
-                padding: 24,
-                minHeight: 360,
-                background: colorBgContainer,
-                borderRadius: borderRadiusLG,
-              }}
-            >
-              <Outlet />
-            </div>
-          </Content>
+        <Layout>
+          <Content
+          style={{
+            margin: '24px 16px',
+            padding: 24,
+            minHeight: 280,
+            background: colorBgContainer,
+            borderRadius: borderRadiusLG,
+          }}
+        >
+         <Outlet />
+        </Content>
           <Footer
             style={{
               textAlign: "center",

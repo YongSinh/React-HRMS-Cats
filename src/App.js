@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayoutLayout from './components/layout/Layout';
 import DashboardPage from './pages/Dashboard/dashboard';
 import LeavePage from './pages/leavePage/MainLeave/leavePage';
-import InfoPage from './pages/infoPage/info';
 import LeaveRequest from './pages/leavePage/UserLeavePage/leaveRequest';
 import DepartmentPage from './pages/DepartmentPage/Department';
 import Staff from './pages/StaffPage/Staff';
@@ -34,7 +33,6 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/leave" element={<LeavePage />} />
-            <Route path="/info" element={<InfoPage />} />
             <Route path="/leave-request" element={<LeaveRequest />} />
             <Route path="/department" element={<DepartmentPage />} />
             <Route path="/position" element={<PositionPage />} />

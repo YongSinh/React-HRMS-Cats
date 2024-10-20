@@ -15,8 +15,8 @@ import {
   Spin,
   Upload,
 } from "antd";
-import { request, request2 } from "../../../share/request";
-import { PlusOutlined, InboxOutlined } from "@ant-design/icons";
+import { request } from "../../../share/request";
+import { InboxOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import { isEmptyOrNull } from "../../../share/helper";
 import dayjs from "dayjs";
@@ -141,7 +141,7 @@ const PersonalDetailForm = ({ activeKey, id }) => {
         nationality: empInfor.nationality,
         workType: empInfor.workType,
         religion: empInfor.religion,
-        idCardNo: empInfor.idCard,
+        idCard: empInfor.idCard,
         passportId: empInfor.passportId,
         remark: empInfor.remark,
         govOfficer: empInfor.govOfficer,
@@ -264,7 +264,6 @@ const PersonalDetailForm = ({ activeKey, id }) => {
 
   return (
     <>
-      <h1>{id}</h1>
       <Spin spinning={loading} tip="Loading" size="middle">
         <Title level={4}>Personal Imformation:</Title>
         <Form
@@ -630,12 +629,6 @@ const PersonalDetailForm = ({ activeKey, id }) => {
               <Form.Item
                 name="idCardNo"
                 label="ID Card No."
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input ID Card No.! ",
-                  },
-                ]}
               >
                 <Input placeholder="E.g., 123456789" />
               </Form.Item>

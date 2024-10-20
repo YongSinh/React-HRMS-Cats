@@ -2,7 +2,7 @@ import './dashboard.css'
 import PageTitle from '../../components/Title_Page/TitlePage';
 import CardCustom from './Card/Card';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import { PiAirplaneTakeoff } from "react-icons/pi";
 import { TfiReceipt } from "react-icons/tfi";
 import { Chart } from "react-google-charts";

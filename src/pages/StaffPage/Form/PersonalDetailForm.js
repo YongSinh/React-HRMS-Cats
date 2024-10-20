@@ -139,7 +139,7 @@ const PersonalDetailForm = ({ activeKey }) => {
       nationality: item.nationality,
       workType: item.workType,
       religion: item.religion,
-      idCard: item.idCardNo,
+      idCard: item.idCard,
       passport: item.passportId,
       remark: item.remark,
       govOfficer: item.govOfficer,
@@ -157,7 +157,9 @@ const PersonalDetailForm = ({ activeKey }) => {
     });
 
     formData.append("body", blob);
-    formData.append("file", file);
+    if (file != null) {
+      formData.append("file", file);
+    }
 
     let url = "info/employee/addEmployee";
     let method = "post";

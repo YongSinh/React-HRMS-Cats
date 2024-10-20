@@ -152,9 +152,11 @@ const HistoryForm = ({id}) => {
       label: "Fluent",
     },
   ];
+
+
+  
   return (
     <>
-    <h1>{id}</h1>
       <Form
         name="basic"
         form={form}

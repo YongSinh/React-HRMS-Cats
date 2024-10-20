@@ -7,18 +7,22 @@ import {
   Space,
   DatePicker,
   Divider,
-  Table
+  Table,
+  Popconfirm,
 } from "antd";
+import { DeleteOutlined, EditFilled } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import { isEmptyOrNull, dateFormat } from "../../../share/helper";
-import { request, request2 } from "../../../share/request";
+import dayjs from "dayjs";
+import { request } from "../../../share/request";
 import Swal from "sweetalert2";
-const HistoryForm = ({id}) => {
+const HistoryForm = ({ id }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [submittedId, setSubmittedId] = useState(null);
-
+  const [edit, setEdit] = useState(false);
+  const [eduId, setEduId] = useState("");
 
   const save = (body, url, method) => {
     request(url, method, body).then((res) => {
@@ -32,6 +36,8 @@ const HistoryForm = ({id}) => {
           // confirmButtonText: "Confirm",
         });
         setLoading(false);
+        getEmpEdu()
+        setEdit(false)
       } else {
         Swal.fire({
           icon: "error",
@@ -39,65 +45,79 @@ const HistoryForm = ({id}) => {
           text: res.message,
         });
         setLoading(false);
+        getEmpEdu()
+        setEdit(false)
       }
     });
   };
-
+  const onDelete = (Item) => {
+    request("info/jobHistory/deleteJobHistory/" + Item.id, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getEmpEdu();
+          setLoading(false);
+        }
+      }
+    );
+  };
+  const handleEdit = (item) => {
+    setEdit(true);
+    setEduId(item.id);
+    form.setFieldsValue({
+      level: item.eduLevel,
+      institution: item.eduInstitution,
+      endYear: dayjs(item.yearEnd),
+      major: item.major,
+      gpa: item.gpa,
+    });
+  };
   const onFinish = (item) => {
     let url = "info/education/addEducation";
-    let method = "post";
-    let body;
-    if (isEmptyOrNull(submittedId)) {
-      Swal.fire({
-        title: "Enter your Employee Id",
-        input: "text",
-        inputLabel: "Employee Id",
-        inputValue: "",
-        showCancelButton: true,
-        inputValidator: (value) => {
-          if (!value) {
-            return "You need to input employee id!";
-          }
-        },
-      }).then((result) => {
-        if (result.isConfirmed && result.value) {
-          const id = result.value;
-          setSubmittedId(id);
-          body = {
-            eduLevel: item.level,
-            eduInstitution: item.institution,
-            yearEnd: dateFormat(item.endYear),
-            major: item.major,
-            emID: id,
-            gpa: item.gpa,
-          };
-          setData((prevData) => [...prevData, body]);
-          save(body, url, method);
-        }
-      });
-    } else {
-      body = {
-        eduLevel: item.level,
-        eduInstitution: item.institution,
-        yearEnd: dateFormat(item.endYear),
-        major: item.major,
-        emID: submittedId,
-        gpa: item.gpa,
-      };
-      save(body, url, method);
-      setData((prevData) => [...prevData, body]);
+    var method = edit ? "put" : "post";
+    
+    if (edit) {
+      url = "info/education/editEducation/" + eduId;
     }
+    let body = {
+      eduLevel: item.level,
+      eduInstitution: item.institution,
+      yearEnd: dateFormat(item.endYear),
+      major: item.major,
+      emID: id,
+      gpa: item.gpa,
+    };
+    save(body, url, method);
   };
+
   useEffect(() => {
     // Retrieve employee ID from local storage when the component mounts
-    const storedId = localStorage.getItem("employeeId");
-    if (storedId) {
-      setSubmittedId(storedId);
-    }
+    getEmpEdu();
   }, []);
 
+  const getEmpEdu = () => {
+    setLoading(true);
+    request("info/education/getListEducationByEmId?emId=" + id, "get", {}).then(
+      (res) => {
+        if (res) {
+          console.log(res.data);
+          setLoading(false);
+          var result = res.data;
+          setData(result);
+        }
+      }
+    );
+  };
   const onCancel = () => {
     form.resetFields();
+    setEdit(false)
   };
   const columns = [
     {
@@ -125,10 +145,32 @@ const HistoryForm = ({id}) => {
       dataIndex: "yearEnd",
       key: "yearEnd",
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, item) => (
+        <Space>
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            onClick={() => handleEdit(item)}
+          />
+          <Popconfirm
+            title="Delete the department"
+            description="Are you sure to delete this department?"
+            //onConfirm={() => onDelete(item)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      ),
+    },
   ];
   return (
     <>
-      <h1>{id}</h1>
       <Form
         name="basic"
         form={form}
@@ -179,7 +221,7 @@ const HistoryForm = ({id}) => {
                 },
               ]}
             >
-              <DatePicker style={{width:"100%"}}/>
+              <DatePicker style={{ width: "100%" }} />
             </Form.Item>
           </Col>
           <Col span={8}>
@@ -198,23 +240,20 @@ const HistoryForm = ({id}) => {
           </Col>
 
           <Col span={8}>
-            <Form.Item
-              name="gpa"
-              label="GPA"
-            >
+            <Form.Item name="gpa" label="GPA">
               <Input placeholder="Enter GPA" />
             </Form.Item>
           </Col>
         </Row>
         <Form.Item>
-            <Space>
-              <Button danger onClick={onCancel}>
-                Clean
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Save
-              </Button>
-            </Space>
+          <Space>
+            <Button danger onClick={onCancel}>
+              Clean
+            </Button>
+            <Button type="primary" htmlType="submit">
+              {edit? "Update" : "Save"}
+            </Button>
+          </Space>
         </Form.Item>
       </Form>
       <Divider />

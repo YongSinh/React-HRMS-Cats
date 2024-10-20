@@ -11,59 +11,38 @@ import {
   DatePicker,
   Table,
   Divider,
-  Popconfirm
+  Popconfirm,
 } from "antd";
-import {
-  EyeFilled,
-  DeleteOutlined,
-  EditFilled,
-} from "@ant-design/icons";
+import { EyeFilled, DeleteOutlined, EditFilled } from "@ant-design/icons";
 import { isEmptyOrNull, dateFormat } from "../../../share/helper";
 import { request, request2 } from "../../../share/request";
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
 const { Title } = Typography;
 
-const HistoryForm = ({ activeKey ,id }) => {
+const HistoryForm = ({ activeKey, id }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [submittedId, setSubmittedId] = useState(null);
+  const [edit, setEdit] = useState(false);
+  const [hisId, setHisId] = useState("");
 
   useEffect(() => {
     if (activeKey === "2") {
-        getEmpHistory()
+      getEmpHistory();
+      getEmpInfo();
       //getListDep(); // Only fetch data when this tab is active
     }
-       // Retrieve employee ID from local storage when the component mounts
-
+    // Retrieve employee ID from local storage when the component mounts
   }, [activeKey]);
 
-
-
-  const text =()=>{
-      Swal.fire({
-        title: "Enter your IP address",
-        input: "text",
-        inputLabel: "Your IP address",
-        inputValue: '',
-        showCancelButton: true,
-        inputValidator: (value) => {
-          if (!value) {
-            return "You need to input employee id!";
-          }
-        }
-      }).then((result) => {
-        if (result.isConfirmed && result.value) {
-          const ipAddress = result.value;
-          Swal.fire(`Your IP address is ${ipAddress}`);
-        }
-      });
-  }
-
-
   const save = (body) => {
-    let url = "info/jobHistory/addJobHistory";
-    let method = "post";
+    let url;
+    url = "info/jobHistory/addJobHistory";
+    let method = edit ? "put" : "post";
+    if (edit) {
+      url = "info/jobHistory/editJobHistory/" + hisId;
+    }
     request(url, method, body).then((res) => {
       if (res.code === 200) {
         Swal.fire({
@@ -75,6 +54,8 @@ const HistoryForm = ({ activeKey ,id }) => {
           // confirmButtonText: "Confirm",
         });
         setLoading(false);
+        setEdit(false);
+        getEmpHistory();
       } else {
         Swal.fire({
           icon: "error",
@@ -82,86 +63,81 @@ const HistoryForm = ({ activeKey ,id }) => {
           text: res.message,
         });
         setLoading(false);
+        setEdit(false);
       }
     });
   };
-
 
   const onFinish = (item) => {
     let body;
-    if (isEmptyOrNull(submittedId)) {
-      Swal.fire({
-        title: "Enter your Employee Id",
-        input: "text",
-        inputLabel: "Employee Id",
-        inputValue: "",
-        showCancelButton: true,
-        inputValidator: (value) => {
-          if (!value) {
-            return "You need to input employee id!";
-          }
-        },
-      }).then((result) => {
-        if (result.isConfirmed && result.value) {
-          const id = result.value;
-          setSubmittedId(id);
-          body = {
-            startDate: dateFormat(item.startDate),
-            endDate: dateFormat(item.endDate),
-            jobTitle: item.jobTitle,
-            department: item.dep,
-            empId: id,
-          };
-          setData((prevData) => [...prevData, body]);
-          save(body);
-        }
-      });
-    } else {
-      body = {
-        startDate: dateFormat(item.startDate),
-        endDate: dateFormat(item.endDate),
-        jobTitle: item.jobTitle,
-        department: item.dep,
-        empId: submittedId,
-      };
-      save(body);
-      setData((prevData) => [...prevData, body]);
-    }
+    body = {
+      startDate: dateFormat(item.startDate),
+      endDate: dateFormat(item.endDate),
+      jobTitle: item.jobTitle,
+      department: item.dep,
+      empId: id,
+    };
+    save(body);
   };
-
-  
-
-  const getEmpHistory = () => {
-    setLoading(true);
-    request("info/jobHistory/getListJobHistoryByEmId?emId="+id, "get", {}).then((res) => {
+  const onDelete = (Item) => {
+    request(
+      "info/jobHistory/deleteJobHistory/" + Item.id,
+      "delete",
+      {}
+    ).then((res) => {
       if (res) {
-        console.log(res.data);
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been deleted",
+          icon: "success",
+          showConfirmButton: true,
+          //timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getEmpHistory();
         setLoading(false);
-        var result = res.data;
-        setData(result)
       }
     });
   };
-
-
-  const getEmpInfo = (value) => {
+  const handleEdit = (item) => {
+    setEdit(true);
+    setHisId(item.id);
+    form.setFieldsValue({
+      dep: item.department,
+      jobTitle: item.jobTitle,
+      startDate: dayjs(item.startDate),
+      endDate: dayjs(item.endDate),
+    });
+  };
+  const getEmpInfo = () => {
     setLoading(true);
-    request("info/employee/getEmployeeById/"+value, "get", {}).then((res) => {
+    request("info/employee/getEmployeeById/" + id, "get", {}).then((res) => {
       if (res) {
         console.log(res.data);
         setLoading(false);
         var result = res.data;
         form.setFieldsValue({
-          empId: result.empId,
-          dep: result.depId,
-          jobTitle: result.posId,
-          name:result.firstName +" "+ result.lastName
+          name: result.firstName + " " + result.lastName,
         });
       }
     });
   };
 
-
+  const getEmpHistory = () => {
+    setLoading(true);
+    request(
+      "info/jobHistory/getListJobHistoryByEmId?emId=" + id,
+      "get",
+      {}
+    ).then((res) => {
+      if (res) {
+        console.log(res.data);
+        setLoading(false);
+        var result = res.data;
+        setData(result);
+      }
+    });
+  };
 
   const columns = [
     {
@@ -192,12 +168,12 @@ const HistoryForm = ({ activeKey ,id }) => {
           <Button
             type="primary"
             icon={<EditFilled />}
-            //onClick={() => onEdit(item)}
+            onClick={() => handleEdit(item)}
           />
           <Popconfirm
             title="Delete the department"
             description="Are you sure to delete this department?"
-            //onConfirm={() => onDelete(item)}
+            onConfirm={() => onDelete(item)}
             //onCancel={cancel}
             okText="Yes"
             cancelText="No"
@@ -207,7 +183,6 @@ const HistoryForm = ({ activeKey ,id }) => {
         </Space>
       ),
     },
-    
   ];
 
   const onCancel = () => {
@@ -216,8 +191,6 @@ const HistoryForm = ({ activeKey ,id }) => {
 
   return (
     <>
-      {/* <Button onClick={text}>Hello</Button> */}
-      <h1>{id}</h1>
       <Spin spinning={loading} tip="Loading" size="middle">
         <Title level={4}> History Imformation</Title>
         <Form
@@ -304,7 +277,7 @@ const HistoryForm = ({ activeKey ,id }) => {
                 Clean
               </Button>
               <Button type="primary" htmlType="submit">
-                Save
+              {edit? "Update" : "Save"}
               </Button>
             </Space>
           </Form.Item>

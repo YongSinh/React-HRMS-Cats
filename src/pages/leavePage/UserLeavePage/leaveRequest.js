@@ -284,9 +284,11 @@ const LeaveRequest = () => {
 
     const formData = new FormData();
     formData.append("body", blob);
-    if (items.upload != null) {
-      formData.append("file", items.upload.file);
+    const file = items.upload != null ? items.upload.file : null;
+    if (file) {
+        formData.append("file", file);
     }
+    
     let url = "attendanceLeave/leave/add";
     let method = "post";
 
