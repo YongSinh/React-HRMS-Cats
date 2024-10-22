@@ -15,7 +15,7 @@ import {
   Spin,
   Upload,
 } from "antd";
-import { request, request2 } from "../../../share/request";
+import { request } from "../../../share/request";
 import { PlusOutlined, InboxOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import { isEmptyOrNull } from "../../../share/helper";
@@ -23,6 +23,16 @@ import dayjs from "dayjs";
 const { TextArea } = Input;
 const { Title } = Typography;
 const { Dragger } = Upload;
+
+const picture = require("../../../asset/image/missing-picture.jpg");
+const getBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+
 const PersonalDetailForm = ({ activeKey }) => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState([]);
@@ -30,7 +40,8 @@ const PersonalDetailForm = ({ activeKey }) => {
   const [position2, setPosition2] = useState([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
-
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState(picture);
   const formatDate = "YYYY-MM-DD";
   const getListDep = () => {
     setLoading(true);
@@ -96,6 +107,7 @@ const PersonalDetailForm = ({ activeKey }) => {
     beforeUpload: (file) => {
       // Before the file is uploaded, store it in the state
       setFile(file);
+      handlePreview(file);
       message.success(`${file.name} file is ready for upload.`);
       return false;
     },
@@ -103,12 +115,21 @@ const PersonalDetailForm = ({ activeKey }) => {
       const { status } = info.file;
       if (status === "removed") {
         setFile(null);
+        setPreviewImage(picture);
         message.info("File removed.");
       }
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);
     },
+  };
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file);
+    }
+    setPreviewImage(file.url || file.preview);
+    //setPreviewOpen(true);
   };
 
   const dateFormat = (value) => {
@@ -424,10 +445,7 @@ const PersonalDetailForm = ({ activeKey }) => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="section"
-                label="Section"
-              >
+              <Form.Item name="section" label="Section">
                 <Input placeholder="E.g., HR" />
               </Form.Item>
             </Col>
@@ -573,7 +591,18 @@ const PersonalDetailForm = ({ activeKey }) => {
                 <TextArea placeholder="Remark" autoSize />
               </Form.Item>
             </Col>
-            <Col span={24}>
+            <Col span={6}>
+              <Image
+                width={200}
+                preview={{
+                  visible: previewOpen,
+                  onVisibleChange: (visible) => setPreviewOpen(visible),
+                  afterOpenChange: (visible) => !visible,
+                }}
+                src={previewImage}
+              />
+            </Col>
+            <Col span={18}>
               <Form.Item name="upload">
                 <Dragger {...props} style={{ height: 50 }}>
                   <p className="ant-upload-drag-icon">

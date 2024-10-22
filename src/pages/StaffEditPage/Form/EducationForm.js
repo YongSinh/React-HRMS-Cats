@@ -9,6 +9,7 @@ import {
   Divider,
   Table,
   Popconfirm,
+  Spin,
 } from "antd";
 import { DeleteOutlined, EditFilled } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
@@ -20,7 +21,6 @@ const HistoryForm = ({ id }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
-  const [submittedId, setSubmittedId] = useState(null);
   const [edit, setEdit] = useState(false);
   const [eduId, setEduId] = useState("");
 
@@ -36,8 +36,8 @@ const HistoryForm = ({ id }) => {
           // confirmButtonText: "Confirm",
         });
         setLoading(false);
-        getEmpEdu()
-        setEdit(false)
+        getEmpEdu();
+        setEdit(false);
       } else {
         Swal.fire({
           icon: "error",
@@ -45,13 +45,13 @@ const HistoryForm = ({ id }) => {
           text: res.message,
         });
         setLoading(false);
-        getEmpEdu()
-        setEdit(false)
+        getEmpEdu();
+        setEdit(false);
       }
     });
   };
   const onDelete = (Item) => {
-    request("info/jobHistory/deleteJobHistory/" + Item.id, "delete", {}).then(
+    request("info/education/deleteEducation/" + Item.id, "delete", {}).then(
       (res) => {
         if (res) {
           Swal.fire({
@@ -68,6 +68,8 @@ const HistoryForm = ({ id }) => {
       }
     );
   };
+
+
   const handleEdit = (item) => {
     setEdit(true);
     setEduId(item.id);
@@ -82,7 +84,7 @@ const HistoryForm = ({ id }) => {
   const onFinish = (item) => {
     let url = "info/education/addEducation";
     var method = edit ? "put" : "post";
-    
+
     if (edit) {
       url = "info/education/editEducation/" + eduId;
     }
@@ -117,7 +119,7 @@ const HistoryForm = ({ id }) => {
   };
   const onCancel = () => {
     form.resetFields();
-    setEdit(false)
+    setEdit(false);
   };
   const columns = [
     {
@@ -158,7 +160,7 @@ const HistoryForm = ({ id }) => {
           <Popconfirm
             title="Delete the department"
             description="Are you sure to delete this department?"
-            //onConfirm={() => onDelete(item)}
+            onConfirm={() => onDelete(item)}
             //onCancel={cancel}
             okText="Yes"
             cancelText="No"
@@ -171,93 +173,95 @@ const HistoryForm = ({ id }) => {
   ];
   return (
     <>
-      <Form
-        name="basic"
-        form={form}
-        layout={"vertical"}
-        onFinish={(item) => {
-          //form.resetFields();
-          onFinish(item);
-        }}
-      >
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="level"
-              label="Level"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input level!",
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="institution"
-              label="Institution"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the institution!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Institution" />
-            </Form.Item>
-          </Col>
+      <Spin spinning={loading}>
+        <Form
+          name="basic"
+          form={form}
+          layout={"vertical"}
+          onFinish={(item) => {
+            form.resetFields();
+            onFinish(item);
+          }}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="level"
+                label="Level"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input level!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="institution"
+                label="Institution"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the institution!",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Institution" />
+              </Form.Item>
+            </Col>
 
-          <Col span={8}>
-            <Form.Item
-              name="endYear"
-              label="End Year"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the end year!",
-                },
-              ]}
-            >
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              name="major"
-              label="Major"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the major!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Major" />
-            </Form.Item>
-          </Col>
+            <Col span={8}>
+              <Form.Item
+                name="endYear"
+                label="End Year"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the end year!",
+                  },
+                ]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="major"
+                label="Major"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the major!",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Major" />
+              </Form.Item>
+            </Col>
 
-          <Col span={8}>
-            <Form.Item name="gpa" label="GPA">
-              <Input placeholder="Enter GPA" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Form.Item>
-          <Space>
-            <Button danger onClick={onCancel}>
-              Clean
-            </Button>
-            <Button type="primary" htmlType="submit">
-              {edit? "Update" : "Save"}
-            </Button>
-          </Space>
-        </Form.Item>
-      </Form>
-      <Divider />
-      <Table dataSource={data} columns={columns} />
+            <Col span={8}>
+              <Form.Item name="gpa" label="GPA">
+                <Input placeholder="Enter GPA" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item>
+            <Space>
+              <Button danger onClick={onCancel}>
+                Clean
+              </Button>
+              <Button type="primary" htmlType="submit">
+                {edit ? "Update" : "Save"}
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+        <Divider />
+        <Table dataSource={data} columns={columns} />
+      </Spin>
     </>
   );
 };

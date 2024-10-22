@@ -8,65 +8,90 @@ import {
   Button,
   Space,
   Table,
+  Popconfirm,
+  Spin,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { isEmptyOrNull, dateFormat } from "../../../share/helper";
 import { request, request2 } from "../../../share/request";
+import { DeleteOutlined, EditFilled } from "@ant-design/icons";
 import Swal from "sweetalert2";
 const { Title } = Typography;
 
-const HistoryForm = ({id}) => {
+const HistoryForm = ({ id }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [submittedId, setSubmittedId] = useState(null);
   const [data, setData] = useState([]);
+  const [edit, setEdit] = useState(false);
+  const [conId, setConId] = useState("");
+  const getEmpContact = () => {
+    setLoading(true);
+    request("info/emergencyContact/ByEmId?emId=" + id, "get", {}).then(
+      (res) => {
+        if (res) {
+          setLoading(false);
+          var result = res.data;
+          setData(result);
+        }
+      }
+    );
+  };
+
+  const handleEdit = (item) => {
+    setEdit(true);
+    setConId(item.id);
+    form.setFieldsValue({
+      fullName: item.fullName,
+      relationship: item.relationship,
+      address: item.address,
+      tel: item.tel,
+      officeAddress: item.officeAddress,
+      officeTel: item.officeTel,
+    });
+  };
+
+  const onDelete = (Item) => {
+    request("info/emergencyContact/delete?id=" + Item.id, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getEmpContact();
+          setLoading(false);
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    // Retrieve employee ID from local storage when the component mounts
+    getEmpContact();
+  }, []);
 
   const onFinish = (item) => {
     let body;
-    var url = "info/emergencyContact/add";
-    var method = "post";
-    if (isEmptyOrNull(submittedId)) {
-      Swal.fire({
-        title: "Enter your Employee Id",
-        input: "text",
-        inputLabel: "Employee Id",
-        inputValue: "",
-        showCancelButton: true,
-        inputValidator: (value) => {
-          if (!value) {
-            return "You need to input employee id!";
-          }
-        },
-      }).then((result) => {
-        if (result.isConfirmed && result.value) {
-          const id = result.value;
-          setSubmittedId(id);
-          body = {
-            fullName: item.fullName,
-            relationship: item.relationship,
-            address: item.address,
-            tel: item.tel,
-            officeAddress: item.officeAddress,
-            officeTel: item.officeTel,
-            empId: id,
-          };
-          setData((prevData) => [...prevData, body]);
-          save(body, url, method);
-        }
-      });
-    } else {
-      body = {
-        fullName: item.fullName,
-        relationship: item.relationship,
-        address: item.address,
-        tel: item.tel,
-        officeAddress: item.officeAddress,
-        officeTel: item.officeTel,
-        empId: submittedId,
-      };
-      save(body, url, method);
-      setData((prevData) => [...prevData, body]);
-    }
+    let url = edit
+      ? "info/emergencyContact/edit?Id=" + conId
+      : "info/emergencyContact/add";
+    var method = edit ? "put" : "post";
+    body = {
+      fullName: item.fullName,
+      relationship: item.relationship,
+      address: item.address,
+      tel: item.tel,
+      officeAddress: item.officeAddress,
+      officeTel: item.officeTel,
+      empId: id,
+    };
+
+    save(body, url, method);
   };
 
   const save = (body, url, method) => {
@@ -80,13 +105,17 @@ const HistoryForm = ({id}) => {
           timer: 1500,
           // confirmButtonText: "Confirm",
         });
+        setEdit(false);
         setLoading(false);
+        getEmpContact();
       } else {
         Swal.fire({
           icon: "error",
           title: "Something went wrong, please check in error detail!",
           text: res.message,
         });
+        setEdit(false);
+        getEmpContact();
         setLoading(false);
       }
     });
@@ -123,100 +152,125 @@ const HistoryForm = ({id}) => {
       dataIndex: "officeTel",
       key: "officeTel",
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, item) => (
+        <Space>
+          <Button
+            type="primary"
+            icon={<EditFilled />}
+            onClick={() => handleEdit(item)}
+          />
+          <Popconfirm
+            title="Delete the Data"
+            description="Are you sure to delete?"
+            onConfirm={() => onDelete(item)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </Space>
+      ),
+    },
   ];
 
   const onCancel = () => {
     form.resetFields();
+    setEdit(false);
   };
   return (
     <>
-    <h1>{id}</h1>
-      <Form
-        name="basic"
-        form={form}
-        layout={"vertical"}
-        onFinish={(item) => {
-          //form.resetFields();
-          onFinish(item);
-        }}
-      >
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="fullName"
-              label="Full Name"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the full name!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Full Name" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="relationship"
-              label="Relationship"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the relationship!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Relationship" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="address"
-              label="Address"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the address!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Address" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="tel"
-              label="Tel"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input the telephone number!",
-                },
-              ]}
-            >
-              <Input placeholder="Enter Tel" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="officeAddress" label="Office Address">
-              <Input placeholder="Enter Office Address" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="officeTel" label="Office Tel">
-              <Input placeholder="Enter Office Tel" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Space>
-          <Button onClick={onCancel}>Cancel</Button>
-          <Button type="primary" htmlType="submit">
-            Save
-          </Button>
-        </Space>
-      </Form>
-      <Divider />
-      <Table dataSource={data} columns={columns} />
+      <Spin spinning={loading}>
+        <Form
+          name="basic"
+          form={form}
+          layout={"vertical"}
+          onFinish={(item) => {
+            form.resetFields();
+            onFinish(item);
+          }}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="fullName"
+                label="Full Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the full name!",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Full Name" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="relationship"
+                label="Relationship"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the relationship!",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Relationship" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="address"
+                label="Address"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the address!",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Address" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="tel"
+                label="Tel"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the telephone number!",
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Tel" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="officeAddress" label="Office Address">
+                <Input placeholder="Enter Office Address" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="officeTel" label="Office Tel">
+                <Input placeholder="Enter Office Tel" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Space>
+            <Button onClick={onCancel}>Cancel</Button>
+            <Button type="primary" htmlType="submit">
+              {edit ? "Update" : "Save"}
+            </Button>
+          </Space>
+        </Form>
+        <Divider />
+        <Table dataSource={data} columns={columns} />
+      </Spin>
     </>
   );
 };

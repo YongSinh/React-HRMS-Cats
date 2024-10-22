@@ -29,21 +29,35 @@ const LeaveRequest = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
-  const [items, setItems] = useState([]);
+  const [edit, setEdit] = useState(false);
+  const [item, setItem] = useState([]);
   const [leaveType, setLeaveType] = useState([]);
   const [date, setDate] = useState([]);
+  const [fileId, setFileId] = useState("");
   const today = new Date();
-  const userId = UserService.getUsername()
+  const userId = UserService.getUsername();
   const showDrawer = (value) => {
-    setItems(value);
+    setItem(value);
     setOpen(true);
+    setEdit(false);
   };
   const onClose = () => {
     setOpen(false);
   };
 
+  const handleChangeFile = (file) => {
+    setFileId(file);
+  };
+
+
+  const showDrawetEdit = (value) => {
+    setItem(value);
+    setOpen(true);
+    setEdit(true);
+  };
+
   const showDrawer2 = (value) => {
-    setItems(value);
+    setItem(value);
     setOpen2(true);
   };
 
@@ -52,7 +66,7 @@ const LeaveRequest = () => {
   };
   const getList = () => {
     setLoading(true);
-    request("attendanceLeave/leave/getLeaveByEmId/"+userId, "get", {}).then(
+    request("attendanceLeave/leave/getLeaveByEmId/" + userId, "get", {}).then(
       (res) => {
         if (res) {
           setData(res.data);
@@ -78,13 +92,11 @@ const LeaveRequest = () => {
   };
 
   const onChangeDate = (value, dataSrting) => {
-    setDate(dataSrting);
     console.log(dataSrting[0]);
     console.log(dataSrting[1]);
   };
 
   const onSeacrh = () => {
-    console.log(isEmptyOrNull(date[0]))
     if (!isEmptyOrNull(date[0])) {
       setLoading(true);
       var filter = `?emId=${userId}&startDate=${date[0]}&endDate=${date[1]}`;
@@ -235,7 +247,7 @@ const LeaveRequest = () => {
             icon={<SendOutlined />}
           />
           <Button
-            // onClick={() => onApprove(record)}
+            onClick={() => showDrawetEdit(record)}
             type="primary"
             disabled={record.status}
             icon={<EditFilled />}
@@ -258,7 +270,7 @@ const LeaveRequest = () => {
     var time = isEmptyOrNull(items.time)
       ? "00:00:00"
       : dayjs(items.time).format("hh:mm:ss");
-
+    const result = leaveType.find(item => item.label === items.leaveType || item.value === items.leaveType) ;
     const reasonDiv = document.createElement("div");
     reasonDiv.innerHTML = items.reason;
     const plainTextReason = reasonDiv.textContent || reasonDiv.innerText || "";
@@ -266,17 +278,32 @@ const LeaveRequest = () => {
     remarkDiv.innerHTML = items.remark;
     const plainTextRemark = remarkDiv.textContent || remarkDiv.innerText || "";
     var remark = isEmptyOrNull(plainTextRemark) ? " " : plainTextRemark;
-    const body = {
+    let body = {
       empId: userId,
       startDate: dayjs(items.date[0]).format(format),
       endDate: dayjs(items.date[1]).format(format),
       timeOfHaftDay: time,
       reason: plainTextReason,
-      leaveTypeId: items.leaveType,
+      leaveTypeId: result.value,
       remark: remark,
       dayOfLeave: items.duration,
       createdAt: today,
     };
+    if(edit){
+      body = {
+        leaveId: item.id,
+        fileId: fileId,
+        empId: userId,
+        startDate: dayjs(items.date[0]).format(format),
+        endDate: dayjs(items.date[1]).format(format),
+        timeOfHaftDay: time,
+        reason: plainTextReason,
+        leaveTypeId: result.value,
+        remark: remark,
+        dayOfLeave: items.duration,
+        createdAt: today,
+      };
+    }
     const json = JSON.stringify(body);
     const blob = new Blob([json], {
       type: "application/json",
@@ -286,12 +313,11 @@ const LeaveRequest = () => {
     formData.append("body", blob);
     const file = items.upload != null ? items.upload.file : null;
     if (file) {
-        formData.append("file", file);
+      formData.append("file", file);
     }
-    
-    let url = "attendanceLeave/leave/add";
-    let method = "post";
 
+    let url =  edit ? "attendanceLeave/leave/edit":"attendanceLeave/leave/add";
+    let method =edit ? "put" : "post";
     request(url, method, formData).then((res) => {
       if (res.code === 200) {
         Swal.fire({
@@ -304,8 +330,9 @@ const LeaveRequest = () => {
         });
         getListLeaveType();
         setLoading(false);
-        // setEdit(false);
-        getList()
+        setEdit(false);
+        setOpen(false)
+        getList();
       } else {
         Swal.fire({
           icon: "error",
@@ -314,12 +341,10 @@ const LeaveRequest = () => {
         });
         setLoading(false);
         getListLeaveType();
-        getList()
+        getList();
       }
     });
   };
-
-  
 
   const onApply = (items) => {
     Swal.fire({
@@ -373,10 +398,10 @@ const LeaveRequest = () => {
               text: "Leave has been cancelled.",
               icon: "success",
             });
-            console.log(res)
+            console.log(res);
             getList();
             setLoading(false);
-          }else {
+          } else {
             Swal.fire({
               icon: "error",
               title: "Something went wrong!",
@@ -421,11 +446,13 @@ const LeaveRequest = () => {
       <Drawerleave
         open={open}
         onClose={onClose}
-        items={items}
+        items={item}
         leaevType={leaveType}
         onFinish={onFinish}
+        edit={edit}
+        fileId={handleChangeFile}
       />
-      <DrawerView open={open2} onClose={onClose2} items={items} />
+      <DrawerView open={open2} onClose={onClose2} items={item} />
       <Table
         style={{ marginTop: 10 }}
         scroll={{

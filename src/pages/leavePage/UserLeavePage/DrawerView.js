@@ -47,8 +47,10 @@ const DrawerView = ({ open = false, onClose, items }) => {
       {}
     ).then((res) => {
       if (res) {
-        console.log(res);
-        setData(res);
+        if (res.length !== 0) {
+          setData([res[0]]);
+        }
+        //console.log(res);
       }
     });
   };
@@ -58,7 +60,6 @@ const DrawerView = ({ open = false, onClose, items }) => {
   };
   useEffect(() => {
     if (open) {
-      console.log(items.reason);
       getListFile();
       form.setFieldsValue({
         id: items.empId,

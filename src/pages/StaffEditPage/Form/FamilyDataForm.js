@@ -33,7 +33,7 @@ const HistoryForm = ({ id }) => {
   useEffect(() => {
     // Retrieve employee ID from local storage when the component mounts
     getEmpFamilyData();
-    getEmpEduData();
+    getEmpSiblingData();
   }, []);
 
   const save = (body, url, method) => {
@@ -47,14 +47,20 @@ const HistoryForm = ({ id }) => {
           timer: 1500,
           // confirmButtonText: "Confirm",
         });
+        setEditSibling(true)
         setLoading(false);
+        getEmpFamilyData();
+        getEmpSiblingData();
       } else {
         Swal.fire({
           icon: "error",
           title: "Something went wrong, please check in error detail!",
           text: res.message,
         });
+        setEditSibling(true)
         setLoading(false);
+        getEmpFamilyData();
+        getEmpSiblingData();
       }
     });
   };
@@ -97,6 +103,11 @@ const HistoryForm = ({ id }) => {
       key: "sex",
     },
     {
+      title: "Marital Stats",
+      dataIndex: "maritalStats",
+      key: "maritalStats",
+    },
+    {
       title: "Education",
       dataIndex: "education",
       key: "education",
@@ -117,11 +128,6 @@ const HistoryForm = ({ id }) => {
       key: "office",
     },
     {
-      title: "Marital Stats",
-      dataIndex: "maritalStats",
-      key: "maritalStats",
-    },
-    {
       title: "Action",
       key: "action",
       render: (_, item) => (
@@ -132,9 +138,9 @@ const HistoryForm = ({ id }) => {
             onClick={() => handleEdit(item)}
           />
           <Popconfirm
-            title="Delete the department"
-            description="Are you sure to delete this department?"
-            //onConfirm={() => onDelete(item)}
+            title="Delete the Data"
+            description="Are you sure to delete?"
+            onConfirm={() => onDelete(item)}
             //onCancel={cancel}
             okText="Yes"
             cancelText="No"
@@ -175,7 +181,7 @@ const HistoryForm = ({ id }) => {
     });
   };
 
-  const getEmpEduData = () => {
+  const getEmpSiblingData = () => {
     setLoading(true);
     request(
       "info/siblingData/getListSiblingDataByEmId?emId=" + id,
@@ -213,11 +219,30 @@ const HistoryForm = ({ id }) => {
     save(body, url, method);
   };
 
+  const onDelete = (Item) => {
+    setLoading(true)
+    request("info/siblingData/deleteSiblingData/" + Item.id, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getEmpSiblingData();
+          setLoading(false);
+        }
+      }
+    );
+  };
+
   const onFinish2 = (item) => {
     let url = editSibling
-      ? "info/siblingData/editSiblingData/" + siblingId
-      : "info/siblingData/addSiblingData";
-      let method = editFamData ? "post" : "put";
+      ?"info/siblingData/addSiblingData":"info/siblingData/editSiblingData/" + siblingId;
+    let method = editSibling   ? "post":"put";
     let body;
     body = {
       empId: id,
@@ -232,7 +257,7 @@ const HistoryForm = ({ id }) => {
       maritalStats: item.maritalStats,
     };
     console.log(body, url, method);
-    // save(body, url, method);
+    save(body, url, method);
   };
 
   const onCancel = () => {
@@ -241,7 +266,7 @@ const HistoryForm = ({ id }) => {
 
   const onCancel2 = () => {
     form2.resetFields();
-    setEditSibling(true)
+    setEditSibling(true);
   };
   return (
     <>
@@ -328,17 +353,44 @@ const HistoryForm = ({ id }) => {
         >
           <Row gutter={16}>
             <Col span={6}>
-              <Form.Item name="firstName" label="First Name">
+              <Form.Item
+                name="firstName"
+                label="First Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the First Name!",
+                  },
+                ]}
+              >
                 <Input placeholder="Enter Sibling's First Name" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="lastName" label="Last Name">
+              <Form.Item
+                name="lastName"
+                label="Last Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the Last Name!",
+                  },
+                ]}
+              >
                 <Input placeholder="Enter Sibling's Last Name" />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="gender" label="Gender">
+              <Form.Item
+                name="gender"
+                label="Gender"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please Select the Gender!",
+                  },
+                ]}
+              >
                 <Select placeholder="Select Gender">
                   <Select.Option value="male">Male</Select.Option>
                   <Select.Option value="female">Female</Select.Option>
@@ -346,14 +398,23 @@ const HistoryForm = ({ id }) => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="age" label="Age">
+              <Form.Item
+                name="age"
+                label="Age"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the Age!",
+                  },
+                ]}
+              >
                 <Input placeholder="Enter Sibling's Age" />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item
                 label="Marital Stats"
-                name="maritalStat"
+                name="maritalStats"
                 rules={[
                   {
                     required: true,

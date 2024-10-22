@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Col,
@@ -11,6 +11,8 @@ import {
   Space,
   InputNumber,
   TimePicker,
+  Alert,
+  Tooltip,
 } from "antd";
 import { InboxOutlined, SaveFilled } from "@ant-design/icons";
 import { message, Upload } from "antd";
@@ -18,14 +20,29 @@ import Editor from "../Editor/Editor";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import UserService from "../../../UserService/UserService";
+import { FileOutlined } from "@ant-design/icons";
+import { request } from "../../../share/request";
+
 dayjs.extend(customParseFormat);
 const { Dragger } = Upload;
 
-const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false }) => {
+const Drawerleave = ({
+  open = false,
+  onClose,
+  onFinish,
+  leaevType,
+  edit = false,
+  items,
+  fileId,
+}) => {
   const [file, setFile] = useState(null);
   const [isHalfDay, setIsHalfDay] = useState(false);
   const [duration, setDuration] = useState(0.5);
   const [form] = Form.useForm();
+  const [end, setEndDate] = useState("");
+  const [start, setStartDate] = useState("");
+  const dateFormat = "YYYY-MM-DD";
+  const [data, setData] = useState([]);
 
   const onChangeDuration = (value) => {
     setDuration(value);
@@ -35,10 +52,48 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
       setIsHalfDay(false);
     }
   };
+  const handleViewFile = (value) => {
+    window.open(value.url, "_blank", "noopener,noreferrer");
+  };
+  const getListFile = () => {
+    let date = items.createdAt;
+    let empId = items.empId;
+    request(
+      `files/ByEmIdAndTypeServiceDate?emId=${empId}&type=2&date=${date}&service=2`,
+      "get",
+      {}
+    ).then((res) => {
+      if (res) {
+        if (res.length !== 0) {
+          fileId(res[0].fileId);
+          setData([res[0]]);
+        }
+        //console.log(res);
+      }
+    });
+  };
+
+  useEffect(() => {
+    getListFile();
+    if (edit) {
+      setEndDate(dayjs(items.startDate));
+      setStartDate(dayjs(items.endDate));
+      form.setFieldsValue({
+        id: items.empId,
+        leaveType: items.leaveType,
+        duration: items.dayOfLeave,
+        reason: items.reason,
+        remark: items.remark,
+        date: [dayjs(items.startDate), dayjs(items.endDate)],
+      });
+      // setReasonContent(items.reason || ""); // Set initial value for Reason editor
+      // setRemarkContent(items.remark || ""); // Set initial value for Remark editor
+    }
+  }, [items]);
 
   const props = {
     name: "file",
-    maxCount:1,
+    maxCount: 1,
     multiple: false, // Disable multiple uploads, can be enabled if needed
     beforeUpload: (file) => {
       // Before the file is uploaded, store it in the state
@@ -68,23 +123,17 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
   };
 
   const onChangeDate = (value, dataSrting) => {
-    console.log(dataSrting[0]);
-    console.log(dataSrting[1]);
+    setEndDate(value[1]);
+    setStartDate(value[0]);
   };
 
   const onChangeTime = (time, timeString) => {
     console.log(time, timeString);
   };
 
-
   return (
     <>
-      <Drawer
-        title="Request Leave"
-        width={720}
-        onClose={onClose}
-        open={open}
-      >
+      <Drawer title="Request Leave" width={720} onClose={onClose} open={open}>
         <Form
           form={form}
           layout="vertical"
@@ -99,7 +148,10 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="Employee ID">
-                <Input placeholder="Employee ID"  value={UserService.getUsername()}/>
+                <Input
+                  placeholder="Employee ID"
+                  value={UserService.getUsername()}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -137,6 +189,11 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
                   style={{
                     width: "100%",
                   }}
+                  // value={[
+                  //   dayjs(start, dateFormat),
+                  //   dayjs(end, dateFormat),
+                  // ]}
+                  // format={dateFormat}
                 />
               </Form.Item>
             </Col>
@@ -181,15 +238,15 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
                 />
               </Form.Item>
             </Col>
-            <Form.Item 
-            name={"reason"} 
-            label="Reason"
-            rules={[
-              {
-                required: true,
-                message: "Please Input the reason",
-              },
-            ]}
+            <Form.Item
+              name={"reason"}
+              label="Reason"
+              rules={[
+                {
+                  required: true,
+                  message: "Please Input the reason",
+                },
+              ]}
             >
               <Editor
                 // value={editorContent}
@@ -204,6 +261,7 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
                 placeholder="Start typing..."
               />
             </Form.Item>
+
             <Form.Item name="upload" label="Upload">
               <Dragger {...props}>
                 <p className="ant-upload-drag-icon">
@@ -218,15 +276,40 @@ const Drawerleave = ({ open = false, onClose, onFinish, leaevType, edit = false 
                 </p>
               </Dragger>
             </Form.Item>
-            <Form.Item style={{ textAlign: "right" }}>
-              <Space>
-                <Button onClick={handleCancel}>Cancel</Button>
-                <Button type="primary" htmlType="submit">
-                  <SaveFilled />
-                  submit
-                </Button>
-              </Space>
-            </Form.Item>
+            <div style={{ marginBottom: 10 }}>
+              {data.length !== 0 ? (
+                <Space wrap>
+                  {data.map((items) => (
+                    <Tooltip title={items.name}>
+                      <Button
+                        icon={<FileOutlined />}
+                        onClick={() => handleViewFile(items)}
+                      >
+                        view
+                      </Button>
+                    </Tooltip>
+                  ))}
+                </Space>
+              ) : (
+                <Alert
+                  message="There is no file Upload!"
+                  type="info"
+                  showIcon
+                />
+              )}
+            </div>
+
+            <Col span={24}>
+              <Form.Item style={{ textAlign: "right" }}>
+                <Space>
+                  <Button onClick={handleCancel}>Cancel</Button>
+                  <Button type="primary" htmlType="submit">
+                    <SaveFilled />
+                    submit
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Col>
           </Row>
         </Form>
       </Drawer>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Select, Space, Form, Table, Tag } from "antd";
-import { EyeFilled, EditFilled, DeleteOutlined } from "@ant-design/icons";
+import { Button, Popconfirm, Space, Form, Table } from "antd";
+import { UserAddOutlined, EditFilled, DeleteOutlined } from "@ant-design/icons";
 import StaffDrawer from "./StaffDrawer";
-import { request, config } from "../../share/request";
+import { request } from "../../share/request";
 import { Link } from "react-router-dom";
 import "./Staff.css";
+import Swal from "sweetalert2";
 import getColumnSearchProps from "../../share/ColumnSearchProps";
 const Staff = () => {
   const [data, setData] = useState([]);
@@ -13,9 +14,6 @@ const Staff = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [form] = Form.useForm();
 
-  const handleSelectChange = (value, type) => {
-    console.log(`selected ${value} for ${type}`);
-  };
   const getList = () => {
     setLoading(true);
     request("info/employee/listEmployee", "get", {}).then((res) => {
@@ -27,12 +25,34 @@ const Staff = () => {
     });
   };
 
+  const onDelete = (Item) => {
+    setLoading(true);
+    request(
+      "info/employee/delete?emId=" + Item.empId,
+      "delete",
+      {}
+    ).then((res) => {
+      if (res) {
+        Swal.fire({
+          title: "Success!",
+          text: "Your has been deleted",
+          icon: "success",
+          showConfirmButton: true,
+          //timer: 1500,
+          // confirmButtonText: "Confirm",
+        });
+        getList();
+        setLoading(false);
+      }
+    });
+  };
+
   const columns = [
     {
       title: "Employee ID",
       dataIndex: "empId",
       fixed: "left",
-      ...getColumnSearchProps("empId")
+      ...getColumnSearchProps("empId"),
     },
     {
       title: "First Name",
@@ -57,11 +77,12 @@ const Staff = () => {
     {
       title: "Department",
       dataIndex: "depId",
-      ...getColumnSearchProps("depId")
+      ...getColumnSearchProps("depId"),
     },
     {
       title: "Position",
       dataIndex: "posId",
+      ...getColumnSearchProps("posId"),
     },
     {
       title: "Location",
@@ -77,11 +98,6 @@ const Staff = () => {
       fixed: "right",
       render: (_, record) => (
         <Space>
-          <Button
-            type="primary"
-            icon={<EyeFilled />}
-            style={{ backgroundColor: "#4CAF50", borderColor: "#4CAF50" }}
-          />
           <Link to={`/edit-employee/${record.empId}`}>
             <Button
               type="primary"
@@ -89,13 +105,16 @@ const Staff = () => {
               style={{ backgroundColor: "#2196F3", borderColor: "#2196F3" }}
             />
           </Link>
-
-          <Button
-            type="primary"
-            icon={<DeleteOutlined />}
-            danger
-            style={{ backgroundColor: "#F44336", borderColor: "#F44336" }}
-          ></Button>
+          <Popconfirm
+            title="Delete the Data"
+            description="Are you sure to delete?"
+            onConfirm={() => onDelete(record)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
         </Space>
       ),
     },
@@ -103,17 +122,6 @@ const Staff = () => {
   useEffect(() => {
     getList(); // Only fetch data when this tab is active
   }, []);
-  const handleSearch = (value) => {
-    console.log("search:", value);
-  };
-
-  const filterOption = (input, option) =>
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-
-  const showDrawer = () => {
-    setDrawerVisible(true);
-  };
-
   const handleDrawerClose = () => {
     setDrawerVisible(false);
   };
@@ -121,42 +129,10 @@ const Staff = () => {
   return (
     <>
       <Space style={{ marginBottom: 15, marginTop: 7 }}>
-        <Select
-          showSearch
-          placeholder="Select ID"
-          optionFilterProp="children"
-          onChange={(value) => handleSelectChange(value, "ID")}
-          onSearch={handleSearch}
-          filterOption={filterOption}
-          options={[{ value: "0011", label: "0011" }]}
-        />
-        <Select
-          showSearch
-          placeholder="Select Position"
-          optionFilterProp="children"
-          onChange={(value) => handleSelectChange(value, "Position")}
-          onSearch={handleSearch}
-          filterOption={filterOption}
-          options={[{ value: "Position 1", label: "Position 1" }]}
-        />
-        <Select
-          showSearch
-          placeholder="Select Department"
-          optionFilterProp="children"
-          onChange={(value) => handleSelectChange(value, "Department")}
-          onSearch={handleSearch}
-          filterOption={filterOption}
-          options={[{ value: "Department 1", label: "Department 1" }]}
-        />
-        <Button
-          icon={<SearchOutlined />}
-          type="primary"
-          style={{ backgroundColor: "green", borderColor: "green" }}
-        >
-          Search
-        </Button>
         <Link to={`/add-employee`}>
-          <Button type="primary">Add</Button>
+          <Button icon={<UserAddOutlined />} type="primary">
+            Add
+          </Button>
         </Link>
       </Space>
       <Table

@@ -20,6 +20,13 @@ const HistoryForm = ({  }) => {
   const [form] = Form.useForm();
   const [submittedId, setSubmittedId] = useState(null);
   const [data, setData] = useState([]);
+  useEffect(() => {
+    // Retrieve employee ID from local storage when the component mounts
+    const storedId = localStorage.getItem("employeeId");
+    if (storedId) {
+      setSubmittedId(storedId);
+    }
+  }, []);
 
   const onFinish = (item) => {
     let body;

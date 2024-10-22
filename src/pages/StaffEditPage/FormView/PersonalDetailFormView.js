@@ -7,43 +7,26 @@ import {
   DatePicker,
   Divider,
   Typography,
-  Button,
-  Space,
   Select,
-  message,
   Image,
   Spin,
-  Upload,
 } from "antd";
 import { request } from "../../../share/request";
-import { InboxOutlined } from "@ant-design/icons";
-import Swal from "sweetalert2";
 import { isEmptyOrNull } from "../../../share/helper";
 import dayjs from "dayjs";
 const { TextArea } = Input;
 const { Title } = Typography;
-const { Dragger } = Upload;
 const picture = require("../../../asset/image/missing-picture.jpg");
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-const PersonalDetailForm = ({ activeKey, id }) => {
+const PersonalDetailFormView = ({ activeKey, id }) => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState([]);
   const [position, setPosition] = useState([]);
   const [position2, setPosition2] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState(null);
   const [fileId, setFileIforId] = useState("");
-  const [fileEdit, setEditFile] = useState(false);
   const [empInfor, setEmpInfor] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(picture);
-  const formatDate = "YYYY-MM-DD";
   const getListDep = () => {
     setLoading(true);
     request("info/department/department", "get", {}).then((res) => {
@@ -74,17 +57,16 @@ const PersonalDetailForm = ({ activeKey, id }) => {
   };
 
   const getListFile = (date) => {
-    console.log(date)
+    console.log(date);
     request(
       `files/ByEmIdAndTypeServiceDate?emId=${id}&type=1&date=${date}&service=1`,
       "get",
       {}
     ).then((res) => {
       if (res) {
-        console.log(res);
-        if(res.length !== 0 ){
-          setFileIforId(res[0].fileId)
-          setPreviewImage(res[0].url)
+        if (res.length !== 0) {
+          setFileIforId(res[0].fileId);
+          setPreviewImage(res[0].url);
         }
         //setData(res);
       }
@@ -126,12 +108,11 @@ const PersonalDetailForm = ({ activeKey, id }) => {
 
   useEffect(() => {
     getEmpInfo();
-  
+
     getListDep(); // Only fetch data when this tab is active
   }, [activeKey]);
 
   useEffect(() => {
-
     if (empInfor) {
       const departmentMatch = department.find(
         (item) => item.label === empInfor.depId
@@ -177,125 +158,6 @@ const PersonalDetailForm = ({ activeKey, id }) => {
     }
   }, [empInfor]);
 
-  const props = {
-    name: "file",
-    maxCount: 1,
-    multiple: false, // Disable multiple uploads, can be enabled if needed
-    beforeUpload: (file) => {
-      // Before the file is uploaded, store it in the state
-      setFile(file);
-      handlePreview(file);
-      message.success(`${file.name} file is ready for upload.`);
-      return false;
-    },
-    onChange(info) {
-      const { status } = info.file;
-      if (status === "removed") {
-        setFile(null);
-        setPreviewImage(picture)
-        message.info("File removed.");
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
-  };
-
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file);
-    }
-    setPreviewImage(file.url || file.preview);
-    //setPreviewOpen(true);
-  };
-
-
-  const dateFormat = (value) => {
-    return dayjs(value).format(formatDate);
-  };
-
-
-  const onFinish = (item) => {
-    console.log("success", item);
-
-    const result = department.find(
-      (items) =>
-        items.label === item.department || items.value === item.department
-    );
-    const result2 = position.find(
-      (items) => items.label === item.position || items.value === item.position
-    );
-    const posId =
-      result2 && !isEmptyOrNull(result2.value) ? result2.value : null;
-    const body = {
-      empId: id,
-      firstName: item.firstName,
-      lastName: item.lastName,
-      email: item.email,
-      phone: item.phone,
-      birthDate: dateFormat(item.birthDate),
-      placeOfBirth: item.placeOfBirth,
-      age: item.age,
-      sex: item.gender,
-      height: item.height,
-      address: item.address,
-      empDate: dateFormat(item.empDate),
-      joinDate: dateFormat(item.joinDate),
-      mangerId: item.mangerId,
-      location: item.location,
-      maritalStats: item.maritalStats,
-      nationality: item.nationality,
-      workType: item.workType,
-      religion: item.religion,
-      idCard: item.idCard,
-      passport: item.passport,
-      remark: item.remark,
-      govOfficer: item.govOfficer,
-      govTel: item.govTel,
-      govAddress: item.govAddress,
-      govPosition: item.govPosition,
-      depId: result.value,
-      posId: posId,
-      weight: item.weight,
-      fileId: fileId,
-    };
-    const formData = new FormData();
-    const json = JSON.stringify(body);
-    const blob = new Blob([json], {
-      type: "application/json",
-    });
-
-    formData.append("body", blob);
-    if (file != null) {
-      formData.append("file", file);
-    }
-
-    let url = "info/employee/editEmployee";
-    let method = "post";
-
-    request(url, method, formData).then((res) => {
-      if (res.code === 200) {
-        Swal.fire({
-          title: "Success!",
-          text: "Your has been saved",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-          // confirmButtonText: "Confirm",
-        });
-        setLoading(false);
-        getEmpInfo();
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Something went wrong, please check in error detail!",
-          text: res.message,
-        });
-        setLoading(false);
-      }
-    });
-  };
-
   return (
     <>
       <Spin spinning={loading} tip="Loading" size="middle">
@@ -309,119 +171,137 @@ const PersonalDetailForm = ({ activeKey, id }) => {
           layout={"vertical"}
           onFinish={(item) => {
             //form.resetFields();
-            onFinish(item);
+            //onFinish(item);
           }}
         >
           <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item
-                name="empId"
-                label="Employee ID"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the employee ID!",
-                  },
-                ]}
-              >
-                <Input placeholder="Enter Employee ID!" />
-              </Form.Item>
+            <Col span={20}>
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Form.Item
+                    name="empId"
+                    label="Employee ID"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the employee ID!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Enter Employee ID!" />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    name="firstName"
+                    label="First Name"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the first name!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Enter First Name" />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    name="lastName"
+                    label="Last Name"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the Last Name!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="E.g., Doe" />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="Age"
+                    name="age"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the age!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="E.g., 19" />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="Gender"
+                    name="gender"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the gender!",
+                      },
+                    ]}
+                  >
+                    <Select placeholder="Select Gender">
+                      <Select.Option value="male">Male</Select.Option>
+                      <Select.Option value="female">Female</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="Marital Stats"
+                    name="maritalStats"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the marital stats!",
+                      },
+                    ]}
+                  >
+                    <Select
+                      showSearch
+                      placeholder="Select a Marital Stats"
+                      optionFilterProp="label"
+                      options={[
+                        {
+                          value: "Single",
+                          label: "Single",
+                        },
+                        {
+                          value: "Married",
+                          label: "Married",
+                        },
+                        {
+                          value: "Separated",
+                          label: "Separated",
+                        },
+                        {
+                          value: "Divorced",
+                          label: "Divorced",
+                        },
+                      ]}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
             </Col>
-            <Col span={8}>
-              <Form.Item
-                name="firstName"
-                label="First Name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the first name!",
-                  },
-                ]}
-              >
-                <Input placeholder="Enter First Name" />
-              </Form.Item>
+
+            <Col span={4}
+            style={{textAlign:"center"}}>
+              <Image
+                width={140}
+                preview={{
+                  visible: previewOpen,
+                  onVisibleChange: (visible) => setPreviewOpen(visible),
+                  afterOpenChange: (visible) => !visible,
+                }}
+                src={previewImage}
+              />
             </Col>
-            <Col span={8}>
-              <Form.Item
-                name="lastName"
-                label="Last Name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the Last Name!",
-                  },
-                ]}
-              >
-                <Input placeholder="E.g., Doe" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Age"
-                name="age"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the age!",
-                  },
-                ]}
-              >
-                <Input placeholder="E.g., 19" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Gender"
-                name="gender"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the gender!",
-                  },
-                ]}
-              >
-                <Select placeholder="Select Gender">
-                  <Select.Option value="male">Male</Select.Option>
-                  <Select.Option value="female">Female</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Marital Stats"
-                name="maritalStats"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the marital stats!",
-                  },
-                ]}
-              >
-                <Select
-                  showSearch
-                  placeholder="Select a Marital Stats"
-                  optionFilterProp="label"
-                  options={[
-                    {
-                      value: "Single",
-                      label: "Single",
-                    },
-                    {
-                      value: "Married",
-                      label: "Married",
-                    },
-                    {
-                      value: "Separated",
-                      label: "Separated",
-                    },
-                    {
-                      value: "Divorced",
-                      label: "Divorced",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
+
             <Col span={8}>
               <Form.Item
                 name="phone"
@@ -671,37 +551,6 @@ const PersonalDetailForm = ({ activeKey, id }) => {
                 <TextArea placeholder="Remark" autoSize />
               </Form.Item>
             </Col>
-            <Col span={6}>
-              <Image
-                width={200}
-                preview={{
-                  visible: previewOpen,
-                  onVisibleChange: (visible) => setPreviewOpen(visible),
-                  afterOpenChange: (visible) => !visible,
-                }}
-                src={previewImage}
-              />
-            </Col>
-            <Col span={18}>
-              <Form.Item name="upload">
-                <Dragger
-                  onPreview={handlePreview}
-                  {...props}
-                  style={{ height: "100%" }}
-                >
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                  </p>
-                  <p className="ant-upload-text">
-                    Click or drag file to this area to upload
-                  </p>
-                  <p className="ant-upload-hint">
-                    Support for a single or bulk upload. Strictly prohibited
-                    from uploading company data or other banned files.
-                  </p>
-                </Dragger>
-              </Form.Item>
-            </Col>
           </Row>
           <Divider variant="dashed" dashed>
             Government Officer
@@ -728,19 +577,10 @@ const PersonalDetailForm = ({ activeKey, id }) => {
               </Form.Item>
             </Col>
           </Row>
-
-          <Form.Item>
-            <Space>
-              <Button danger>Cancel</Button>
-              <Button type="primary" htmlType="submit">
-                Save
-              </Button>
-            </Space>
-          </Form.Item>
         </Form>
       </Spin>
     </>
   );
 };
 
-export default PersonalDetailForm;
+export default PersonalDetailFormView;

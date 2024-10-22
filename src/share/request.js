@@ -1,6 +1,6 @@
 import { message } from "antd";
 import axios from "axios";
-import UserServicere from "../UserService/UserService"
+import UserServicere from "../UserService/UserService";
 export function getLocalAccessToken() {
   const accessToken = localStorage.getItem("access_token");
   return accessToken;
@@ -8,15 +8,14 @@ export function getLocalAccessToken() {
 
 //http://10.10.1.216:8282/
 export const config = {
-  base_server: "https://192.168.0.106:8085/api/",
-  //base_server: "https://localhost:8085/api/",
+  //base_server: "https://192.168.0.106:8085/api/",
+  base_server: "https://localhost:8085/api/",
   image_path: "",
   version: 1,
 };
 
 export const request = async (url, method, param) => {
-
-  var header = { 'Content-Type': 'application/json', "accept": "*/*" }
+  var header = { "Content-Type": "application/json", accept: "*/*" };
   if (param instanceof FormData) {
     header = {
       "Content-Type": "multipart/form-data",
@@ -30,7 +29,7 @@ export const request = async (url, method, param) => {
     data: param,
     headers: {
       ...header,
-    //Authorization: "Bearer " + getLocalAccessToken(),
+      Authorization: "Bearer " + getLocalAccessToken(),
     },
   })
     .then((res) => {
@@ -40,18 +39,15 @@ export const request = async (url, method, param) => {
       var status = err.response?.status;
       if (status === 404) {
         message.error("Route Not Found!");
-      }  else if (status === 500) {
+      } else if (status === 500) {
         message.error(err.message);
-      }else if (status === 401) {
+      } else if (status === 401) {
         message.warning("401 Unauthorized!");
         //UserServicere.doLogin()
-      }
-      else if(status === 403)
-      {
+      } else if (status === 403) {
         message.warning("You don't have permission to access this resource!");
-      }
-      else {
-       // UserServicere.doLogin()
+      } else {
+        // UserServicere.doLogin()
         message.error(err.message);
       }
       return false;
@@ -102,16 +98,16 @@ export const request2 = async (url, method, param) => {
     });
 };
 
-
 export const requestForReport = async (url, method, param) => {
   return axios({
-    url: config.base_server+url,
+    url: config.base_server + url,
     method: method,
     data: param,
     responseType: "blob",
     headers: {
       Authorization: "Bearer " + getLocalAccessToken(),
-      'Content-Type': 'application/pdf', "accept": "application/json"
+      "Content-Type": "application/pdf",
+      accept: "application/json",
     },
   })
     .then((res) => {
@@ -121,16 +117,13 @@ export const requestForReport = async (url, method, param) => {
       var status = err.response?.status;
       if (status === 404) {
         message.error("Route Not Found!");
-      }  else if (status === 500) {
+      } else if (status === 500) {
         message.error("Internal error server!");
-      } 
-      else if (status === 401) {
+      } else if (status === 401) {
         //UserServicere.doLogin()
-      }
-      else if (status === 403) {
+      } else if (status === 403) {
         message.error(err.message);
-      }
-      else {
+      } else {
         message.error(err.message);
       }
       return false;
