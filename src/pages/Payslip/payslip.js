@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 //Componets form MUI
 import PageTitle from "../../components/Title_Page/TitlePage";
 import "./paySlip.css";
@@ -8,7 +8,6 @@ import {
   DatePicker,
   Space,
   Table,
-  Tag,
   Button,
   Form,
   Select,
@@ -18,44 +17,35 @@ import {
   Typography,
   Input,
   Card,
+  Popconfirm
 } from "antd";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
-import { SendOutlined, EditFilled } from "@ant-design/icons";
+import { SendOutlined, EditFilled, DeleteOutlined } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 import { request } from "../../share/request";
-const { Search } = Input;
+import getColumnSearchProps from "../../share/ColumnSearchProps";
 const { Title } = Typography;
-
 
 const PayslipPage = () => {
   const [form] = Form.useForm();
-  const now = Date.now();
-  const today = dayjs(now);
-  const dateFormat = "YYYY";
-  const [empList, setEmpList] = useState([]);
   const [allowances, setAllowances] = useState([]);
   const [loading, setLoading] = useState(false);
   const [department, setDepartment] = useState([]);
   const [emp, setEmp] = useState([]);
   const [data, setData] = useState([]);
-  const [year, setYear] = useState("2024");
   const [salaryCycle, setSalaryCycle] = useState("1");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
 
   const onChangeType = (value) => {
     setSalaryCycle(value);
     //console.log(value);
   };
 
-
   const getListDeductions = () => {
     setLoading(true);
     request("payrolls/deductions", "get", {}).then((res) => {
       if (res) {
         setLoading(false);
-        console.log(res.data);
       }
     });
   };
@@ -83,6 +73,26 @@ const PayslipPage = () => {
         //console.log(res.data);
       }
     });
+  };
+
+  const onDelete = (Item) => {
+    setLoading(true);
+    request("payrolls/payslips/delete?id=" + Item.id, "delete", {}).then(
+      (res) => {
+        if (res) {
+          Swal.fire({
+            title: "Success!",
+            text: "Your has been deleted",
+            icon: "success",
+            showConfirmButton: true,
+            //timer: 1500,
+            // confirmButtonText: "Confirm",
+          });
+          getList();
+          setLoading(false);
+        }
+      }
+    );
   };
 
   const getListEmp = (value) => {
@@ -124,7 +134,7 @@ const PayslipPage = () => {
     getList();
     getListAllowances();
     getListDeductions();
-  }, [empList]);
+  }, []);
 
   const columns = [
     {
@@ -132,6 +142,7 @@ const PayslipPage = () => {
       dataIndex: "empId",
       key: "empId",
       fixed: "left",
+      ...getColumnSearchProps("empId")
     },
     {
       title: "Payment Type",
@@ -186,13 +197,23 @@ const PayslipPage = () => {
               icon={<EditFilled />}
             />
           </Link>
+          <Popconfirm
+            title="Delete the PaySlip"
+            description="Are you sure to delete this PaySlip?"
+            onConfirm={() => onDelete(record)}
+            //onCancel={cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary" icon={<DeleteOutlined />} danger />
+          </Popconfirm>
         </Space>
       ),
     },
   ];
 
   const onFinish = (values) => {
-    console.log("Success:", values);
+    //console.log("Success:", values);
     var date = dayjs(values.payrollDate).format("YYYY-MM-DD");
     var param = {
       dateCreated: dayjs(values.createdDate),
@@ -201,14 +222,13 @@ const PayslipPage = () => {
       paymentType: values.paymentType,
       emId: values.employees,
     };
-
     let url = "payrolls/payslips/add";
     let method = "post";
     // case update
     setLoading(true);
 
     request(url, method, param).then((res) => {
-      if (res.code === 200) {
+      if (res.code === 200 && res.status) {
         Swal.fire({
           title: "Success!",
           text: "Your has been saved",
@@ -219,24 +239,23 @@ const PayslipPage = () => {
         });
         getList();
         setLoading(false);
+        console.log(res)
         //onReset();
       } else {
         Swal.fire({
           icon: "error",
           title: "Something went wrong, please check in error detail!",
-          text: res.message,
+          text: res.error,
         });
         setLoading(false);
         getList();
+        console.log(res)
       }
     });
-    console.log("param", param);
   };
-
 
   const onReset = () => {
     form.resetFields();
-
   };
 
   const typeOption = [

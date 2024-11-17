@@ -24,11 +24,16 @@ const updateToken = (successCallback) =>
 
 const getUsername = () => _kc.tokenParsed?.preferred_username;
 const getLastname = () => _kc.tokenParsed?.family_name;
+const getFirstname = () => _kc.tokenParsed?.given_name;
 const getEmail = () => _kc.tokenParsed?.email;
 const authenticated = () => _kc.authenticated;
 const hasRole = (roles) => roles.some((role) => _kc.hasRealmRole(role));
 
-
+// const hasRole = (roles) => {
+//   // Ensure roles is an array, even if it's undefined or another type
+//   const roleArray = Array.isArray(roles) ? roles : [];
+//   return roleArray.some((role) => _kc.hasRealmRole(role));
+// };
 
 const UserService = {
   doLogin,
@@ -44,7 +49,8 @@ const UserService = {
   getEmail,
   authenticated,
   account,
-  getrole
+  getrole,
+  getFirstname
 };
 
 export default UserService;

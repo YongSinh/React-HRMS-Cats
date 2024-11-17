@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons";
 import PageTitle from "../../../components/Title_Page/TitlePage";
 import React, { useState, useEffect } from "react";
-import { request } from "../../../share/request";
+import { request, config } from "../../../share/request";
 import Swal from "sweetalert2";
 import Drawerleave from "./Drawer";
 import getColumnSearchProps from "../../../share/ColumnSearchProps";
@@ -49,7 +49,6 @@ const LeaveRequest = () => {
     setFileId(file);
   };
 
-
   const showDrawetEdit = (value) => {
     setItem(value);
     setOpen(true);
@@ -75,6 +74,28 @@ const LeaveRequest = () => {
       }
     );
   };
+  const isEmptyOrNull2 = (date) =>
+    !date || date.length !== 2 || !date[0] || !date[1];
+
+  const handleDownloadFile = () => {
+    if (!isEmptyOrNull2(date)) {
+      const startDate = dayjs(date[0]).format("YYYY-MM-DD");
+      const endDate = dayjs(date[1]).format("YYYY-MM-DD");
+      const url = `attendanceLeave/report/leaveListDateBetween?startDate=${startDate}&endDate=${endDate}&emId=${userId}`;
+
+      request(url, "get", {}).then((res) => {
+        if (res) {
+          window.open(config.base_server + url, "_blank");
+        }
+      });
+    } else {
+      Swal.fire({
+        title: "Download leave Report",
+        text: "Please Select Date Range!",
+        icon: "info",
+      });
+    }
+  };
 
   const getListLeaveType = () => {
     setLoading(true);
@@ -92,8 +113,7 @@ const LeaveRequest = () => {
   };
 
   const onChangeDate = (value, dataSrting) => {
-    console.log(dataSrting[0]);
-    console.log(dataSrting[1]);
+    setDate(dataSrting);
   };
 
   const onSeacrh = () => {
@@ -270,7 +290,9 @@ const LeaveRequest = () => {
     var time = isEmptyOrNull(items.time)
       ? "00:00:00"
       : dayjs(items.time).format("hh:mm:ss");
-    const result = leaveType.find(item => item.label === items.leaveType || item.value === items.leaveType) ;
+    const result = leaveType.find(
+      (item) => item.label === items.leaveType || item.value === items.leaveType
+    );
     const reasonDiv = document.createElement("div");
     reasonDiv.innerHTML = items.reason;
     const plainTextReason = reasonDiv.textContent || reasonDiv.innerText || "";
@@ -289,7 +311,7 @@ const LeaveRequest = () => {
       dayOfLeave: items.duration,
       createdAt: today,
     };
-    if(edit){
+    if (edit) {
       body = {
         leaveId: item.id,
         fileId: fileId,
@@ -316,8 +338,8 @@ const LeaveRequest = () => {
       formData.append("file", file);
     }
 
-    let url =  edit ? "attendanceLeave/leave/edit":"attendanceLeave/leave/add";
-    let method =edit ? "put" : "post";
+    let url = edit ? "attendanceLeave/leave/edit" : "attendanceLeave/leave/add";
+    let method = edit ? "put" : "post";
     request(url, method, formData).then((res) => {
       if (res.code === 200) {
         Swal.fire({
@@ -331,7 +353,7 @@ const LeaveRequest = () => {
         getListLeaveType();
         setLoading(false);
         setEdit(false);
-        setOpen(false)
+        setOpen(false);
         getList();
       } else {
         Swal.fire({
@@ -426,11 +448,13 @@ const LeaveRequest = () => {
             <Button icon={<SearchOutlined />} onClick={onSeacrh} type="primary">
               Search
             </Button>
-            <div>
-              <Button icon={<ExportOutlined />} type="primary">
-                Export xlsx
-              </Button>
-            </div>
+            <Button
+              icon={<ExportOutlined />}
+              type="primary"
+              onClick={handleDownloadFile}
+            >
+              Export PDF
+            </Button>
           </Space>
         </Col>
         <Col style={{ textAlign: "right" }} span={12}>

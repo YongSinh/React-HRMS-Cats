@@ -378,7 +378,6 @@ const EidtPayslipPage = () => {
     });
   };
   const onFinish = (values) => {
-    console.log("Success:", values);
     const result = allowances.find(item => item.label === allValue || item.value === allValue) ;
     const resultType = typeOption.find(item => item.label === type || item.value === type) ;
     var eDate = isEmptyOrNull(values.effectiveDate) ? "": values.effectiveDate;

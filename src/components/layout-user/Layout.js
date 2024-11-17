@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { Space, Layout, Menu, Button, theme } from "antd";
+import { Breadcrumb, Layout, Menu, Button, theme } from "antd";
 import "./Layout.css";
-import MenuItems from "./MenuItems";
-import Notification from "../notetification/notetification";
+import MenuItems from './MenuItems'
 import {
   PieChartOutlined,
   TeamOutlined,
@@ -31,36 +30,23 @@ const logo = require("../../asset/image/catslogo.png");
 const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 
 const items = [
-  getItem("Home", "home", <PieChartOutlined />),
-  getItem("Attendance", "Attendance", <FieldTimeOutlined />),
-  getItem("Leave Management", "/", <TeamOutlined />, [
-    getItem("All Employee", "leave", <TeamOutlined />),
-    getItem("Leave Type", "leave-type", <TeamOutlined />),
-    getItem("Leave Balance", "leave-balance", <ControlOutlined />),
-    getItem("Leave Request", "leave-request", <UserOutlined />),
-  ]),
-  getItem("Info Management", "Management", <TeamOutlined />, [
-    getItem("Department", "Department", <BankOutlined />),
-    getItem("Position", "position", <BankOutlined />),
-    getItem("Employees", "employee", <UserOutlined />),
-  ]),
-  getItem("Hr Payroll", "Setting", <SettingOutlined />, [
-    getItem("Payroll", "/payroll"),
-    getItem("Payroll Report", "/payroll-report"),
-    getItem("Payslips", "/payslip"),
-    getItem("Allowances", "/allowance"),
-    getItem("Deductions", "/deduction"),
-    getItem("Salary", "/salary"),
-    getItem("Tax", "/tax"),
-  ]),
+  getItem("Home", "/user/home", <PieChartOutlined />),
+  getItem("Information", "/user/employee", <PieChartOutlined />),
+  getItem("Attendance", "/user/attendance", <FieldTimeOutlined />),
+  getItem("Staffs Leave", "/user/staff-leave-request", <UserOutlined />),
+  getItem("Leave Request", "/user/leave-request", <UserOutlined />),
+  getItem("Leave Balance", "/user/leave-balance", <UserOutlined />),
+  getItem("Payslip", "/user/payslip", <UserOutlined />),
 ];
 
-const MainLayout = () => {
+const UserLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const navigate = useNavigate();
+
+  const userRoles = UserService.getrole();
 
   const onChange = (value) => {
     navigate(value.key);
@@ -70,6 +56,8 @@ const MainLayout = () => {
   const handleLogoClick = () => {
     navigate("/"); // Change the route as per your requirement
   };
+
+
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -89,17 +77,14 @@ const MainLayout = () => {
           </Button>
           <div className="header-title">Human Resource Management System</div>
         </div>
-        <Space size={"large"}>
-          <Notification /> 
-          <MenuItems />
-        </Space>
+        <MenuItems/>
       </Header>
       <Layout>
         <Sider
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
-          style={{ width: 200 }}
+          style={{width:200}}
         >
           <Menu
             theme="dark"
@@ -111,16 +96,16 @@ const MainLayout = () => {
         </Sider>
         <Layout>
           <Content
-            style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            <Outlet />
-          </Content>
+          style={{
+            margin: '24px 16px',
+            padding: 24,
+            minHeight: 280,
+            background: colorBgContainer,
+            borderRadius: borderRadiusLG,
+          }}
+        >
+         <Outlet />
+        </Content>
           <Footer
             style={{
               textAlign: "center",
@@ -136,4 +121,4 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+export default UserLayout;

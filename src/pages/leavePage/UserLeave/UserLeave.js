@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import ModelForm from "./ModelForm";
+import UserService from "../../../UserService/UserService";
 import "./leaveType.css";
 //Componets form antd
 import {
   Image,
-  Space,
   Table,
-  Tag,
-  Button,
   Spin,
   Form,
-  Popconfirm,
   Col,
   Row,
   Divider,
@@ -19,28 +15,16 @@ import {
   Input,
   Card,
 } from "antd";
-import dayjs from "dayjs";
-import {
-  EditOutlined,
-  PlusCircleOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
 import { request } from "../../../share/request";
-import Swal from "sweetalert2";
 const { Title } = Typography;
 const picture = require("../../../asset/image/missing-picture.jpg");
 
-const LeaveEmpPage = () => {
-  const now = Date.now();
-  const [leaveType, setLeaveType] = useState([]);
+const UserLeave = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [dataLeave, setDataLeave] = useState([]);
   const [empInfo, setEmpInfo] = useState([]);
-  const [item, setItem] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [edit, setEdit] = useState(false);
-  const { id } = useParams();
+  const id = UserService.getUsername();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(picture);
   const getListFile = (date) => {
@@ -70,18 +54,6 @@ const LeaveEmpPage = () => {
     });
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleOpen = () => {
-    setIsModalOpen(true);
-    setEdit(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   const getList = () => {
     setLoading(true);
     request("attendanceLeave/getLeaveBalanceByEmId?emId=" + id, "get", {}).then(
@@ -107,58 +79,11 @@ const LeaveEmpPage = () => {
     );
   };
 
-  //attendanceLeave/leave/getLeaveByEmId/1000'
-
-  const getListLeaveType = () => {
-    setLoading(true);
-    request("attendanceLeave/getListLeaveType", "get", {}).then((res) => {
-      if (res) {
-        //console.log(res);
-        const arrTmpP = res.data.map((item) => ({
-          label: item.leaveTitle,
-          value: item.id,
-        }));
-        setLeaveType(arrTmpP);
-        // setData(res.data);
-        setLoading(false);
-      }
-    });
-  };
-
-  const onDelete = (Item) => {
-    request(
-      "attendanceLeave/LeaveBalance/delete/" + Item.id,
-      "delete",
-      {}
-    ).then((res) => {
-      if (res) {
-        Swal.fire({
-          title: "Success!",
-          text: "Your has been deleted",
-          icon: "success",
-          showConfirmButton: true,
-          //timer: 1500,
-          // confirmButtonText: "Confirm",
-        });
-        getList();
-        setLoading(false);
-      }
-    });
-  };
-
-  const onEdit = (Item) => {
-    setIsModalOpen(true);
-    setItem(Item);
-    setEdit(true);
-  };
-
   const getListEmpInfo = () => {
     setLoading(true);
     request("info/employee/getEmpInfoById?emId=" + id, "get", {}).then(
       (res) => {
         if (res) {
-          //console.log(res);
-          //console.log(res.data)
           setEmpInfo(res.data);
           setLoading(false);
         } else {
@@ -187,85 +112,7 @@ const LeaveEmpPage = () => {
       dataIndex: "balanceAmount",
       key: "balanceAmount",
     },
-    {
-      title: "Action",
-      key: "action",
-      fixed: "right",
-      render: (_, record) => (
-        <Space>
-          <Button
-            onClick={() => onEdit(record)}
-            type="primary"
-            icon={<EditOutlined />}
-          />
-
-          <Popconfirm
-            title="Delete the Type"
-            description="Are you sure to delete this type?"
-            onConfirm={() => onDelete(record)}
-            //onCancel={cancel}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button icon={<DeleteOutlined />} danger />
-          </Popconfirm>
-        </Space>
-      ),
-    },
   ];
-
-  const onFinish = (value) => {
-    // console.log(item)
-    // console.log("update: "+ item)
-    let param, url, method;
-
-    if (edit) {
-      url = "attendanceLeave/LeaveBalance/update/" + item.id;
-      method = "put";
-      param = {
-        empId: 0,
-        balanceAmount: value.balance,
-        lastUpdateDate: dayjs(value.date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
-        leaveType: "string",
-      };
-    } else {
-      url = "attendanceLeave/LeaveBalance/add";
-      method = "post";
-      param = {
-        empId: [id],
-        balanceAmount: 0,
-        lastUpdateDate: dayjs(value.date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
-        leaveType: value.type,
-      };
-    }
-    setIsModalOpen(false);
-    console.log(param);
-    console.log(method);
-    request(url, method, param).then((res) => {
-      if (res.code === 200) {
-        Swal.fire({
-          title: "Success!",
-          text: "Your has been save!",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-          // confirmButtonText: "Confirm",
-        });
-        getList();
-        setLoading(false);
-        setEdit(false);
-        setIsModalOpen(false);
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Something went wrong, please check in error detail!",
-          text: res.message,
-        });
-        setLoading(false);
-        getList();
-      }
-    });
-  };
 
   const columns = [
     {
@@ -314,23 +161,12 @@ const LeaveEmpPage = () => {
   useEffect(() => {
     getList();
     getListEmpInfo();
-    getListLeaveType();
     getListLeave();
     getEmpInfo2();
   }, []);
 
   return (
     <>
-      {/* <PageTitle PageTitle="Leave Type" /> */}
-      <ModelForm
-        open={isModalOpen}
-        onOk={handleOk}
-        handleClose={handleCancel}
-        item={item}
-        onFinish={onFinish}
-        leaveType={leaveType}
-        edit={edit}
-      />
       <Spin spinning={loading}>
         <Card style={{ width: "100%" }}>
           {/* <Title>{id}</Title> */}
@@ -399,19 +235,6 @@ const LeaveEmpPage = () => {
             <Title level={3}>Leave Credits</Title>
             {/* <Divider dashed /> */}
             <Card style={{ width: "100%", position: "relative" }}>
-              <Button
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "11px",
-                  zIndex: "5",
-                }}
-                type="primary"
-                icon={<PlusCircleOutlined />}
-                shape="circle"
-                onClick={handleOpen}
-              />
-
               <Table
                 scroll={{
                   x: "max-content",
@@ -441,4 +264,4 @@ const LeaveEmpPage = () => {
   );
 };
 
-export default LeaveEmpPage;
+export default UserLeave;

@@ -31,7 +31,7 @@ const Drawerleave = ({
   onClose,
   onFinish,
   leaevType,
-  edit = false,
+  edit,
   items,
   fileId,
 }) => {
@@ -41,7 +41,6 @@ const Drawerleave = ({
   const [form] = Form.useForm();
   const [end, setEndDate] = useState("");
   const [start, setStartDate] = useState("");
-  const dateFormat = "YYYY-MM-DD";
   const [data, setData] = useState([]);
 
   const onChangeDuration = (value) => {
@@ -74,8 +73,8 @@ const Drawerleave = ({
   };
 
   useEffect(() => {
-    getListFile();
     if (edit) {
+      getListFile();
       setEndDate(dayjs(items.startDate));
       setStartDate(dayjs(items.endDate));
       form.setFieldsValue({
@@ -89,7 +88,7 @@ const Drawerleave = ({
       // setReasonContent(items.reason || ""); // Set initial value for Reason editor
       // setRemarkContent(items.remark || ""); // Set initial value for Remark editor
     }
-  }, [items]);
+  }, [items, edit]);
 
   const props = {
     name: "file",
@@ -113,18 +112,17 @@ const Drawerleave = ({
     },
   };
 
-  const handleEditorChange = (content) => {
-    console.log(content); // Log the plain text content
-  };
-
   const handleCancel = () => {
     onClose();
     form.resetFields(); // clear data in form
   };
-
+  const isEmptyOrNull2 = (date) =>
+    !date || date.length !== 2 || !date[0] || !date[1];
   const onChangeDate = (value, dataSrting) => {
-    setEndDate(value[1]);
-    setStartDate(value[0]);
+    if (!isEmptyOrNull2(value)) {
+      setEndDate(value[1]);
+      setStartDate(value[0]);
+    }
   };
 
   const onChangeTime = (time, timeString) => {
@@ -276,29 +274,32 @@ const Drawerleave = ({
                 </p>
               </Dragger>
             </Form.Item>
-            <div style={{ marginBottom: 10 }}>
-              {data.length !== 0 ? (
-                <Space wrap>
-                  {data.map((items) => (
-                    <Tooltip title={items.name}>
-                      <Button
-                        icon={<FileOutlined />}
-                        onClick={() => handleViewFile(items)}
-                      >
-                        view
-                      </Button>
-                    </Tooltip>
-                  ))}
-                </Space>
-              ) : (
-                <Alert
-                  message="There is no file Upload!"
-                  type="info"
-                  showIcon
-                />
-              )}
-            </div>
-
+            {edit ? (
+              <div style={{ marginBottom: 10 }}>
+                {data.length !== 0 ? (
+                  <Space wrap>
+                    {data.map((items) => (
+                      <Tooltip title={items.name}>
+                        <Button
+                          icon={<FileOutlined />}
+                          onClick={() => handleViewFile(items)}
+                        >
+                          view
+                        </Button>
+                      </Tooltip>
+                    ))}
+                  </Space>
+                ) : (
+                  <Alert
+                    message="There is no file Upload!"
+                    type="info"
+                    showIcon
+                  />
+                )}
+              </div>
+            ) : (
+              <></>
+            )}
             <Col span={24}>
               <Form.Item style={{ textAlign: "right" }}>
                 <Space>

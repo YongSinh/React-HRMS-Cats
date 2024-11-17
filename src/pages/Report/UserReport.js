@@ -12,7 +12,7 @@ import { isEmptyOrNull } from "../../share/helper";
 import { request, config } from "../../share/request";
 import UserService from "../../UserService/UserService";
 
-function PersonalReport({ activeKey }) {
+function UserReport() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
     const userId = UserService.getUsername();
@@ -121,10 +121,8 @@ function PersonalReport({ activeKey }) {
   };
 
   useEffect(() => {
-    if (activeKey === "2") {
       getList(); // Only fetch data when this tab is active
-    }
-  }, [activeKey]);
+  }, []);
   
   return (
     <>
@@ -141,4 +139,4 @@ function PersonalReport({ activeKey }) {
   );
 }
 
-export default PersonalReport;
+export default UserReport;

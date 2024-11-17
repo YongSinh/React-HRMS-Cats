@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DownOutlined, LoginOutlined, LogoutOutlined } from "@ant-design/icons";
 import { Dropdown, Space, Avatar } from "antd";
 import UserService from "../../UserService/UserService";
-import Notification from "../notetification/notetification";
+
 
 const MenuItems = () => {
   const themes = {
@@ -28,8 +28,8 @@ const MenuItems = () => {
   
   const handleLogout = () => {
     UserService.doLogout();
-   // window.location.href = "http://192.168.0.142:3005/"
-    //window.location.href = "https://www.cats.com.kh/apps/sso/logout";
+    //window.location.href = "http://192.168.0.142:3005/";
+    //window.location.href = "http://192.168.0.142:3005/"
   };
   const handleLogIn = () => {
     UserService.doLogin();
@@ -44,13 +44,27 @@ const MenuItems = () => {
     },
   ];
   
+
   const name = UserService.getLastname() +" "+ UserService.getFirstname();
   
   return (
     <>
       <div>
         <div>
-          {/* <Notification/> */}
+          {/* <Tooltip title="Notification" arrow>
+            <Badge
+              badgeContent={100}
+              sx={{
+                "& .MuiBadge-badge": {
+                  color: "white",
+                  backgroundColor: "red",
+                },
+              }}
+              //style={badgeStyles}
+            >
+              <MdOutlineNotificationsActive size={28} />
+            </Badge>
+          </Tooltip> */}
           <Dropdown
             menu={{
               items: menuUser,

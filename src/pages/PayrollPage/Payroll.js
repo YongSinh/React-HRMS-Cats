@@ -160,6 +160,7 @@ const PayrollPage = () => {
       employees: Item.empId,
       endDate: dayjs(Item.toDate),
       startDate: dayjs(Item.fromDate),
+      createDate:dayjs(Item.createDate),
       salary: Item.salary,
       selectType: Item.type === 1 ? "Monthly" : "Semi-Monthly",
       status: Item.status === 1 ? "New" : "Computed",
@@ -365,7 +366,7 @@ const PayrollPage = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => `${status === 1 ? "New" : "Computed"}`,
+      render: (status) => `${status === 1 ? "New" : "Completed"}`,
     },
     {
       title: "Create Date",

@@ -12,21 +12,11 @@ import {
   ClearOutlined,
 } from "@ant-design/icons";
 //Componets form antd
-import {
-  Space,
-  Table,
-  Button,
-  Input,
-  Card,
-  Popconfirm,
-  Row,
-  Col,
-} from "antd";
+import { Space, Table, Button, Input, Card, Popconfirm, Row, Col } from "antd";
 import dayjs from "dayjs";
 import { request } from "../../../share/request";
-
+import { isEmptyOrNull } from "../../../share/helper";
 import { Link } from "react-router-dom";
-
 
 const LeaveBalancePage = () => {
   // const now = Date.now();
@@ -82,7 +72,6 @@ const LeaveBalancePage = () => {
     });
   };
 
-
   const getListLeaveType = () => {
     setLoading(true);
     request("attendanceLeave/getListLeaveType", "get", {}).then((res) => {
@@ -92,7 +81,7 @@ const LeaveBalancePage = () => {
           label: item.leaveTitle,
           value: item.id,
         }));
-        setLeaveType(arrTmpP)
+        setLeaveType(arrTmpP);
         // setData(res.data);
         setLoading(false);
       }
@@ -151,7 +140,7 @@ const LeaveBalancePage = () => {
           <Popconfirm
             title="Delete the Type"
             description="Are you sure to delete this type?"
-            onConfirm={() =>onDelete(record)}
+            onConfirm={() => onDelete(record)}
             //onCancel={cancel}
             okText="Yes"
             cancelText="No"
@@ -162,7 +151,6 @@ const LeaveBalancePage = () => {
       ),
     },
   ];
-
 
   useEffect(() => {
     getList();
@@ -181,39 +169,45 @@ const LeaveBalancePage = () => {
     });
   };
 
-  const onSearch = () =>{
+  const onSearch = () => {
     setLoading(true);
-    request(`attendanceLeave/getLeaveBalanceByEmId?emId=${emId}`, "get", {}).then((res) => {
-      if (res) {
-        //console.log(res);
-        setData(res.data);
-        setLoading(false);
-      }
-    });
-  }
+    if (!isEmptyOrNull(emId)) {
+      request(
+        `attendanceLeave/getLeaveBalanceByEmId?emId=${emId}`,
+        "get",
+        {}
+      ).then((res) => {
+        if (res) {
+          //console.log(res);
+          setData(res.data);
+          setLoading(false);
+        }
+      });
+    }
+  };
 
-  const onClickClear = () =>{
-    getList()
-    setEmId("")
-  }
+  const onClickClear = () => {
+    getList();
+    setEmId("");
+  };
 
-  const onChangeEmId = (e) =>{
-    setEmId(e.target.value)
-    console.log(e.target.value)
-  }
+  const onChangeEmId = (e) => {
+    setEmId(e.target.value);
+    console.log(e.target.value);
+  };
 
-  const onFinish = (value) =>{
+  const onFinish = (value) => {
     //console.log(value)
     var param = {
-      "empId": value.employee,
-      "balanceAmount": 0,
-      "lastUpdateDate": dayjs(value.date).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-      "leaveType": value.type
-    }
-   // console.log(param)
+      empId: value.employee,
+      balanceAmount: 0,
+      lastUpdateDate: dayjs(value.date).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
+      leaveType: value.type,
+    };
+    // console.log(param)
     let url;
     let method;
-    url = "attendanceLeave/LeaveBalance/add" ;
+    url = "attendanceLeave/LeaveBalance/add";
     method = "post";
     //console.log(date)
     setLoading(true);
@@ -230,7 +224,7 @@ const LeaveBalancePage = () => {
         });
         getList();
         setLoading(false);
-        setIsModalOpen(false)
+        setIsModalOpen(false);
       } else {
         Swal.fire({
           icon: "error",
@@ -241,7 +235,7 @@ const LeaveBalancePage = () => {
         getList();
       }
     });
-  }
+  };
 
   return (
     <>

@@ -1,4 +1,12 @@
-.chart{
-    border-radius: 5px;
-    overflow: hidden;
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+/* This makes sure the image is centered vertically too */
+}
+
+.welcome-img {
+    max-width: 100%;
+    width: 850px;
+    height: auto;
 }

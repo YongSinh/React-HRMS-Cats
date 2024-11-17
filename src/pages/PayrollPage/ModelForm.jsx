@@ -45,10 +45,10 @@ const ModalForm = ({
             >
 
                 <Form.Item
-                    label={"Date Update"}
+                    label={"Select Date To"}
                     name={"date"}
                     rules={[{
-                        required: true, message: 'Please selectDate!'
+                        required: true, message: 'Please select date!'
                     }]}
                 >
                     <DatePicker style={{width:"100%"}}/>

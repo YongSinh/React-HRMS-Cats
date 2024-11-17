@@ -1,0 +1,74 @@
+.header {
+  /* position: fixed; */
+  width: 100%;
+  z-index: 100;
+  background: #001529;
+  color: white;
+  padding: 0px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-logo {
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+ }
+
+.title-logo .logo {
+  height: 3rem; /* Adjust height as needed */
+  margin-right: 1rem; /* Adjust spacing as needed */
+}
+
+.header-title {
+  align-items: center;
+  color: #fff;
+  margin-left: 4rem;
+  font-size: 28px;
+  font-weight: bold;
+ 
+}
+/* .ant-layout-sider-trigger{
+ width: 230px !important;
+} */
+
+/* .content {
+  margin: 24px 16px;
+} */
+
+
+/* .ant-layout-sider {
+  width: 230px !important;
+  flex: 0 0 230px !important;
+  max-width: 230px !important;
+} */
+
+/* .site-layout-background {
+  background: #fff; 
+  padding: 24px;
+  min-height: 280px; 
+  border-radius: 8px; 
+  border: 1px solid #e8e8e8;
+} */
+
+
+/* .ant-layout-footer {
+  text-align: center;
+  background: #fff;
+  position: fixed; 
+  bottom: 0; 
+  width: 100%; 
+  z-index: 2;
+  border-top: 1px solid #e8e8e8; 
+  padding: 12px 0; 
+} */
+
+/* :where(.css-dev-only-do-not-override-zg0ahe).ant-layout .ant-layout-sider-children {
+  height:auto;
+  margin-top: 85px;
+}
+ */
+
+
+

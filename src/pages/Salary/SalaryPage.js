@@ -95,7 +95,10 @@ const SalaryPage = () => {
   };
 
   const onChangeDep = (value) => {
-    getListEmp(value);
+    if (!isEmptyOrNull(value)) {
+      getListEmp(value);
+    }
+
   };
 
   const filterByDep = (value) => {
@@ -289,6 +292,7 @@ const SalaryPage = () => {
       dataIndex: "empId",
       key: "empId",
       fixed: "left",
+      ...getColumnSearchProps("empId"),
     },
     {
       title: "Salary",
