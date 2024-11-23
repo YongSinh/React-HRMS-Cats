@@ -137,7 +137,7 @@ const PersonalDetailForm = ({ activeKey }) => {
   };
 
   const onFinish = (item) => {
-    console.log("success", item);
+    //console.log("success", item);
 
     localStorage.setItem("employeeId", item.empId);
     const body = {
@@ -219,7 +219,7 @@ const PersonalDetailForm = ({ activeKey }) => {
           form={form}
           layout={"vertical"}
           onFinish={(item) => {
-            //form.resetFields();
+            form.resetFields();
             onFinish(item);
           }}
         >

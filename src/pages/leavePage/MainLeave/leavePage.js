@@ -183,6 +183,16 @@ const LeavePage = () => {
       width: 180,
     },
     {
+      title: "Cancell",
+      dataIndex: "cancelled",
+      width: 150,
+      render: (_, record) => {
+        let status = record.cancelled ? "success" : "error";
+        let text = record.cancelled ? "Cancelled" : "No";
+        return <Badge status={status} text={text} />;
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       width: 150,
@@ -225,20 +235,6 @@ const LeavePage = () => {
       },
     },
     {
-      title: "Hr Approve",
-      dataIndex: "approvedByHr",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByHr ? "success" : "error";
-        let text = record.approvedByHr ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
       title: "Approve",
       dataIndex: "approved",
       width: 150,
@@ -253,29 +249,34 @@ const LeavePage = () => {
       },
     },
     {
-      title: " Action",
+      title: "Action",
       dataIndex: "action",
       width: 150,
       fixed: "right",
       render: (_, record) => (
         <Space>
+          {/* View button is always enabled */}
           <Button onClick={() => showDrawer(record)} icon={<EyeFilled />} />
+    
+          {/* Approve button is disabled if the record is approved or cancelled */}
           <Button
             onClick={() => onApprove(record)}
             type="primary"
-            disabled={record.approved && !record.cancel}
+            disabled={record.cancelled || record.approved}
             icon={<CheckOutlined />}
           />
+    
+          {/* Reject button is disabled if the record is cancelled */}
           <Button
             type="primary"
             onClick={() => onReject(record)}
             icon={<CloseOutlined />}
-            disabled={record.cancel}
+            disabled={record.cancelled}
             danger
           />
         </Space>
       ),
-    },
+    }    
   ];
 
 

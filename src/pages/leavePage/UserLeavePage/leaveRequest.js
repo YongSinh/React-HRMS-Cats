@@ -20,9 +20,6 @@ import DrawerView from "./DrawerView";
 import UserService from "../../../UserService/UserService";
 const { RangePicker } = DatePicker;
 
-// Filter `option.label` match the user type `input`
-const filterOption = (input, option) =>
-  (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
 const LeaveRequest = () => {
   const [loading, setLoading] = useState(false);
@@ -183,6 +180,16 @@ const LeaveRequest = () => {
       width: 180,
     },
     {
+      title: "Cancell",
+      dataIndex: "cancelled",
+      width: 150,
+      render: (_, record) => {
+        let status = record.cancelled ? "success" : "error";
+        let text = record.cancelled ? "Cancelled" : "No";
+        return <Badge status={status} text={text} />;
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       width: 150,
@@ -225,20 +232,6 @@ const LeaveRequest = () => {
       },
     },
     {
-      title: "Hr Approve",
-      dataIndex: "approvedByHr",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByHr ? "success" : "error";
-        let text = record.approvedByHr ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
       title: "Approve",
       dataIndex: "approved",
       width: 150,
@@ -253,30 +246,36 @@ const LeaveRequest = () => {
       },
     },
     {
-      title: " Action",
+      title: "Action",
       dataIndex: "action",
       width: 180,
       fixed: "right",
       render: (_, record) => (
         <Space>
-          <Button onClick={() => showDrawer2(record)} icon={<EyeFilled />} />
+          {/* View button is always enabled */}
+          <Button
+            onClick={() => showDrawer2(record)}
+            icon={<EyeFilled />}
+          />
+          
+          {/* Other buttons are disabled if record.cancelled is true */}
           <Button
             onClick={() => onApply(record)}
             type="primary"
-            disabled={record.status}
+            disabled={record.cancelled}
             icon={<SendOutlined />}
           />
           <Button
             onClick={() => showDrawetEdit(record)}
             type="primary"
-            disabled={record.status}
+            disabled={record.cancelled}
             icon={<EditFilled />}
           />
           <Button
             type="primary"
             onClick={() => onCancel(record)}
             icon={<CloseOutlined />}
-            disabled={record.status}
+            disabled={record.cancelled}
             danger
           />
         </Space>
@@ -286,7 +285,7 @@ const LeaveRequest = () => {
 
   const onFinish = (items) => {
     var format = "YYYY-MM-DD";
-    var remark = isEmptyOrNull(items.remark) ? " " : items.remark;
+    //var remark = isEmptyOrNull(items.remark) ? " " : items.remark;
     var time = isEmptyOrNull(items.time)
       ? "00:00:00"
       : dayjs(items.time).format("hh:mm:ss");
@@ -344,7 +343,7 @@ const LeaveRequest = () => {
       if (res.code === 200) {
         Swal.fire({
           title: "Success!",
-          text: "Your has been saved",
+          text: res.message,
           icon: "success",
           showConfirmButton: false,
           timer: 1500,
@@ -411,7 +410,7 @@ const LeaveRequest = () => {
       if (result.isConfirmed) {
         request(
           `attendanceLeave/leave/cancelLeave?id=${items.id}`,
-          "delete",
+          "post",
           {}
         ).then((res) => {
           if (res.code === 200) {

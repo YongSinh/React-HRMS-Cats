@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, List, Button, Popover, Badge } from "antd";
+import { Avatar, List, Popover, Badge, Skeleton, Divider, notification } from "antd";
 import { BellOutlined } from "@ant-design/icons";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import "./notification.css";
+import { request } from "../../share/request";
+import InfiniteScroll from "react-infinite-scroll-component";
+import dayjs from "dayjs";
+var relativeTime = require("dayjs/plugin/relativeTime");
+dayjs.extend(relativeTime);
+
 
 const Notification = () => {
   const [stompClient, setStompClient] = useState(null);
@@ -11,12 +17,15 @@ const Notification = () => {
   const [message, setMessage] = useState("");
   const [isPopoverVisible, setIsPopoverVisible] = useState(false); // State for toggling popover visibility
   const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
   const onClick = () => {
     if (message.length > 0) {
       const currentTime = new Date().toLocaleTimeString();
       setData((prevData) => [
         ...prevData,
-        { 
+        {
           title: message,
           receivedTime: `${currentTime} ago`,
         },
@@ -27,13 +36,33 @@ const Notification = () => {
   };
 
   const togglePopoverVisibility = () => {
+    getList()
     setIsPopoverVisible((prevVisibility) => !prevVisibility); // Toggle popover visibility
     if (!isPopoverVisible) {
       setUnreadCount(0); // Reset unread count when popover is opened
     }
   };
 
+  const getList = () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    request(`notification/general?type=GENERAL&page=${page}&size=10`, "get", {}).then((res) => {
+      if (res) {
+          setData((prevData) => [...prevData, ...res.data]);
+          setHasMore(res.hasMore);
+          setPage((prevPage) => {
+            const newPage = prevPage + 1;
+            console.log("Updating page to:", newPage); // Log new page value
+            return newPage;
+          });
+          console.log(page)
+          setLoading(false)
+      }
+    });
+  };
+
   useEffect(() => {
+    getList();
     const newClient = new Client({
       webSocketFactory: () => new SockJS("http://localhost:8089/ws"),
       onConnect: () => {
@@ -41,13 +70,12 @@ const Notification = () => {
           const newMessage = JSON.parse(message.body);
           console.log(newMessage);
           setUnreadCount((prevCount) => prevCount + 1);
-          setData((prevData) => [
-            ...prevData,
-            {
-              title: newMessage.sender || "New Kafka Message",
-              description: newMessage.englishText || "No content",
-            },
-          ]);
+          setData((prevData) => [newMessage, ...prevData]);
+          notification.info({
+            message: `Notification from ${newMessage.sender}`,
+            description: newMessage.englishText || "You have a new notification!",
+            placement: "topRight", // You can customize placement
+          });
         });
       },
       onStompError: (frame) => {
@@ -64,49 +92,77 @@ const Notification = () => {
   }, []);
 
   const notificationFeed = (
-    <List
-      className="notification-feed"
-      itemLayout="horizontal"
-      dataSource={data}
-      renderItem={(item, index) => (
-        <List.Item key={index}  actions={[<a key="list-loadmore-edit">mask as read</a>]}>
-          <List.Item.Meta
-            avatar={
-              <Avatar
-                src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`}
-              />
-            }
-            title={<span>{item.title}</span>}
-            description={item.description || "Just now"}
+    <div
+      id="scrollableDiv"
+      style={{
+        height: 300,
+        overflow: "auto",
+      }}
+    >
+      <InfiniteScroll
+        dataLength={data.length}
+        next={getList}
+        hasMore={hasMore}
+        loader={
+          <Skeleton
+            avatar
+            paragraph={{
+              rows: 1,
+            }}
+            active
           />
-        </List.Item>
-      )}
-    />
+        }
+        endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+        scrollableTarget="scrollableDiv"
+      >
+        <List
+          className="notification-feed"
+          itemLayout="horizontal"
+          dataSource={data}
+          renderItem={(item, index) => (
+            <List.Item
+              key={index}
+              // actions={[<a key="list-loadmore-edit">mask as read</a>]}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar
+                    src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`}
+                  />
+                }
+                title={<span>{item.sender}</span>}
+                description={item.englishText || "Just now"}
+              />
+              <div style={{marginLeft:6}}>{dayjs().from(dayjs(item.dateTime))}</div>
+            </List.Item>
+          )}
+        />
+      </InfiniteScroll>
+    </div>
   );
 
   return (
-
-      <Popover
-        content={notificationFeed}
-        title="Notifications"
-        trigger="click"
-        popupVisible={isPopoverVisible}
-        onOpenChange={togglePopoverVisibility}
+    <Popover
+      content={notificationFeed}
+      title="Notifications"
+      trigger="click"
+      popupVisible={isPopoverVisible}
+      onOpenChange={togglePopoverVisibility}
+    >
+      <Badge
+        onClick={togglePopoverVisibility}
+        count={unreadCount}
+        offset={[10, 0]}
+        color="red"
       >
-        <Badge
-          onClick={togglePopoverVisibility}
-          count={unreadCount}
-          offset={[10, 0]}
-          color="red"
-        >
-          <BellOutlined
-           style={{
-            color: '#fff',
-            fontSize:20
+        <BellOutlined
+          style={{
+            color: "#fff",
+            fontSize: 20,
           }}
-          />
-        </Badge>
-      </Popover>
+        />
+      </Badge>
+    </Popover>
   );
 };
 

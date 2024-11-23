@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { Breadcrumb, Layout, Menu, Button, theme } from "antd";
+import React, { useState } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Space, Layout, Menu, Button, theme } from "antd";
 import "./Layout.css";
 import MenuItems from './MenuItems'
+import Notification from "../notetification/notetification";
 import {
   PieChartOutlined,
-  TeamOutlined,
   UserOutlined,
-  SettingOutlined,
-  InfoCircleOutlined,
   FieldTimeOutlined,
-  ControlOutlined,
-  BankOutlined,
 } from "@ant-design/icons";
 import UserService from "../../UserService/UserService";
 
@@ -29,7 +25,7 @@ function getItem(label, key, icon, children) {
 const logo = require("../../asset/image/catslogo.png");
 const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 
-const items = [
+const allItems = [
   getItem("Home", "/user/home", <PieChartOutlined />),
   getItem("Information", "/user/employee", <PieChartOutlined />),
   getItem("Attendance", "/user/attendance", <FieldTimeOutlined />),
@@ -46,18 +42,40 @@ const UserLayout = () => {
   } = theme.useToken();
   const navigate = useNavigate();
 
-  const userRoles = UserService.getrole();
+  const location = useLocation(); // Get current path
+  const currentPath = location.pathname;
+
+  const checkRole = (value) => {
+    const matchedRole = value.find(role => UserService.hasRole([role]));
+    return matchedRole;
+  }
+
+  const getFilteredItems = () => {
+    return allItems.filter(item => {
+      // If the user has the 'hrms_manager' or 'hrms_head' role, show all menu items
+      
+     
+      if (checkRole(["hrms_manger", "hrms_head"])) {
+        return true;
+      }
+
+      // Otherwise, show basic menu items for users with only 'user' role
+      if (checkRole(['hrms_user'])) {
+        return item.key !== "/user/staff-leave-request" && item.key !== "/user/leave-balance";
+      } 
+
+      return false; // Hide other items if no matching roles
+    });
+  };
 
   const onChange = (value) => {
     navigate(value.key);
-    console.log(value.key);
+    //console.log(value.key);
   };
 
   const handleLogoClick = () => {
     navigate("/"); // Change the route as per your requirement
   };
-
-
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -77,35 +95,39 @@ const UserLayout = () => {
           </Button>
           <div className="header-title">Human Resource Management System</div>
         </div>
-        <MenuItems/>
+        <Space size={"large"}>
+          <Notification /> 
+          <MenuItems />
+        </Space>
       </Header>
       <Layout>
         <Sider
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
-          style={{width:200}}
+          style={{ width: 200 }}
         >
           <Menu
             theme="dark"
             defaultSelectedKeys={["1"]}
             mode="inline"
-            items={items}
+            selectedKeys={[currentPath]} 
+            items={getFilteredItems()}
             onClick={onChange}
           />
         </Sider>
         <Layout>
           <Content
-          style={{
-            margin: '24px 16px',
-            padding: 24,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-         <Outlet />
-        </Content>
+            style={{
+              margin: '24px 16px',
+              padding: 24,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
+            <Outlet />
+          </Content>
           <Footer
             style={{
               textAlign: "center",
@@ -120,5 +142,6 @@ const UserLayout = () => {
     </Layout>
   );
 };
+
 
 export default UserLayout;

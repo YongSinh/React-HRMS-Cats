@@ -5,7 +5,6 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import UserService from "./UserService/UserService";
 import keycloak from "./UserService/keycloak.js";
-import axios from "axios";
 
 const storedToken = localStorage.getItem("access_token");
 const storedRefreshToken = localStorage.getItem("refresh_token");

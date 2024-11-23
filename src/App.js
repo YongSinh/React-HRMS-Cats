@@ -63,7 +63,7 @@ function App() {
               </RenderOnRole>
             }
           >
-            <Route path="/home" element={<WebSocketComponent/>} />
+            <Route path="/home" element={<DashboardPage/>} />
             <Route path="/leave" element={<LeavePage />} />
             <Route path="/leave-request" element={<LeaveRequest />} />
             <Route path="/department" element={<DepartmentPage />} />
@@ -90,7 +90,7 @@ function App() {
           <Route
             path="/"
             element={
-              <RenderOnRole roles={["hrms_user", "hrms_admin"]}>
+              <RenderOnRole roles={["hrms_user", "hrms_admin", "hrms_head"]}>
                 <UserLayout />
               </RenderOnRole>
             }

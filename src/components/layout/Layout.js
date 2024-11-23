@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Space, Layout, Menu, Button, theme } from "antd";
 import "./Layout.css";
 import MenuItems from "./MenuItems";
@@ -9,12 +9,10 @@ import {
   TeamOutlined,
   UserOutlined,
   SettingOutlined,
-  InfoCircleOutlined,
   FieldTimeOutlined,
   ControlOutlined,
   BankOutlined,
 } from "@ant-design/icons";
-import UserService from "../../UserService/UserService";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -31,18 +29,18 @@ const logo = require("../../asset/image/catslogo.png");
 const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 
 const items = [
-  getItem("Home", "home", <PieChartOutlined />),
-  getItem("Attendance", "Attendance", <FieldTimeOutlined />),
+  getItem("Home", "/home", <PieChartOutlined />),
+  getItem("Attendance", "/Attendance", <FieldTimeOutlined />),
   getItem("Leave Management", "/", <TeamOutlined />, [
-    getItem("All Employee", "leave", <TeamOutlined />),
-    getItem("Leave Type", "leave-type", <TeamOutlined />),
-    getItem("Leave Balance", "leave-balance", <ControlOutlined />),
-    getItem("Leave Request", "leave-request", <UserOutlined />),
+    getItem("All Employee", "/leave", <TeamOutlined />),
+    getItem("Leave Type", "/leave-type", <TeamOutlined />),
+    getItem("Leave Balance", "/leave-balance", <ControlOutlined />),
+    getItem("Leave Request", "/leave-request", <UserOutlined />),
   ]),
   getItem("Info Management", "Management", <TeamOutlined />, [
-    getItem("Department", "Department", <BankOutlined />),
-    getItem("Position", "position", <BankOutlined />),
-    getItem("Employees", "employee", <UserOutlined />),
+    getItem("Department", "/Department", <BankOutlined />),
+    getItem("Position", "/position", <BankOutlined />),
+    getItem("Employees", "/employee", <UserOutlined />),
   ]),
   getItem("Hr Payroll", "Setting", <SettingOutlined />, [
     getItem("Payroll", "/payroll"),
@@ -57,6 +55,7 @@ const items = [
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  ///const [value, s]
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -64,8 +63,10 @@ const MainLayout = () => {
 
   const onChange = (value) => {
     navigate(value.key);
-    console.log(value.key);
+   // console.log(window.location.origin);
   };
+  const location = useLocation(); // Get current path
+  const currentPath = location.pathname;
 
   const handleLogoClick = () => {
     navigate("/"); // Change the route as per your requirement
@@ -104,6 +105,7 @@ const MainLayout = () => {
           <Menu
             theme="dark"
             defaultSelectedKeys={["1"]}
+            selectedKeys={[currentPath]} 
             mode="inline"
             items={items}
             onClick={onChange}

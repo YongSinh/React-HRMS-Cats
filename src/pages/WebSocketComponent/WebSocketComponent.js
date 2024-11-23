@@ -3,6 +3,7 @@ import { Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import Notification from "../../components/notetification/notetification";
 import { Client } from "@stomp/stompjs";
+
 const WebSocketComponent = () => {
   const [stompClient, setStompClient] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -33,6 +34,9 @@ const WebSocketComponent = () => {
       newClient.deactivate();
     };
   }, []);
+
+
+
 
   return (
     <div>
