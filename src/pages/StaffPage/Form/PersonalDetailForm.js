@@ -219,7 +219,7 @@ const PersonalDetailForm = ({ activeKey }) => {
           form={form}
           layout={"vertical"}
           onFinish={(item) => {
-            form.resetFields();
+            //form.resetFields();
             onFinish(item);
           }}
         >

@@ -176,72 +176,27 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
             <Col span={20}>
               <Row gutter={16}>
                 <Col span={8}>
-                  <Form.Item
-                    name="empId"
-                    label="Employee ID"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input the employee ID!",
-                      },
-                    ]}
-                  >
+                  <Form.Item name="empId" label="Employee ID">
                     <Input placeholder="Enter Employee ID!" />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
-                  <Form.Item
-                    name="firstName"
-                    label="First Name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input the first name!",
-                      },
-                    ]}
-                  >
+                  <Form.Item name="firstName" label="First Name">
                     <Input placeholder="Enter First Name" />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
-                  <Form.Item
-                    name="lastName"
-                    label="Last Name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input the Last Name!",
-                      },
-                    ]}
-                  >
+                  <Form.Item name="lastName" label="Last Name">
                     <Input placeholder="E.g., Doe" />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
-                  <Form.Item
-                    label="Age"
-                    name="age"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input the age!",
-                      },
-                    ]}
-                  >
+                  <Form.Item label="Age" name="age">
                     <Input placeholder="E.g., 19" />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
-                  <Form.Item
-                    label="Gender"
-                    name="gender"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input the gender!",
-                      },
-                    ]}
-                  >
+                  <Form.Item label="Gender" name="gender">
                     <Select placeholder="Select Gender">
                       <Select.Option value="male">Male</Select.Option>
                       <Select.Option value="female">Female</Select.Option>
@@ -249,16 +204,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
                   </Form.Item>
                 </Col>
                 <Col span={8}>
-                  <Form.Item
-                    label="Marital Stats"
-                    name="maritalStats"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input the marital stats!",
-                      },
-                    ]}
-                  >
+                  <Form.Item label="Marital Stats" name="maritalStats">
                     <Select
                       showSearch
                       placeholder="Select a Marital Stats"
@@ -287,8 +233,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
               </Row>
             </Col>
 
-            <Col span={4}
-            style={{textAlign:"center"}}>
+            <Col span={4} style={{ textAlign: "center" }}>
               <Image
                 width={140}
                 preview={{
@@ -301,72 +246,27 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
             </Col>
 
             <Col span={8}>
-              <Form.Item
-                name="phone"
-                label="Phone"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the phone!",
-                  },
-                ]}
-              >
+              <Form.Item name="phone" label="Phone">
                 <Input placeholder="E.g., +1 234 567 890" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the Email!",
-                  },
-                ]}
-              >
+              <Form.Item name="email" label="Email">
                 <Input placeholder="E.g., john.doe@example.com" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="workType"
-                label="Work Type"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the employeeID!",
-                  },
-                ]}
-              >
+              <Form.Item name="workType" label="Work Type">
                 <Input placeholder="E.g., Full-time" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="location"
-                label="Working Site"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input Working Site!",
-                  },
-                ]}
-              >
+              <Form.Item name="location" label="Working Site">
                 <Input placeholder="E.g., New York Office" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="department"
-                label="Department"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Department!",
-                  },
-                ]}
-              >
+              <Form.Item name="department" label="Department">
                 <Select
                   showSearch
                   placeholder="Select a Department"
@@ -377,16 +277,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="position"
-                label="Position"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Position!",
-                  },
-                ]}
-              >
+              <Form.Item name="position" label="Position">
                 <Select
                   showSearch
                   placeholder="Select a Position"
@@ -398,16 +289,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="mangerId"
-                label="Position Level"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input Position Level!",
-                  },
-                ]}
-              >
+              <Form.Item name="mangerId" label="Position Level">
                 <Input />
               </Form.Item>
             </Col>
@@ -418,16 +300,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
             </Col>
 
             <Col span={8}>
-              <Form.Item
-                name="joinDate"
-                label="Join Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Start Date!",
-                  },
-                ]}
-              >
+              <Form.Item name="joinDate" label="Join Date">
                 <DatePicker
                   placeholder="Select Start Date"
                   style={{ width: "100%" }}
@@ -435,16 +308,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="empDate"
-                label="End Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Stop Date!",
-                  },
-                ]}
-              >
+              <Form.Item name="empDate" label="End Date">
                 <DatePicker
                   placeholder="Select Stop Date"
                   style={{ width: "100%" }}
@@ -452,30 +316,12 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="address"
-                label="Address"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input Address!",
-                  },
-                ]}
-              >
+              <Form.Item name="address" label="Address">
                 <Input placeholder="E.g., 123 Main St" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="birthDate"
-                label="Date of Birth"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Date of Birth!",
-                  },
-                ]}
-              >
+              <Form.Item name="birthDate" label="Date of Birth">
                 <DatePicker
                   placeholder="Select Date of Birth"
                   style={{ width: "100%" }}
@@ -493,44 +339,17 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="nationality"
-                label="Nationality"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input Nationality!",
-                  },
-                ]}
-              >
+              <Form.Item name="nationality" label="Nationality">
                 <Input placeholder="E.g., American" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="religion"
-                label="Religion"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input Religion!",
-                  },
-                ]}
-              >
+              <Form.Item name="religion" label="Religion">
                 <Input placeholder="E.g., Christian" />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="placeOfBirth"
-                label="Place of Birth"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input Place of Birth!",
-                  },
-                ]}
-              >
+              <Form.Item name="placeOfBirth" label="Place of Birth">
                 <Input placeholder="E.g., New York" />
               </Form.Item>
             </Col>

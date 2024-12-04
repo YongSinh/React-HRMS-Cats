@@ -3,12 +3,16 @@ import dayjs from "dayjs";
 export const isEmptyOrNull = (value) => {
     return (value === "" || value === null || value === undefined) ? true : false
 }
+
+const ip_url = "192.168.100.127";
+const local_url = "192.168.100.127";
 export const config = {
   //base_server: "https://192.168.1.169:8085/api/",
-  base_server: "https://localhost:8085/api/",
-  image_path: "",
+  base_keyclock: `http://localhost:8080`,
+  base_webSocket:`http://localhost:8089/ws`,
   version: 1,
 };
+
 const formatDate = "YYYY-MM-DD";
 export const dateFormat = (value) => {
   return dayjs(value).format(formatDate);

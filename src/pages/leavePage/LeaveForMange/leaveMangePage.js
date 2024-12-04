@@ -288,7 +288,7 @@ const LeaveForMange = () => {
                       }
                       type="primary"
                       danger
-                      disabled={!record.status || record.cancel}
+                      disabled={!record.status || record.cancel || record.approved}
                       icon={<CloseOutlined />}
                     />
                   </Space>
@@ -309,11 +309,11 @@ const LeaveForMange = () => {
         <Button icon={<SearchOutlined />} onClick={onSeacrh} type="primary">
           Search
         </Button>
-        <div>
+        {/* <div>
           <Button icon={<ExportOutlined />} type="primary">
             Export xlsx
           </Button>
-        </div>
+        </div> */}
       </Space>
       <Drawerleave open={open} onClose={onClose} items={items} />
       <Table

@@ -64,6 +64,7 @@ function App() {
             }
           >
             <Route path="/home" element={<DashboardPage/>} />
+            <Route path="/personal-info" element={<EmployeeView />} />
             <Route path="/leave" element={<LeavePage />} />
             <Route path="/leave-request" element={<LeaveRequest />} />
             <Route path="/department" element={<DepartmentPage />} />
@@ -90,7 +91,7 @@ function App() {
           <Route
             path="/"
             element={
-              <RenderOnRole roles={["hrms_user", "hrms_admin", "hrms_head"]}>
+              <RenderOnRole roles={["hrms_user", "hrms_admin", "hrms_head", "hrms_manger"]}>
                 <UserLayout />
               </RenderOnRole>
             }

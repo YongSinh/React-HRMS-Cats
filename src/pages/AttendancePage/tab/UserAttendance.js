@@ -16,6 +16,7 @@ const UserAttendance = () => {
   const [id, setId] = useState("");
   const [loading, setLoading] = useState(false);
   const userId = UserService.getUsername();
+  const today = dayjs().format("YYYY-MM-DD");
   const getList = () => {
     setLoading(true);
     request(
@@ -48,6 +49,9 @@ const UserAttendance = () => {
     setOpen(false);
     form.resetFields();
   };
+  const hasTimedInToday = data.some(
+    (record) => record.dateIn === today && !isEmptyOrNull(record.timeIn)
+  );
 
   const onFinish = (value) => {
     //console.log(value);
@@ -166,9 +170,10 @@ const UserAttendance = () => {
         type="primary"
         onClick={showDrawer}
         // icon={<PlusOutlined />}
+        disabled={hasTimedInToday}
         style={{ marginBottom: 15, marginTop: 7 }}
       >
-        Time In
+        Time In 
       </Button>
       <TimeInAndOut
         open={open}

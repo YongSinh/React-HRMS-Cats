@@ -8,6 +8,9 @@ import {
   PieChartOutlined,
   UserOutlined,
   FieldTimeOutlined,
+  FormOutlined,
+  SolutionOutlined,
+  AccountBookOutlined
 } from "@ant-design/icons";
 import UserService from "../../UserService/UserService";
 
@@ -30,9 +33,9 @@ const allItems = [
   getItem("Information", "/user/employee", <PieChartOutlined />),
   getItem("Attendance", "/user/attendance", <FieldTimeOutlined />),
   getItem("Staffs Leave", "/user/staff-leave-request", <UserOutlined />),
-  getItem("Leave Request", "/user/leave-request", <UserOutlined />),
-  getItem("Leave Balance", "/user/leave-balance", <UserOutlined />),
-  getItem("Payslip", "/user/payslip", <UserOutlined />),
+  getItem("Leave Request", "/user/leave-request", <FormOutlined />),
+  getItem("Leave Balance", "/user/leave-balance", <SolutionOutlined />),
+  getItem("Payslip", "/user/payslip",<AccountBookOutlined />),
 ];
 
 const UserLayout = () => {
@@ -61,7 +64,7 @@ const UserLayout = () => {
 
       // Otherwise, show basic menu items for users with only 'user' role
       if (checkRole(['hrms_user'])) {
-        return item.key !== "/user/staff-leave-request" && item.key !== "/user/leave-balance";
+        return item.key !== "/user/staff-leave-request" ;
       } 
 
       return false; // Hide other items if no matching roles

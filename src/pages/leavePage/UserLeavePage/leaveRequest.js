@@ -262,20 +262,20 @@ const LeaveRequest = () => {
           <Button
             onClick={() => onApply(record)}
             type="primary"
-            disabled={record.cancelled}
+            disabled={record.cancelled || record.status}
             icon={<SendOutlined />}
           />
           <Button
             onClick={() => showDrawetEdit(record)}
             type="primary"
-            disabled={record.cancelled}
+            disabled={record.cancelled || record.status}
             icon={<EditFilled />}
           />
           <Button
             type="primary"
             onClick={() => onCancel(record)}
             icon={<CloseOutlined />}
-            disabled={record.cancelled}
+            disabled={record.cancelled || record.status}
             danger
           />
         </Space>

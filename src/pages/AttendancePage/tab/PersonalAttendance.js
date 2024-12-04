@@ -112,6 +112,8 @@ const PersonalAttendance = ({ activeKey }) => {
     (record) => record.dateIn === today && !isEmptyOrNull(record.timeIn)
   );
 
+  console.log(hasTimedInToday)
+
   const columns = [
     {
       title: "Employee ID",

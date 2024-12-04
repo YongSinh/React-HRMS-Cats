@@ -53,24 +53,6 @@ const DepartmentPage = () => {
     });
   };
 
-  const onDelete = (Item) => {
-    request(`info/department/deleteDepartment/${Item.depId}`, "delete", {}).then(
-      (res) => {
-        if (res) {
-          Swal.fire({
-            title: "Success!",
-            text: "Your has been deleted",
-            icon: "success",
-            showConfirmButton: true,
-            //timer: 1500,
-            // confirmButtonText: "Confirm",
-          });
-          getListDep();
-          setLoading(false);
-        }
-      }
-    );
-  };
   const onFinish = (Item) => {
     console.log("Success:", item);
     var param = {
@@ -122,11 +104,19 @@ const DepartmentPage = () => {
     getListDep();
   }, []);
 
-  const columns = [
+  const columns = [ 
     {
-      title: "depId",
-      dataIndex: "depId",
-      key: "depId",
+      title: "No",
+      dataIndex: "No",
+      render: (items, item, index) => {
+        return (
+          <>
+            <div>
+              <text style={{ fontSize: 13 }}>{index + 1}</text>
+            </div>
+          </>
+        );
+      },
     },
     {
       title: "Department Name",
@@ -162,20 +152,6 @@ const DepartmentPage = () => {
         <Space>
           <Button type="primary" icon={<EyeFilled />}  onClick={() => handleClickView(item)}/>
           <Button type="primary" icon={<EditFilled />} onClick={() => onEdit(item)}/>
-          <Popconfirm
-            title="Delete the department"
-            description="Are you sure to delete this department?"
-            onConfirm={() =>onDelete(item)}
-            //onCancel={cancel}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button 
-            type="primary"
-            icon={<DeleteOutlined />}
-            danger/>
-          </Popconfirm>
-        
         </Space>
       ),
     },

@@ -7,6 +7,8 @@ import "./notification.css";
 import { request } from "../../share/request";
 import InfiniteScroll from "react-infinite-scroll-component";
 import dayjs from "dayjs";
+import { config } from "../../share/helper";
+import UserService from "../../UserService/UserService";
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
@@ -20,6 +22,7 @@ const Notification = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
+  const userId = UserService.getUsername()
   const onClick = () => {
     if (message.length > 0) {
       const currentTime = new Date().toLocaleTimeString();
@@ -35,10 +38,27 @@ const Notification = () => {
     }
   };
 
+  const markAsRead = () => {
+    request(`notification/markAsRead?userId=${userId}`, "put", {}).then((res) => {
+      if (res) {
+       console.log(res)
+      }
+    });
+  };
+
+  const getUnreadCount = () => {
+    request(`notification/unreadCount?userId=${userId}`, "get", {}).then((res) => {
+      if (res) {
+       setUnreadCount(res.data)
+      }
+    });
+  };
+
   const togglePopoverVisibility = () => {
     getList()
     setIsPopoverVisible((prevVisibility) => !prevVisibility); // Toggle popover visibility
     if (!isPopoverVisible) {
+      markAsRead()
       setUnreadCount(0); // Reset unread count when popover is opened
     }
   };
@@ -46,10 +66,10 @@ const Notification = () => {
   const getList = () => {
     if (loading || !hasMore) return;
     setLoading(true);
-    request(`notification/general?type=GENERAL&page=${page}&size=10`, "get", {}).then((res) => {
-      if (res) {
-          setData((prevData) => [...prevData, ...res.data]);
-          setHasMore(res.hasMore);
+    request(`notification/user?type=GENERAL&page=${page}&size=10&userId=${userId}`, "get", {}).then((res) => {
+      if (res.code === 200) {
+          setData((prevData) => [...prevData, ...res.data.data]);
+          setHasMore(res.data.data.hasMore);
           setPage((prevPage) => {
             const newPage = prevPage + 1;
             console.log("Updating page to:", newPage); // Log new page value
@@ -63,8 +83,9 @@ const Notification = () => {
 
   useEffect(() => {
     getList();
+    getUnreadCount();
     const newClient = new Client({
-      webSocketFactory: () => new SockJS("http://localhost:8089/ws"),
+      webSocketFactory: () => new SockJS(config.base_webSocket),
       onConnect: () => {
         newClient.subscribe("/topic/genMessage", (message) => {
           const newMessage = JSON.parse(message.body);

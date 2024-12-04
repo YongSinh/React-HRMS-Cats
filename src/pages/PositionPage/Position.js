@@ -72,24 +72,6 @@ const PositionPage = () => {
     });
   };
 
-  const onDelete = (Item) => {
-    request(`info/position/deletePosition/${Item.id}`, "delete", {}).then(
-      (res) => {
-        if (res) {
-          Swal.fire({
-            title: "Success!",
-            text: "Your has been deleted",
-            icon: "success",
-            showConfirmButton: true,
-            //timer: 1500,
-            // confirmButtonText: "Confirm",
-          });
-          getListPos();
-          setLoading(false);
-        }
-      }
-    );
-  };
 
   const onFinish = (Item) => {
     console.log("Success:", item);
@@ -208,16 +190,6 @@ const PositionPage = () => {
             icon={<EditFilled />}
             onClick={() => onEdit(item)}
           />
-          <Popconfirm
-            title="Delete the department"
-            description="Are you sure to delete this department?"
-            onConfirm={() => onDelete(item)}
-            //onCancel={cancel}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button type="primary" icon={<DeleteOutlined />} danger />
-          </Popconfirm>
         </Space>
       ),
     },

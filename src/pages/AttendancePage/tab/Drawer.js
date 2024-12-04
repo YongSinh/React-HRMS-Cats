@@ -23,9 +23,18 @@ const TimeInAndOut = ({ open = false, onClose, onFinish, edit = false }) => {
   };
 
   useEffect(() => {
+    const today = dayjs();
+    let remark = "";
+    const dayOfWeek = today.day();
+    if (dayOfWeek === 6) {
+      remark = "Saturday"; // Set remark to Saturday
+    } else if (dayOfWeek === 0) {
+      remark = "Sunday"; // Set remark to Sunday
+    }
       form.setFieldsValue({
         time: dayjs(),
         date: dayjs(),
+        remark: remark,
       })
   }, []);
 

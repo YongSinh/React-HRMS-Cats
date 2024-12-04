@@ -4,10 +4,10 @@ import UserAttendance from "./tab/UserAttendance";
 import React, { useState, useEffect } from "react";
 import EmployeeAttendance from "./tab/EmployeeAtten";
 import './TabsAttendance.css';
-
+import UserService from "../../UserService/UserService";
 const UserTabsAttendance = () => {
   const [activeKey, setActiveKey] = useState("1");
-
+  const userRoles = UserService.getrole();
   useEffect(() => {
     console.log("Tab changed to: ", activeKey);
   }, [activeKey]);
@@ -22,9 +22,9 @@ const UserTabsAttendance = () => {
       key: "2",
       label: "Employee Attendance",
       children: <EmployeeAttendance/>, // Pass activeKey as prop
+      disabled:  !UserService.hasRole(["hrms_manger", "hrms_head"]),
     },
   ];
-
   return (
     <>
       <PageTitle PageTitle="Attendance" />

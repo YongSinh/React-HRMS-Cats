@@ -8,10 +8,11 @@ import {
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
-  SettingOutlined,
   FieldTimeOutlined,
   ControlOutlined,
   BankOutlined,
+  FormOutlined,
+  AccountBookOutlined
 } from "@ant-design/icons";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -30,19 +31,20 @@ const Whitelogo = require("../../asset/image/CatsWhiteLogo.png");
 
 const items = [
   getItem("Home", "/home", <PieChartOutlined />),
+  getItem("Personal info", "/personal-info", <UserOutlined />),
   getItem("Attendance", "/Attendance", <FieldTimeOutlined />),
   getItem("Leave Management", "/", <TeamOutlined />, [
     getItem("All Employee", "/leave", <TeamOutlined />),
     getItem("Leave Type", "/leave-type", <TeamOutlined />),
     getItem("Leave Balance", "/leave-balance", <ControlOutlined />),
-    getItem("Leave Request", "/leave-request", <UserOutlined />),
+    getItem("Leave Request", "/leave-request", <FormOutlined />),
   ]),
   getItem("Info Management", "Management", <TeamOutlined />, [
     getItem("Department", "/Department", <BankOutlined />),
     getItem("Position", "/position", <BankOutlined />),
     getItem("Employees", "/employee", <UserOutlined />),
   ]),
-  getItem("Hr Payroll", "Setting", <SettingOutlined />, [
+  getItem("Hr Payroll", "Payroll", <AccountBookOutlined />, [
     getItem("Payroll", "/payroll"),
     getItem("Payroll Report", "/payroll-report"),
     getItem("Payslips", "/payslip"),

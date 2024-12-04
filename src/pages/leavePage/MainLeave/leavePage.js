@@ -288,11 +288,11 @@ const LeavePage = () => {
         <Button icon={<SearchOutlined />} onClick={onSeacrh} type="primary">
           Search
         </Button>
-        <div>
+        {/* <div>
           <Button icon={<ExportOutlined />} type="primary">
             Export xlsx
           </Button>
-        </div>
+        </div> */}
       </Space>
       <Drawerleave 
       open={open} 
