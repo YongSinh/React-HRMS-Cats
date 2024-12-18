@@ -28,8 +28,4 @@
     max-width: 400px; /* Adjust max width if needed */
   }
   
-  .notification-feed {
-    max-height: 300px; /* Limit height of the notification feed */
-    overflow-y: auto; /* Enable scrolling if content exceeds max height */
-  }
-  
+ 

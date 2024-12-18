@@ -114,36 +114,32 @@ const UserAttendance = () => {
       dataIndex: "timeIn",
     },
     {
-      title: "Date In",
-      dataIndex: "dateIn",
-    },
-    {
       title: "Time Out",
       dataIndex: "timeOut",
     },
     {
-      title: "Date Out",
-      dataIndex: "dateOut",
+      title: "Date",
+      dataIndex: "dateIn",
     },
     {
-      title: "Remark",
-      dataIndex: "remark",
-      width: 250,
-      ellipsis: true,
-    },
-    {
-      title: "On Leave",
+      title: "Permission",
       dataIndex: "onLeave",
       width: 150,
       render: (_, record) => {
         let status = record.onLeave ? "error" : "success";
-        let text = record.onLeave ? "on Leave" : "Present";
+        let text = record.onLeave ? "Permission" : "Present";
         return (
           <>
             <Badge status={status} text={text} />
           </>
         );
       },
+    },
+    {
+      title: "Remark",
+      dataIndex: "remark",
+      width: 250,
+      ellipsis: true,
     },
     {
       title: "Action",
@@ -173,7 +169,7 @@ const UserAttendance = () => {
         disabled={hasTimedInToday}
         style={{ marginBottom: 15, marginTop: 7 }}
       >
-        Time In 
+        Time In
       </Button>
       <TimeInAndOut
         open={open}

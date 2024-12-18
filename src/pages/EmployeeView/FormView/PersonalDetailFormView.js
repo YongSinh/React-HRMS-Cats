@@ -17,7 +17,7 @@ import dayjs from "dayjs";
 const { TextArea } = Input;
 const { Title } = Typography;
 const picture = require("../../../asset/image/missing-picture.jpg");
-const PersonalDetailFormView = ({ activeKey, id }) => {
+const PersonalDetailFormView = ({ id }) => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState([]);
   const [position, setPosition] = useState([]);
@@ -27,34 +27,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
   const [empInfor, setEmpInfor] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(picture);
-  const getListDep = () => {
-    setLoading(true);
-    request("info/department/department", "get", {}).then((res) => {
-      if (res) {
-        //console.log(res.data);
-        const arrTmpP = res.data.map((dep) => ({
-          label: dep.depName,
-          value: dep.depId,
-        }));
-        setLoading(false);
-        setDepartment(arrTmpP);
-      }
-    });
-  };
 
-  const onChangePos = (value) => {
-    if (!isEmptyOrNull(value)) {
-      const result = position2.find((item) => item.id === value);
-      form.setFieldsValue({
-        section: result.poSection,
-        mangerId: result.poLevel,
-      });
-    }
-  };
-
-  const onchangeDep = (value) => {
-    getListPos(value);
-  };
 
   const getListFile = (date) => {
     request(
@@ -107,8 +80,8 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
 
   useEffect(() => {
     getEmpInfo();
-    getListDep(); // Only fetch data when this tab is active
-  }, [activeKey]);
+    // getListDep(); // Only fetch data when this tab is active
+  }, []);
 
   useEffect(() => {
     if (empInfor) {
@@ -159,7 +132,7 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
   return (
     <>
       <Spin spinning={loading} tip="Loading" size="middle">
-        <Title level={4}>Personal Imformation:</Title>
+        {/* <Title level={4}>Personal Imformation:</Title> */}
         <Form
           name="basic"
           initialValues={{
@@ -197,37 +170,12 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
                 </Col>
                 <Col span={8}>
                   <Form.Item label="Gender" name="gender">
-                    <Select placeholder="Select Gender">
-                      <Select.Option value="male">Male</Select.Option>
-                      <Select.Option value="female">Female</Select.Option>
-                    </Select>
+                    <Input />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item label="Marital Stats" name="maritalStats">
-                    <Select
-                      showSearch
-                      placeholder="Select a Marital Stats"
-                      optionFilterProp="label"
-                      options={[
-                        {
-                          value: "Single",
-                          label: "Single",
-                        },
-                        {
-                          value: "Married",
-                          label: "Married",
-                        },
-                        {
-                          value: "Separated",
-                          label: "Separated",
-                        },
-                        {
-                          value: "Divorced",
-                          label: "Divorced",
-                        },
-                      ]}
-                    />
+                    <Input />
                   </Form.Item>
                 </Col>
               </Row>
@@ -267,25 +215,12 @@ const PersonalDetailFormView = ({ activeKey, id }) => {
             </Col>
             <Col span={8}>
               <Form.Item name="department" label="Department">
-                <Select
-                  showSearch
-                  placeholder="Select a Department"
-                  optionFilterProp="label"
-                  options={department}
-                  onChange={onchangeDep}
-                />
+                <Input />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item name="position" label="Position">
-                <Select
-                  showSearch
-                  placeholder="Select a Position"
-                  optionFilterProp="label"
-                  options={position}
-                  allowClear
-                  onChange={onChangePos}
-                />
+                <Input />
               </Form.Item>
             </Col>
             <Col span={8}>

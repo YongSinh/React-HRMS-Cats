@@ -29,7 +29,6 @@ const { Title } = Typography;
 
 const PayslipPage = () => {
   const [form] = Form.useForm();
-  const [allowances, setAllowances] = useState([]);
   const [loading, setLoading] = useState(false);
   const [department, setDepartment] = useState([]);
   const [emp, setEmp] = useState([]);
@@ -41,28 +40,6 @@ const PayslipPage = () => {
     //console.log(value);
   };
 
-  const getListDeductions = () => {
-    setLoading(true);
-    request("payrolls/deductions", "get", {}).then((res) => {
-      if (res) {
-        setLoading(false);
-      }
-    });
-  };
-
-  const getListAllowances = () => {
-    setLoading(true);
-    request("payrolls/allowances", "get", {}).then((res) => {
-      if (res) {
-        setLoading(false);
-        const arrTmpP = res.data.map((items) => ({
-          label: items.allowances,
-          value: items.allid,
-        }));
-        setAllowances(arrTmpP);
-      }
-    });
-  };
 
   const getList = () => {
     setLoading(true);
@@ -132,8 +109,6 @@ const PayslipPage = () => {
   useEffect(() => {
     getListDep();
     getList();
-    getListAllowances();
-    getListDeductions();
   }, []);
 
   const columns = [

@@ -101,36 +101,32 @@ const AllAttendance = ({ activeKey }) => {
       dataIndex: "timeIn",
     },
     {
-      title: "Date In",
-      dataIndex: "dateIn",
-    },
-    {
       title: "Time Out",
       dataIndex: "timeOut",
     },
     {
-      title: "Date Out",
-      dataIndex: "dateOut",
+      title: "Date",
+      dataIndex: "dateIn",
     },
     {
-      title: "Remark",
-      dataIndex: "remark",
-      width: 250,
-      ellipsis: true,
-    },
-    {
-      title: "On Leave",
+      title: "Permission",
       dataIndex: "onLeave",
       width: 150,
       render: (_, record) => {
         let status = record.onLeave ? "error" : "success";
-        let text = record.onLeave ? "on Leave" : "Present";
+        let text = record.onLeave ? "Permission" : "Present";
         return (
           <>
             <Badge status={status} text={text} />
           </>
         );
       },
+    },
+    {
+      title: "Remark",
+      dataIndex: "remark",
+      width: 250,
+      ellipsis: true,
     },
   ];
 
@@ -147,9 +143,8 @@ const AllAttendance = ({ activeKey }) => {
 
   return (
     <>
-      <Row gutter={16}>
+      {/* <Row gutter={16}>
         <Col span={12}>
-          {/* <Input /> */}
         </Col>
         <Col span={12} style={{ textAlign: "right" }}>
           <Space>
@@ -169,7 +164,7 @@ const AllAttendance = ({ activeKey }) => {
             </Button>
           </Space>
         </Col>
-      </Row>
+      </Row> */}
       <Table
         style={{ marginTop: 14 }}
         loading={loading}

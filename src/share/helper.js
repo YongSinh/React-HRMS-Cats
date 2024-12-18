@@ -4,8 +4,6 @@ export const isEmptyOrNull = (value) => {
     return (value === "" || value === null || value === undefined) ? true : false
 }
 
-const ip_url = "192.168.100.127";
-const local_url = "192.168.100.127";
 export const config = {
   //base_server: "https://192.168.1.169:8085/api/",
   base_keyclock: `http://localhost:8080`,
@@ -43,3 +41,30 @@ export const WindowSize = () => {
       
     return windowSize;
 }
+
+
+export const getStatus = (record) => {
+  if (record.cancelled === false && record.status === false && record.approvedByHead === false) {
+    return { status: "error", text: "Draft" };
+  }
+  if (record.approvedByHr && record.approvedByManger && record.approved) {
+    return { status: "success", text: "Approved" };
+  }
+  if (record.approvedByManger && !record.approved) {
+    return { status: "warning", text: "Manager Approved" };
+  }
+
+  if (record.status && record.cancelled === false) {
+    return { status: "processing", text: "Applied" };
+  }
+
+  if (record.cancelled) {
+    return { status: "error", text: "Cancelled" };
+  }
+
+  if (record.approved === false) {
+    return { status: "error", text: "Rejected" };
+  }
+
+  return { status: "default", text: "Pending" };
+};

@@ -33,16 +33,16 @@ const items = [
   getItem("Home", "/home", <PieChartOutlined />),
   getItem("Personal info", "/personal-info", <UserOutlined />),
   getItem("Attendance", "/Attendance", <FieldTimeOutlined />),
+  getItem("Info Management", "Management", <TeamOutlined />, [
+    getItem("Department", "/Department", <BankOutlined />),
+    getItem("Position", "/position", <BankOutlined />),
+    getItem("Employees", "/employee", <UserOutlined />),
+  ]),
   getItem("Leave Management", "/", <TeamOutlined />, [
     getItem("All Employee", "/leave", <TeamOutlined />),
     getItem("Leave Type", "/leave-type", <TeamOutlined />),
     getItem("Leave Balance", "/leave-balance", <ControlOutlined />),
     getItem("Leave Request", "/leave-request", <FormOutlined />),
-  ]),
-  getItem("Info Management", "Management", <TeamOutlined />, [
-    getItem("Department", "/Department", <BankOutlined />),
-    getItem("Position", "/position", <BankOutlined />),
-    getItem("Employees", "/employee", <UserOutlined />),
   ]),
   getItem("Hr Payroll", "Payroll", <AccountBookOutlined />, [
     getItem("Payroll", "/payroll"),

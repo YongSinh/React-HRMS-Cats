@@ -8,19 +8,16 @@ import {
 import { request } from "../../../share/request";
 const { Title } = Typography;
 
-const HistoryFormView = ({ activeKey, id }) => {
+const HistoryFormView = ({ id }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    if (activeKey === "2") {
       getEmpHistory();
       getEmpInfo();
-      //getListDep(); // Only fetch data when this tab is active
-    }
     // Retrieve employee ID from local storage when the component mounts
-  }, [activeKey]);
+  }, []);
 
 
   const getEmpInfo = () => {
@@ -84,7 +81,7 @@ const HistoryFormView = ({ activeKey, id }) => {
   return (
     <>
       <Spin spinning={loading} tip="Loading" size="middle">
-        <Title level={4}> History Imformation</Title>
+        {/* <Title level={4}> History Imformation</Title> */}
         <Table dataSource={data} columns={columns} />
       </Spin>
     </>

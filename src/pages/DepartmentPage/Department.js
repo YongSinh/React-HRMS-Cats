@@ -119,7 +119,7 @@ const DepartmentPage = () => {
       },
     },
     {
-      title: "Department Name",
+      title: "Department",
       dataIndex: "depName",
       key: "depName",
     },

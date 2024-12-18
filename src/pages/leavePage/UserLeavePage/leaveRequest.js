@@ -15,11 +15,10 @@ import Swal from "sweetalert2";
 import Drawerleave from "./Drawer";
 import getColumnSearchProps from "../../../share/ColumnSearchProps";
 import dayjs from "dayjs";
-import { isEmptyOrNull } from "../../../share/helper";
+import { isEmptyOrNull, getStatus } from "../../../share/helper";
 import DrawerView from "./DrawerView";
 import UserService from "../../../UserService/UserService";
 const { RangePicker } = DatePicker;
-
 
 const LeaveRequest = () => {
   const [loading, setLoading] = useState(false);
@@ -180,69 +179,12 @@ const LeaveRequest = () => {
       width: 180,
     },
     {
-      title: "Cancell",
-      dataIndex: "cancelled",
-      width: 150,
-      render: (_, record) => {
-        let status = record.cancelled ? "success" : "error";
-        let text = record.cancelled ? "Cancelled" : "No";
-        return <Badge status={status} text={text} />;
-      },
-    },
-    {
       title: "Status",
       dataIndex: "status",
       width: 150,
       render: (_, record) => {
-        let status = record.status ? "success" : "error";
-        let text = record.status ? "Send" : "Not yet";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Manger Approve",
-      dataIndex: "approvedByManger",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByManger ? "success" : "error";
-        let text = record.approvedByManger ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Head Approve",
-      dataIndex: "approvedByHead",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByHead ? "success" : "error";
-        let text = record.approvedByHead ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Approve",
-      dataIndex: "approved",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approved ? "success" : "error";
-        let text = record.approved ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
+        const { status, text } = getStatus(record); // Using the helper function
+        return <Badge status={status} text={text} />;
       },
     },
     {
@@ -253,11 +195,8 @@ const LeaveRequest = () => {
       render: (_, record) => (
         <Space>
           {/* View button is always enabled */}
-          <Button
-            onClick={() => showDrawer2(record)}
-            icon={<EyeFilled />}
-          />
-          
+          <Button onClick={() => showDrawer2(record)} icon={<EyeFilled />} />
+
           {/* Other buttons are disabled if record.cancelled is true */}
           <Button
             onClick={() => onApply(record)}
@@ -296,9 +235,8 @@ const LeaveRequest = () => {
     reasonDiv.innerHTML = items.reason;
     const plainTextReason = reasonDiv.textContent || reasonDiv.innerText || "";
     const remarkDiv = document.createElement("div");
-    remarkDiv.innerHTML = items.remark;
-    const plainTextRemark = remarkDiv.textContent || remarkDiv.innerText || "";
-    var remark = isEmptyOrNull(plainTextRemark) ? " " : plainTextRemark;
+    remarkDiv.innerHTML = items.remark || ""; // Fallback to an empty string if items.remark is undefined
+    const plainTextRemark = remarkDiv.textContent || remarkDiv.innerText || ""; // Safely extract text
     let body = {
       empId: userId,
       startDate: dayjs(items.date[0]).format(format),
@@ -306,7 +244,7 @@ const LeaveRequest = () => {
       timeOfHaftDay: time,
       reason: plainTextReason,
       leaveTypeId: result.value,
-      remark: remark,
+      remark: plainTextRemark,
       dayOfLeave: items.duration,
       createdAt: today,
     };
@@ -320,11 +258,12 @@ const LeaveRequest = () => {
         timeOfHaftDay: time,
         reason: plainTextReason,
         leaveTypeId: result.value,
-        remark: remark,
+        remark: plainTextRemark,
         dayOfLeave: items.duration,
         createdAt: today,
       };
     }
+    console.log(body);
     const json = JSON.stringify(body);
     const blob = new Blob([json], {
       type: "application/json",

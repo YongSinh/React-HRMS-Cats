@@ -132,7 +132,7 @@ const FamilyDataFormView = ({ id }) => {
   return (
     <>
       <Spin spinning={loading}>
-        <Title level={4}>Family Information</Title>
+        {/* <Title level={4}>Family Information</Title> */}
         <Form
           name="basic"
           form={form}

@@ -10,7 +10,7 @@ const EmployeeAttendance = () => {
   const getList = () => {
     setLoading(true);
     request(
-      "attendanceLeave/attendance/getListAttendanceForManagement?emId=" + userId,
+      "attendanceLeave/attendance/getListAttendanceForManagement?emId="+userId,
       "get",
       {}
     ).then((res) => {
@@ -25,7 +25,6 @@ const EmployeeAttendance = () => {
     getList(); // Only fetch data when this tab is active
   }, []);
 
-
   const columns = [
     {
       title: "Employee ID",
@@ -37,16 +36,26 @@ const EmployeeAttendance = () => {
       dataIndex: "timeIn",
     },
     {
-      title: "Date In",
-      dataIndex: "dateIn",
-    },
-    {
       title: "Time Out",
       dataIndex: "timeOut",
     },
     {
-      title: "Date Out",
-      dataIndex: "dateOut",
+      title: "Date",
+      dataIndex: "dateIn",
+    },
+    {
+      title: "Permission",
+      dataIndex: "onLeave",
+      width: 150,
+      render: (_, record) => {
+        let status = record.onLeave ? "error" : "success";
+        let text = record.onLeave ? "Permission" : "Present";
+        return (
+          <>
+            <Badge status={status} text={text} />
+          </>
+        );
+      },
     },
     {
       title: "Remark",
@@ -54,20 +63,6 @@ const EmployeeAttendance = () => {
       width: 250,
       ellipsis: true,
     },
-    {
-      title: "On Leave",
-      dataIndex: "onLeave",
-      width: 150,
-      render: (_, record) => {
-        let status = record.onLeave ? "error" : "success";
-        let text = record.onLeave ? "on Leave" : "Present";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    }
   ];
 
   return (

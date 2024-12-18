@@ -7,7 +7,7 @@ export function getLocalAccessToken() {
 }
 
 export const config = {
-  //base_server: "https://192.168.1.147:8085/api/",
+  //base_server: "https://172.20.10.3:8085/api/",
   base_server: "https://localhost:8085/api/",
   image_path: "",
   version: 1,
@@ -32,7 +32,12 @@ export const request = async (url, method, param) => {
     },
   })
     .then((res) => {
-      return res.data;
+      if(res.data.code === 400 || res.data.code === 503){
+        message.warning(res.data.message);
+      }else{
+        return res.data;
+      }
+
     })
     .catch((err) => {
       var status = err.response?.status;

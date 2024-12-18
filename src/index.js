@@ -36,6 +36,8 @@ keycloak
   .then((authenticated) => {
     if (!authenticated) {
       UserService.doLogin()
+      localStorage.setItem("access_token", "");
+      localStorage.setItem("refresh_token","");
       console.log("user is not authenticated..!");
     }
 

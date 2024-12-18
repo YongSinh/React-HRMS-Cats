@@ -1,5 +1,5 @@
 import "./leavePage.css";
-import { Button, Space, DatePicker, Table, Badge} from "antd";
+import { Button, Space, DatePicker, Table, Badge } from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
@@ -11,7 +11,7 @@ import {
 import PageTitle from "../../../components/Title_Page/TitlePage";
 import React, { useState, useEffect } from "react";
 import { request } from "../../../share/request";
-import { isEmptyOrNull } from "../../../share/helper";
+import { isEmptyOrNull, getStatus } from "../../../share/helper";
 import Swal from "sweetalert2";
 import Drawerleave from "./Drawer";
 import getColumnSearchProps from "../../../share/ColumnSearchProps";
@@ -30,9 +30,9 @@ const LeavePage = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState([]);
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState([]);
   const showDrawer = (value) => {
-    setItems(value)
+    setItems(value);
     setOpen(true);
   };
   const onClose = () => {
@@ -48,7 +48,6 @@ const LeavePage = () => {
       }
     });
   };
-
 
   const onReject = (value) => {
     Swal.fire({
@@ -121,7 +120,7 @@ const LeavePage = () => {
   };
 
   const onSeacrh = () => {
-    console.log(isEmptyOrNull(date[0]))
+    console.log(isEmptyOrNull(date[0]));
     if (!isEmptyOrNull(date[0])) {
       setLoading(true);
       var filter = `?startDate=${date[0]}&endDate=${date[1]}`;
@@ -170,12 +169,12 @@ const LeavePage = () => {
       width: 250,
       ellipsis: true,
     },
-
     {
       title: "Remark",
       dataIndex: "remark",
       width: 250,
       ellipsis: true,
+      render: (remark) => (remark ? remark : "N/A"), // Handle undefined remarks
     },
     {
       title: "Date Create",
@@ -183,69 +182,12 @@ const LeavePage = () => {
       width: 180,
     },
     {
-      title: "Cancell",
-      dataIndex: "cancelled",
-      width: 150,
-      render: (_, record) => {
-        let status = record.cancelled ? "success" : "error";
-        let text = record.cancelled ? "Cancelled" : "No";
-        return <Badge status={status} text={text} />;
-      },
-    },
-    {
       title: "Status",
       dataIndex: "status",
       width: 150,
       render: (_, record) => {
-        let status = record.status ? "success" : "error";
-        let text = record.status ? "Send" : "Not yet";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Manger Approve",
-      dataIndex: "approvedByManger",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByManger ? "success" : "error";
-        let text = record.approvedByManger ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Head Approve",
-      dataIndex: "approvedByHead",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByHead ? "success" : "error";
-        let text = record.approvedByHead ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Approve",
-      dataIndex: "approved",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approved ? "success" : "error";
-        let text = record.approved ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
+        const { status, text } = getStatus(record); // Using the helper function
+        return <Badge status={status} text={text} />;
       },
     },
     {
@@ -257,28 +199,34 @@ const LeavePage = () => {
         <Space>
           {/* View button is always enabled */}
           <Button onClick={() => showDrawer(record)} icon={<EyeFilled />} />
-    
+
           {/* Approve button is disabled if the record is approved or cancelled */}
           <Button
             onClick={() => onApprove(record)}
             type="primary"
-            disabled={record.cancelled || record.approved}
+            disabled={
+              getStatus(record).text === "Draft" ||
+              getStatus(record).text === "Approved" ||
+              getStatus(record).text === "Cancelled" ||
+              getStatus(record).text === "Rejected"
+            }
             icon={<CheckOutlined />}
           />
-    
-          {/* Reject button is disabled if the record is cancelled */}
+
           <Button
             type="primary"
             onClick={() => onReject(record)}
             icon={<CloseOutlined />}
-            disabled={record.cancelled}
+            disabled={
+              getStatus(record).text === "Cancelled" ||
+              getStatus(record).text === "Rejected"
+            }
             danger
           />
         </Space>
       ),
-    }    
+    },
   ];
-
 
   return (
     <>
@@ -294,11 +242,7 @@ const LeavePage = () => {
           </Button>
         </div> */}
       </Space>
-      <Drawerleave 
-      open={open} 
-      onClose={onClose} 
-      items={items}
-      />
+      <Drawerleave open={open} onClose={onClose} items={items} />
       <Table
         style={{ marginTop: 10 }}
         scroll={{

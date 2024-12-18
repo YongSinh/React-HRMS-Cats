@@ -58,7 +58,7 @@ function App() {
           <Route
             path="/"
             element={
-              <RenderOnRole roles={["hrms_admin"]}>
+              <RenderOnRole roles={["hrms_admin", "hrms_hr"]}>
                 <MainLayoutLayout />
               </RenderOnRole>
             }

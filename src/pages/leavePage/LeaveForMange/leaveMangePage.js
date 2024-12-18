@@ -10,7 +10,7 @@ import {
 import PageTitle from "../../../components/Title_Page/TitlePage";
 import React, { useState, useEffect } from "react";
 import { request } from "../../../share/request";
-import { isEmptyOrNull } from "../../../share/helper";
+import { isEmptyOrNull, getStatus } from "../../../share/helper";
 import Swal from "sweetalert2";
 import Drawerleave from "./Drawer";
 import UserService from "../../../UserService/UserService";
@@ -127,7 +127,7 @@ const LeaveForMange = () => {
   };
 
   const onSeacrh = () => {
-    console.log(isEmptyOrNull(date[0]));
+    //console.log(isEmptyOrNull(date[0]));
     if (!isEmptyOrNull(date[0])) {
       setLoading(true);
       var filter = `?startDate=${date[0]}&endDate=${date[1]}`;
@@ -193,69 +193,8 @@ const LeaveForMange = () => {
       dataIndex: "status",
       width: 150,
       render: (_, record) => {
-        let status = record.status ? "success" : "error";
-        let text = record.status ? "Send" : "Not yet";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Manger Approve",
-      dataIndex: "approvedByManger",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByManger ? "success" : "error";
-        let text = record.approvedByManger ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Head Approve",
-      dataIndex: "approvedByHead",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByHead ? "success" : "error";
-        let text = record.approvedByHead ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Hr Approve",
-      dataIndex: "approvedByHr",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approvedByHr ? "success" : "error";
-        let text = record.approvedByHr ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
-      },
-    },
-    {
-      title: "Approve",
-      dataIndex: "approved",
-      width: 150,
-      render: (_, record) => {
-        let status = record.approved ? "success" : "error";
-        let text = record.approved ? "Approved" : "No";
-        return (
-          <>
-            <Badge status={status} text={text} />
-          </>
-        );
+        const { status, text } = getStatus(record); // Using the helper function
+        return <Badge status={status} text={text} />;
       },
     },
     {
@@ -288,7 +227,9 @@ const LeaveForMange = () => {
                       }
                       type="primary"
                       danger
-                      disabled={!record.status || record.cancel || record.approved}
+                      disabled={
+                        !record.status || record.cancel || record.approved
+                      }
                       icon={<CloseOutlined />}
                     />
                   </Space>

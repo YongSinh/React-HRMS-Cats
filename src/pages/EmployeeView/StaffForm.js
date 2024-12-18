@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Tabs } from "antd";
-import { useParams } from "react-router-dom";
+import { Tabs, Collapse } from "antd";
+import PageTitle from "../../components/Title_Page/TitlePage";
 import EducationFormView from "./FormView/EducationFormView";
 import EmergencyContactFormView from "./FormView/EmergencyContactFormView";
 import SpecialAbilityView from "./FormView/SpecialAbilityView";
@@ -18,13 +18,13 @@ const EmployeeView = () => {
   const items = [
     {
       key: "1",
-      label: "Personal Detail",
-      children: <PersonalDetailFormView activeKey={activeKey} id={id} />, // Pass activeKey as prop
+      label: "Personal Imformation",
+      children: <PersonalDetailFormView id={id} />, // Pass activeKey as prop
     },
     {
       key: "2",
-      label: "History",
-      children: <HistoryFormView activeKey={activeKey} id={id} />,
+      label: "Job History",
+      children: <HistoryFormView id={id} />,
     },
     {
       key: "3",
@@ -47,15 +47,22 @@ const EmployeeView = () => {
       children: <EmergencyContactFormView id={id} />,
     },
   ];
+
+
+  const onChange = (key) => {
+    setActiveKey(key)
+  };
   return (
     <>
-      <Tabs
+    <PageTitle PageTitle="Personal Detail" />
+    <Collapse items={items} defaultActiveKey={['1']} onChange={onChange} />
+      {/* <Tabs
         defaultActiveKey="1"
         type="card"
         size={"large"}
         items= {items}
         onChange={(key) => setActiveKey(key)} // Update activeKey when tab changes
-      />
+      /> */}
     </>
   );
 };
