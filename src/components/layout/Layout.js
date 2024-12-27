@@ -46,7 +46,7 @@ const items = [
   ]),
   getItem("Hr Payroll", "Payroll", <AccountBookOutlined />, [
     getItem("Payroll", "/payroll"),
-    getItem("Payroll Report", "/payroll-report"),
+    getItem("Payroll Items", "/payroll-item"),
     getItem("Payslips", "/payslip"),
     getItem("Allowances", "/allowance"),
     getItem("Deductions", "/deduction"),

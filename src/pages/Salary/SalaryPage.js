@@ -16,6 +16,7 @@ import {
   Input,
   Card,
   DatePicker,
+  Modal,
   Popconfirm,
 } from "antd";
 import dayjs from "dayjs";
@@ -26,6 +27,7 @@ import {
   EyeFilled,
   EditFilled,
   DeleteOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 
@@ -47,6 +49,18 @@ const SalaryPage = () => {
   const [tax, setTax] = useState([]);
   const [taxRate, setTaxRate] = useState("");
   const [emp, setEmp] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setEdit(false);
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   const getListEmp = (value) => {
     if (!isEmptyOrNull(value)) {
@@ -71,6 +85,7 @@ const SalaryPage = () => {
     //console.log("Failed:", Item);
     getEmpInfo(Item.empId);
     //console.log(Item.fromDate);
+    setIsModalOpen(true)
     setEdit(true);
     form.setFieldsValue({
       emp: Item.empId,
@@ -98,7 +113,6 @@ const SalaryPage = () => {
     if (!isEmptyOrNull(value)) {
       getListEmp(value);
     }
-
   };
 
   const filterByDep = (value) => {
@@ -119,7 +133,6 @@ const SalaryPage = () => {
       getList();
     }
   };
-
 
   const onChangeStart = (date, dateString) => {
     console.log("Start: " + dateString);
@@ -263,6 +276,7 @@ const SalaryPage = () => {
         setLoading(false);
         setEdit(false);
         onReset();
+        setIsModalOpen(false)
       } else {
         Swal.fire({
           icon: "error",
@@ -284,6 +298,7 @@ const SalaryPage = () => {
   const onReset = () => {
     form.resetFields();
     setEdit(false);
+    setIsModalOpen(false)
   };
 
   const columns = [
@@ -352,9 +367,15 @@ const SalaryPage = () => {
   return (
     <>
       <PageTitle PageTitle="Salary" />
-      <Card style={{ width: "100%" }}>
-        <Title level={2}>Generate Salary</Title>
-        <Divider dashed />
+      <Modal
+        title={edit ? "Edit Salary" : "Add Salary"}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={false}
+        maskClosable={false}
+        width={600}
+      >
         <Form
           name="basic"
           form={form}
@@ -501,10 +522,16 @@ const SalaryPage = () => {
             </Space>
           </Form.Item>
         </Form>
-      </Card>
-      <Divider dashed />
-      <Space.Compact block>
-        <Select
+      </Modal>
+      <Space>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={showModal}
+        >
+          Add Employee Salary
+        </Button>
+        {/* <Select
           showSearch
           // style={{
           //   width: "100%",
@@ -519,10 +546,10 @@ const SalaryPage = () => {
               .localeCompare((optionB?.label ?? "").toLowerCase())
           }
           options={department}
-        />
-      </Space.Compact>
-      <br />
-      <Card style={{ width: "100%" }}>
+        /> */}
+      </Space>
+
+      <Card style={{ width: "100%", marginTop:10 }}>
         <Table
           loading={loading}
           scroll={{

@@ -5,9 +5,10 @@ export const isEmptyOrNull = (value) => {
 }
 
 export const config = {
-  //base_server: "https://192.168.1.169:8085/api/",
-  base_keyclock: `http://localhost:8080`,
-  base_webSocket:`http://localhost:8089/ws`,
+  // base_keyclock: `http://localhost:8080`,
+  // base_webSocket:`http://localhost:8089/ws`,
+  base_keyclock: `http://172.20.10.2:8080`,
+  base_webSocket:`http://172.20.10.2:8089/ws`,
   version: 1,
 };
 

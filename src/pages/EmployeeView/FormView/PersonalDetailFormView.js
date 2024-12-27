@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
+  Table,
   Row,
   Col,
   DatePicker,
@@ -28,7 +29,49 @@ const PersonalDetailFormView = ({ id }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(picture);
 
-
+  const columns = [
+    {
+      title: "Employee ID",
+      dataIndex: "empId",
+      fixed: "left",
+    },
+    {
+      title: "First Name",
+      dataIndex: "firstName",
+    },
+    {
+      title: "Last Name",
+      dataIndex: "lastName",
+    },
+    {
+      title: "Gender",
+      dataIndex: "sex",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Date Join",
+      dataIndex: "joinDate",
+    },
+    {
+      title: "Department",
+      dataIndex: "depId",
+    },
+    {
+      title: "Position",
+      dataIndex: "posId",
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+    },
+    {
+      title: "Remark",
+      dataIndex: "remark",
+    },
+  ];
   const getListFile = (date) => {
     request(
       `files/ByEmIdAndTypeServiceDate?emId=${id}&type=1&date=${date}&service=1`,
@@ -132,8 +175,17 @@ const PersonalDetailFormView = ({ id }) => {
   return (
     <>
       <Spin spinning={loading} tip="Loading" size="middle">
+      <Table
+        scroll={{
+          x: "max-content",
+        }}
+        columns={columns}
+        loading={loading}
+        pagination={false}
+        dataSource={[empInfor]}
+      />
         {/* <Title level={4}>Personal Imformation:</Title> */}
-        <Form
+        {/* <Form
           name="basic"
           initialValues={{
             status: 1,
@@ -329,7 +381,7 @@ const PersonalDetailFormView = ({ id }) => {
               </Form.Item>
             </Col>
           </Row>
-        </Form>
+        </Form> */}
       </Spin>
     </>
   );

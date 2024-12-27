@@ -33,7 +33,7 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-const PersonalDetailForm = ({ activeKey }) => {
+const PersonalDetailForm = () => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState([]);
   const [position, setPosition] = useState([]);
@@ -95,10 +95,8 @@ const PersonalDetailForm = ({ activeKey }) => {
   };
 
   useEffect(() => {
-    if (activeKey === "1") {
       getListDep(); // Only fetch data when this tab is active
-    }
-  }, [activeKey]);
+  }, []);
 
   const props = {
     name: "file",
@@ -210,7 +208,6 @@ const PersonalDetailForm = ({ activeKey }) => {
   return (
     <>
       <Spin spinning={loading} tip="Loading" size="middle">
-        <Title level={4}>Personal Imformation:</Title>
         <Form
           name="basic"
           initialValues={{

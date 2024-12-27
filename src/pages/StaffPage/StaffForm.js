@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Tabs, message } from "antd";
+import { Collapse, Tabs, message } from "antd";
 import PersonalDetailForm from "./Form/PersonalDetailForm";
 import HistoryForm from "./Form/HistoryForm";
 import FamilyDataForm from "./Form/FamilyDataForm";
@@ -8,22 +8,17 @@ import SpecialAbilityForm from "./Form/SpecialAbility";
 import EmergencyContactForm from "./Form/EmergencyContactForm";
 
 const StaffForm = () => {
-  const [activeKey, setActiveKey] = useState("1");
-
-  useEffect(() => {
-    console.log("Tab changed to: ", activeKey);
-  }, [activeKey]);
 
   const items = [
     {
       key: "1",
-      label: "Personal Detail",
-      children: <PersonalDetailForm activeKey={activeKey} />, // Pass activeKey as prop
+      label: "Employee Information",
+      children: <PersonalDetailForm />, // Pass activeKey as prop
     },
     {
       key: "2",
-      label: "History",
-      children: <HistoryForm activeKey={activeKey} />,
+      label: "Job History",
+      children: <HistoryForm />,
     },
     {
       key: "3",
@@ -49,13 +44,18 @@ const StaffForm = () => {
 
   return (
     <>
-      <Tabs
+      <Collapse
+        items={items}
+        defaultActiveKey={["1"]}
+       // onChange={(key) => setActiveKey(key)}
+      />
+      {/* <Tabs
         defaultActiveKey="1"
         type="card"
         size={"large"}
         items={items}
         onChange={(key) => setActiveKey(key)} // Update activeKey when tab changes
-      />
+      /> */}
     </>
   );
 };

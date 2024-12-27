@@ -99,6 +99,7 @@ const DeductionPage = () => {
     setItem(Item);
     setEdit(true);
   };
+  
   const onDelete = (Item) => {
     request("payrolls/deductions/deleteDeductionById?id=" + Item.deId, "delete", {}).then(
       (res) => {

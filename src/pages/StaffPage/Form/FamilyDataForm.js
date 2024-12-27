@@ -162,7 +162,6 @@ const HistoryForm = ({ onSave }) => {
   };
   return (
     <>
-      <Title level={4}>Family Information</Title>
       <Form
         name="basic"
         form={form}

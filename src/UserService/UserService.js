@@ -2,8 +2,19 @@ import _kc from './keycloak.js'
 
 const doLogin = _kc.login;
 
-const doLogout = _kc.logout;
+// const doLogout = _kc.logout;
 
+
+const doLogout = async () => {
+  try {
+    // Call the Keycloak logout function
+    await _kc.logout();
+    // Redirect to the root URL after logout
+    window.location.href = window.location.origin;
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+};
 
 const account = _kc.accountManagement;
 

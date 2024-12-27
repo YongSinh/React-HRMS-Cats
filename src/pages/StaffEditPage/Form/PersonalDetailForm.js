@@ -31,7 +31,7 @@ const getBase64 = (file) =>
     reader.onload = () => resolve(reader.result);
     reader.onerror = (error) => reject(error);
   });
-const PersonalDetailForm = ({ activeKey, id }) => {
+const PersonalDetailForm = ({ id }) => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState([]);
   const [position, setPosition] = useState([]);
@@ -126,9 +126,8 @@ const PersonalDetailForm = ({ activeKey, id }) => {
 
   useEffect(() => {
     getEmpInfo();
-  
     getListDep(); // Only fetch data when this tab is active
-  }, [activeKey]);
+  }, []);
 
   useEffect(() => {
 

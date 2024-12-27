@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Tabs, Divider } from "antd";
+import { Button, Tabs, Divider, Collapse } from "antd";
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import PersonalDetailForm from "./Form/PersonalDetailForm";
@@ -30,13 +30,13 @@ const StaffEditForm = () => {
   const items = [
     {
       key: "1",
-      label: "Personal Detail",
-      children: <PersonalDetailForm activeKey={activeKey} id={id} />, // Pass activeKey as prop
+      label: "Employee Information",
+      children: <PersonalDetailForm id={id} />, // Pass activeKey as prop
     },
     {
       key: "2",
-      label: "History",
-      children: <HistoryForm activeKey={activeKey} id={id} />,
+      label: "Job History",
+      children: <HistoryForm id={id} />,
     },
     {
       key: "3",
@@ -63,13 +63,13 @@ const StaffEditForm = () => {
   const items2 = [
     {
       key: "1",
-      label: "Personal Detail",
-      children: <PersonalDetailFormView activeKey={activeKey} id={id} />, // Pass activeKey as prop
+      label: "Employee Information",
+      children: <PersonalDetailFormView id={id} />, // Pass activeKey as prop
     },
     {
       key: "2",
-      label: "History",
-      children: <HistoryFormView activeKey={activeKey} id={id} />,
+      label: "Job History",
+      children: <HistoryFormView id={id} />,
     },
     {
       key: "3",
@@ -97,18 +97,23 @@ const StaffEditForm = () => {
       <Button
         onClick={handleEdit}
         type="primary"
-        icon={edit ? <EyeOutlined/>: <EditOutlined />}
+        icon={edit ? <EyeOutlined /> : <EditOutlined />}
       >
-        {edit ? "View" : "Edit" }
+        {edit ? "View" : "Edit"}
       </Button>
-      <Divider/>
-      <Tabs
+      <Divider />
+      <Collapse
+        items={edit ? items : items2}
+        defaultActiveKey={["1"]}
+        onChange={(key) => setActiveKey(key)}
+      />
+      {/* <Tabs
         defaultActiveKey="1"
         type="card"
         size={"large"}
         items= {edit ? items : items2}
         onChange={(key) => setActiveKey(key)} // Update activeKey when tab changes
-      />
+      /> */}
     </>
   );
 };

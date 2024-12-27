@@ -28,7 +28,7 @@ const MenuItems = () => {
   
   const handleLogout = () => {
     UserService.doLogout();
-    window.location.href = window.location.origin;
+   // window.location.href = window.location.origin;
     //window.location.href = "https://www.cats.com.kh/apps/sso/logout";
   };
   const handleLogIn = () => {

@@ -38,10 +38,8 @@ const PersonalAttendance = ({ activeKey }) => {
   };
 
   useEffect(() => {
-    if (activeKey === "2") {
       getList(); // Only fetch data when this tab is active
-    }
-  }, [activeKey]);
+  }, []);
 
   const showDrawer = () => {
     setOpen(true);
@@ -112,7 +110,7 @@ const PersonalAttendance = ({ activeKey }) => {
     (record) => record.dateIn === today && !isEmptyOrNull(record.timeIn)
   );
 
-  console.log(hasTimedInToday)
+  console.log(hasTimedInToday);
 
   const columns = [
     {
@@ -121,40 +119,40 @@ const PersonalAttendance = ({ activeKey }) => {
       ...getColumnSearchProps("emId"),
     },
     {
-      title: "Time In",
-      dataIndex: "timeIn",
+      title: "Name",
+      dataIndex: "employeeName",
     },
     {
-      title: "Date In",
-      dataIndex: "dateIn",
+      title: "Time In",
+      dataIndex: "timeIn",
     },
     {
       title: "Time Out",
       dataIndex: "timeOut",
     },
     {
-      title: "Date Out",
-      dataIndex: "dateOut",
+      title: "Date",
+      dataIndex: "dateIn",
     },
     {
-      title: "Remark",
-      dataIndex: "remark",
-      width: 250,
-      ellipsis: true,
-    },
-    {
-      title: "On Leave",
+      title: "Permission",
       dataIndex: "onLeave",
       width: 150,
       render: (_, record) => {
         let status = record.onLeave ? "error" : "success";
-        let text = record.onLeave ? "on Leave" : "Present";
+        let text = record.onLeave ? "Permission" : "Present";
         return (
           <>
             <Badge status={status} text={text} />
           </>
         );
       },
+    },
+    {
+      title: "Remark",
+      dataIndex: "remark",
+      width: 250,
+      ellipsis: true,
     },
     {
       title: "Action",

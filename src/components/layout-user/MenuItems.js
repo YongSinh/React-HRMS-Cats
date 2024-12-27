@@ -28,7 +28,7 @@ const MenuItems = () => {
   
   const handleLogout = () => {
     UserService.doLogout();
-    window.location.href = window.location.origin;
+   // window.location.href = window.location.origin;
     //window.location.href = "http://192.168.0.142:3005/";
   };
   const handleLogIn = () => {

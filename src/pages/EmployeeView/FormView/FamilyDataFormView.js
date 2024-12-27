@@ -81,6 +81,52 @@ const FamilyDataFormView = ({ id }) => {
     },
   ];
 
+  const columns2 = [
+    {
+      title: "Father Name",
+      dataIndex: "fatherName",
+      key: "fatherName",
+    },
+    {
+      title: "Father Phone",
+      dataIndex: "fatherPhoneNum",
+      key: "fatherPhoneNum",
+    },
+    {
+      title: "Father Occupation",
+      dataIndex: "fatherOccupation",
+      key: "fatherOccupation",
+    },
+    {
+      title: "Father Address",
+      dataIndex: "motherAddress",
+      key: "motherAddress",
+    },
+    {
+      title: "Mother Name",
+      dataIndex: "motherName",
+      key: "motherName",
+    },
+    {
+      title: "Mother Phone",
+      dataIndex: "motherPhoneNum",
+      key: "motherPhoneNum",
+    },
+    {
+      title: "Mother Occupation",
+      dataIndex: "motherOccupation",
+      key: "motherOccupation",
+    },
+    {
+      title: "Mother Address",
+      dataIndex: "motherAddress",
+      key: "fatherAddress",
+    },
+   
+   
+  ];
+
+
   const getEmpFamilyData = () => {
     setLoading(true);
     request(
@@ -133,7 +179,7 @@ const FamilyDataFormView = ({ id }) => {
     <>
       <Spin spinning={loading}>
         {/* <Title level={4}>Family Information</Title> */}
-        <Form
+        {/* <Form
           name="basic"
           form={form}
           layout={"vertical"}
@@ -191,7 +237,8 @@ const FamilyDataFormView = ({ id }) => {
               </Form.Item>
             </Col>
           </Row>
-        </Form>
+        </Form> */}
+         <Table pagination={false} dataSource={[familyData]} columns={columns2} />
         <Divider>Sibling Information</Divider>
         <Table dataSource={data} columns={columns} />
       </Spin>

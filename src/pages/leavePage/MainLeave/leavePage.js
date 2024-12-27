@@ -148,6 +148,10 @@ const LeavePage = () => {
       width: 140,
     },
     {
+      title: "Name",
+      dataIndex: "employeeName",
+    },
+    {
       title: "Leave Date",
       dataIndex: "leave_date",
       render: (_, record) => record.startDate + " to " + record.endDate,

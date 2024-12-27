@@ -28,6 +28,7 @@ keycloak
     onLoad: "login-required", // check-sso | login-required
     KeycloakResponseType: "code",
     silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+    //silentCheckSsoRedirectUri: window.location.origin,
     checkLoginIframe: false,
     pkceMethod: "S256",
     token: storedToken,

@@ -47,8 +47,6 @@ function App() {
       setUrl("/home");
     }
   }, [userRoles, url]);
-  console.log(url);
-
   return (
     <>
       <BrowserRouter>
@@ -70,9 +68,9 @@ function App() {
             <Route path="/department" element={<DepartmentPage />} />
             <Route path="/position" element={<PositionPage />} />
             <Route path="/employee" element={<Staff />} />
-            <Route path="/payroll-report" element={<Report />} />
+            <Route path="/payslip" element={<Report />} />
             <Route path="/payroll" element={<PayrollPage />} />
-            <Route path="/payslip" element={<PayslipPage />} />
+            <Route path="/payroll-item" element={<PayslipPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/product/:productId" element={<PayslipPage />} />
             <Route path="/allowance" element={<AllowancePage />} />

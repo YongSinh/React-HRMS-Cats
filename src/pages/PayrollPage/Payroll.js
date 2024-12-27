@@ -16,6 +16,7 @@ import {
   Input,
   Card,
   Popconfirm,
+  Modal,
 } from "antd";
 import dayjs from "dayjs";
 import { request } from "../../share/request";
@@ -26,13 +27,15 @@ import {
   DeleteOutlined,
   SearchOutlined,
   ClearOutlined,
-  FileDoneOutlined
+  FileDoneOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 import { useParams, Link } from "react-router-dom";
 import ModalForm from "./ModelForm";
 import Swal from "sweetalert2";
 import UserService from "../../UserService/UserService";
+import getColumnSearchProps from "../../share/ColumnSearchProps";
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -80,13 +83,26 @@ const PayrollPage = () => {
   const [status, setStatus] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const format = "YYYY-MM-DD";
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setEdit(false);
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   const handleOpenModal = () => {
     setVisibleModal(true);
   };
 
-  const onCloseModal= () => {
+  const onCloseModal = () => {
     setVisibleModal(false);
   };
+  
   const onChangeStatus = (value) => {
     setStatus(value);
     //console.log(value);
@@ -95,7 +111,7 @@ const PayrollPage = () => {
     setSalaryCycle(value);
     //console.log(value);
   };
-  
+
   const typeOption = [
     {
       value: "1",
@@ -152,6 +168,7 @@ const PayrollPage = () => {
   const handleClickView = (Item) => {
     //console.log("Failed:", Item);
     getEmpInfo(Item.empId);
+    setIsModalOpen(true)
     setStatus(Item.status);
     //console.log(Item.fromDate);
     setItem(Item);
@@ -160,7 +177,7 @@ const PayrollPage = () => {
       employees: Item.empId,
       endDate: dayjs(Item.toDate),
       startDate: dayjs(Item.fromDate),
-      createDate:dayjs(Item.createDate),
+      createDate: dayjs(Item.createDate),
       salary: Item.salary,
       selectType: Item.type === 1 ? "Monthly" : "Semi-Monthly",
       status: Item.status === 1 ? "New" : "Computed",
@@ -168,7 +185,6 @@ const PayrollPage = () => {
   };
 
   const onFinish = (values) => {
-
     var startDate = dayjs(values.startDate).format(format);
     var endDate = dayjs(values.endDate).format(format);
     var today = dayjs(values.createDate).format(format);
@@ -206,7 +222,8 @@ const PayrollPage = () => {
         getList();
         setLoading(false);
         setEdit(false);
-        //onReset();
+        setIsModalOpen(false)
+        onReset();
       } else {
         Swal.fire({
           icon: "error",
@@ -339,12 +356,13 @@ const PayrollPage = () => {
       dataIndex: "empId",
       key: "empId",
       fixed: "left",
-      render: (text) => <a>{text}</a>,
+      ...getColumnSearchProps("empId"),
     },
     {
       title: "RefNo",
       dataIndex: "refNo",
       key: "refNo",
+      ...getColumnSearchProps("refNo"),
     },
     {
       title: "Date Form",
@@ -435,7 +453,7 @@ const PayrollPage = () => {
     var date = dayjs(values.date).format(format);
     let url;
     let method;
-    url = "payrolls/updateStatusPayroll/"+date ;
+    url = "payrolls/updateStatusPayroll/" + date;
     method = "put";
     //console.log(date)
     setLoading(true);
@@ -452,7 +470,7 @@ const PayrollPage = () => {
         });
         getList();
         setLoading(false);
-        setVisibleModal(false)
+        setVisibleModal(false);
       } else {
         Swal.fire({
           icon: "error",
@@ -478,9 +496,16 @@ const PayrollPage = () => {
         onFinish={onFinish2}
       />
       {/* <Link to={`/product/1`}>Hello</Link> */}
-      <Card style={{ width: "100%" }}>
-        <Title level={2}>Generate Payroll</Title>
-        <Divider dashed />
+
+      <Modal
+        title={edit ? "Edit Payroll" : "Add Payroll"}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={false}
+        maskClosable={false}
+        width={700}
+      >
         <Form
           name="basic"
           form={form}
@@ -636,37 +661,45 @@ const PayrollPage = () => {
             </Space>
           </Form.Item>
         </Form>
-      </Card>
-      <Divider dashed />
+      </Modal>
       <Card style={{ width: "100%" }}>
-        <Space style={{ marginBottom: 20 }}>
-          {/* <Search placeholder="Employees ID" onSearch={onSearch} enterButton /> */}
-          <Input placeholder="Employees ID" value={empId} onChange={onSearch} />
+        <Row gutter={16}>
+          <Col span={12}>
+            <Space style={{ marginBottom: 20 }}>
+              {/* <Search placeholder="Employees ID" onSearch={onSearch} enterButton /> */}
+              {/* <Input placeholder="Employees ID" value={empId} onChange={onSearch} /> */}
 
-          <RangePicker onChange={onRangeChange} />
-          <Button
-            type="primary"
-            icon={<SearchOutlined />}
-            onClick={onClickSearch}
-          >
-            Search
-          </Button>
-          <Button
-            type="primary"
-            icon={<ClearOutlined />}
-            onClick={onClickClear}
-            danger
-          >
-            Clear
-          </Button>
-          <Button
-            type="primary"
-            icon={<FileDoneOutlined />}
-            onClick={handleOpenModal}
-          >
-            update Status
-          </Button>
-        </Space>
+              <RangePicker onChange={onRangeChange} />
+              <Button
+                type="primary"
+                icon={<SearchOutlined />}
+                onClick={onClickSearch}
+              >
+                Search
+              </Button>
+              <Button
+                type="primary"
+                icon={<ClearOutlined />}
+                onClick={onClickClear}
+                danger
+              >
+                Clear
+              </Button>
+              <Button
+                type="primary"
+                icon={<FileDoneOutlined />}
+                onClick={handleOpenModal}
+              >
+                update Status
+              </Button>
+            </Space>
+          </Col>
+          <Col span={12} style={{ textAlign: "right" }}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+              Create Payroll
+            </Button>
+          </Col>
+        </Row>
         <Table
           scroll={{
             x: "max-content",

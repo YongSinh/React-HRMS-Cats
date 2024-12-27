@@ -1,5 +1,5 @@
-import { Space, Table, Select, Button, Form, Input, Popconfirm } from "antd";
-import React, { useState, useEffect } from "react";
+import { Space, Table, Select, Button, Form, Input, Divider } from "antd";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal } from "antd";
 import PageTitle from "../../components/Title_Page/TitlePage";
 import Swal from "sweetalert2";
@@ -12,7 +12,7 @@ import {
   SaveFilled,
 } from "@ant-design/icons";
 import { request } from "../../share/request";
-
+let index = 0;
 const PositionPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -20,7 +20,49 @@ const PositionPage = () => {
   const [edit, setEdit] = useState(false);
   const [data, setData] = useState([]);
   const [item, setItem] = useState();
+  const [items, setItems] = useState([]);
   const [department, setDepartment] = useState([]);
+  const [name, setName] = useState("");
+  const inputRef = useRef(null);
+  const onNameChange = (event) => {
+    setName(event.target.value);
+  };
+  const addItem = () => {
+    if (!name.trim()) return; // Avoid adding empty or whitespace-only items
+    setItems((prevItems) => [{ label: name, value: name }, ...prevItems]); // Add a new item
+    setName(""); // Clear the input field
+    setTimeout(() => {
+      inputRef.current?.focus(); // Focus back on the input field
+    }, 0);
+  };
+
+  const getListPos = () => {
+    setLoading(true);
+    request("info/position/position", "get", {}).then((res) => {
+      if (res) {
+        setData(res.data);
+        setLoading(false);
+        const seenNames = new Set();
+        const filteredData = res.data.filter((pos) => {
+          if (seenNames.has(pos.posName)) {
+            return false; // Exclude duplicate items
+          }
+          seenNames.add(pos.posName);
+          return true; // Include unique items
+        });
+
+        // Format the filtered data
+        const formattedData = filteredData.map((pos) => ({
+          label: pos.posName,
+          value: pos.posName,
+        }));
+
+        setItems(formattedData);
+        // console.log(res.data);
+      }
+    });
+  };
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -31,16 +73,6 @@ const PositionPage = () => {
     setIsModalOpen(false);
   };
 
-  const getListPos = () => {
-    setLoading(true);
-    request("info/position/position", "get", {}).then((res) => {
-      if (res) {
-        setData(res.data);
-        setLoading(false);
-       // console.log(res.data);
-      }
-    });
-  };
   const onEdit = (Item) => {
     handleClickView(Item);
     setItem(Item);
@@ -72,12 +104,11 @@ const PositionPage = () => {
     });
   };
 
-
   const onFinish = (Item) => {
     console.log("Success:", item);
     const foundItem = department.find((item) => item.label === Item.depId);
-    var depId = edit ? foundItem.value : Item.depId
-    
+    var depId = edit ? foundItem.value : Item.depId;
+
     var param = {
       poId: Item.pId,
       posName: Item.pName,
@@ -247,7 +278,52 @@ const PositionPage = () => {
               },
             ]}
           >
-            <Input />
+            <Select
+              loading={loading}
+              showSearch
+              style={{
+                width: "100%",
+              }}
+              placeholder="Search to Select"
+              optionFilterProp="label"
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? "")
+                  .toLowerCase()
+                  .localeCompare((optionB?.label ?? "").toLowerCase())
+              }
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: "8px 0",
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: "0 8px 4px",
+                    }}
+                  >
+                    <Input
+                      placeholder="Please enter item"
+                      ref={inputRef}
+                      value={name}
+                      onChange={onNameChange}
+                      onKeyDown={(e) => e.stopPropagation()} // Prevents key conflicts with the dropdown
+                    />
+                    <Button
+                      type="text"
+                      icon={<PlusOutlined />}
+                      onClick={addItem}
+                    >
+                      Add item
+                    </Button>
+                  </Space>
+                </>
+              )}
+              options={items} // Set options from the `items` state
+            />
+            {/* <Input /> */}
           </Form.Item>
           <Form.Item
             name="depId"

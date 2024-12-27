@@ -85,16 +85,18 @@ const AllAttendance = ({ activeKey }) => {
   };
 
   useEffect(() => {
-    if (activeKey === "1") {
       getList(); // Only fetch data when this tab is active
-    }
-  }, [activeKey]);
+  }, []);
 
   const columns = [
     {
       title: "Employee ID",
       dataIndex: "emId",
       ...getColumnSearchProps("emId"),
+    },
+    {
+      title: "Name",
+      dataIndex: "employeeName",
     },
     {
       title: "Time In",

@@ -20,7 +20,7 @@ import Swal from "sweetalert2";
 import dayjs from "dayjs";
 const { Title } = Typography;
 
-const HistoryForm = ({ activeKey, id }) => {
+const HistoryForm = ({ id }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -28,13 +28,11 @@ const HistoryForm = ({ activeKey, id }) => {
   const [hisId, setHisId] = useState("");
 
   useEffect(() => {
-    if (activeKey === "2") {
       getEmpHistory();
       getEmpInfo();
       //getListDep(); // Only fetch data when this tab is active
-    }
     // Retrieve employee ID from local storage when the component mounts
-  }, [activeKey]);
+  }, []);
 
   const save = (body) => {
     let url;

@@ -32,6 +32,10 @@ const EmployeeAttendance = () => {
       ...getColumnSearchProps("emId"),
     },
     {
+      title: "Name",
+      dataIndex: "employeeName",
+    },
+    {
       title: "Time In",
       dataIndex: "timeIn",
     },

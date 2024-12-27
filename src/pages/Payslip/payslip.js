@@ -17,11 +17,12 @@ import {
   Typography,
   Input,
   Card,
-  Popconfirm
+  Popconfirm,
+  Modal,
 } from "antd";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
-import { SendOutlined, EditFilled, DeleteOutlined } from "@ant-design/icons";
+import { SendOutlined, EditFilled, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
 import { request } from "../../share/request";
 import getColumnSearchProps from "../../share/ColumnSearchProps";
@@ -35,11 +36,22 @@ const PayslipPage = () => {
   const [data, setData] = useState([]);
   const [salaryCycle, setSalaryCycle] = useState("1");
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const onChangeType = (value) => {
     setSalaryCycle(value);
     //console.log(value);
   };
-
 
   const getList = () => {
     setLoading(true);
@@ -117,12 +129,18 @@ const PayslipPage = () => {
       dataIndex: "empId",
       key: "empId",
       fixed: "left",
-      ...getColumnSearchProps("empId")
+      ...getColumnSearchProps("empId"),
     },
     {
       title: "Payment Type",
       dataIndex: "payType",
       key: "payType",
+      render: (payType) =>
+        payType === 1
+          ? "First Payment"
+          : payType === 2
+          ? "Second Payment"
+          : "Unknown",
     },
     {
       title: "Salary",
@@ -214,7 +232,7 @@ const PayslipPage = () => {
         });
         getList();
         setLoading(false);
-        console.log(res)
+        console.log(res);
         //onReset();
       } else {
         Swal.fire({
@@ -224,7 +242,7 @@ const PayslipPage = () => {
         });
         setLoading(false);
         getList();
-        console.log(res)
+        console.log(res);
       }
     });
   };
@@ -250,11 +268,16 @@ const PayslipPage = () => {
 
   return (
     <>
-      <PageTitle PageTitle="Payslip" />
-
-      <Card style={{ width: "100%" }}>
-        <Title level={2}>Generate Payslips</Title>
-        <Divider dashed />
+      <PageTitle PageTitle="Payroll Item" />
+      <Modal
+        title={"Add Payroll Item"}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={false}
+        maskClosable={false}
+        width={700}
+      >
         <Form
           form={form}
           initialValues={{
@@ -374,9 +397,11 @@ const PayslipPage = () => {
             </Space>
           </Form.Item>
         </Form>
-      </Card>
-      <Divider dashed />
-      <Card style={{ width: "100%" }}>
+      </Modal>
+      <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+        Create Payroll Item
+      </Button>
+      <Card style={{ width: "100%", marginTop: 10 }}>
         <Table
           loading={loading}
           scroll={{

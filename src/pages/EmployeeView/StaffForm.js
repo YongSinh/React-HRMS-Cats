@@ -18,7 +18,7 @@ const EmployeeView = () => {
   const items = [
     {
       key: "1",
-      label: "Personal Imformation",
+      label: "Personal Information",
       children: <PersonalDetailFormView id={id} />, // Pass activeKey as prop
     },
     {

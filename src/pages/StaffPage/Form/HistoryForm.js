@@ -17,7 +17,7 @@ import { request, request2 } from "../../../share/request";
 import Swal from "sweetalert2";
 const { Title } = Typography;
 
-const HistoryForm = ({ activeKey }) => {
+const HistoryForm = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [empId, setEmpId] = useState("");
@@ -26,16 +26,10 @@ const HistoryForm = ({ activeKey }) => {
 
   useEffect(() => {
     const storedId = localStorage.getItem("employeeId");
-    if (activeKey === "2") {
-      if (storedId) {
         setSubmittedId(storedId);
         getEmpInfo(storedId);
-      }
-      //getListDep(); // Only fetch data when this tab is active
-    }
        // Retrieve employee ID from local storage when the component mounts
-
-  }, [activeKey]);
+  }, []);
 
 
 
@@ -180,7 +174,6 @@ const HistoryForm = ({ activeKey }) => {
     <>
       {/* <Button onClick={text}>Hello</Button> */}
       <Spin spinning={loading} tip="Loading" size="middle">
-        <Title level={4}> History Imformation</Title>
         <Form
           name="basic"
           form={form}

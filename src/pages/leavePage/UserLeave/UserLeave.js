@@ -122,6 +122,10 @@ const UserLeave = () => {
       fixed: "left",
     },
     {
+      title: "Name",
+      dataIndex: "employeeName",
+    },
+    {
       title: "Leave Title",
       dataIndex: "leaveType",
       key: "leaveType",
