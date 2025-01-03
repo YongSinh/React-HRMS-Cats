@@ -207,12 +207,8 @@ const PayslipPage = () => {
 
   const onFinish = (values) => {
     //console.log("Success:", values);
-    var date = dayjs(values.payrollDate).format("YYYY-MM-DD");
     var param = {
-      dateCreated: dayjs(values.createdDate),
       khmerRate: values.khrate,
-      payrollDate: date,
-      paymentType: values.paymentType,
       emId: values.employees,
     };
     let url = "payrolls/payslips/add";
@@ -250,21 +246,6 @@ const PayslipPage = () => {
   const onReset = () => {
     form.resetFields();
   };
-
-  const typeOption = [
-    {
-      value: "1",
-      label: "First Payment",
-    },
-    {
-      value: "2",
-      label: "Second Payment",
-    },
-    {
-      value: "3",
-      label: "once",
-    },
-  ];
 
   return (
     <>
@@ -331,58 +312,12 @@ const PayslipPage = () => {
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 label="Khmer Rate"
                 name="khrate"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input Khmer Rate!",
-                  },
-                ]}
               >
                 <Input placeholder="Khmer Riel" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Payment Type" name="paymentType">
-                <Select
-                  placeholder="Select a Type"
-                  optionFilterProp="label"
-                  onChange={onChangeType}
-                  value={salaryCycle}
-                  allowClear
-                  options={typeOption}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name={"payrollDate"}
-                label="Payroll Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Payroll Date!",
-                  },
-                ]}
-              >
-                <DatePicker style={{ width: "100%" }} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name={"createdDate"}
-                label="Create Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Create  Date!",
-                  },
-                ]}
-              >
-                <DatePicker showTime style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>

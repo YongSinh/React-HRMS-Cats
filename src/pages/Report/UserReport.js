@@ -98,8 +98,9 @@ function UserReport() {
 
 
   const handleDownloadFile = (value) => {
-    var url = config.base_server+"payrolls/report/payslip?refNo="+value.ref_no;
-    request("payrolls/report/payslip?refNo="+value.ref_no, "get", {}).then(
+    var url =
+         config.base_server + "payrolls/v2/report/payslip?refNo=" + value.ref_no;
+       request("payrolls/v2/report/payslip?refNo=" + value.ref_no, "get", {}).then(
       (res) => {
         if (res) {
           window.open(url, "_blank");

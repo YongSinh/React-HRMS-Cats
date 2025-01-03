@@ -12,18 +12,17 @@ import {
   Col,
   Row,
   Divider,
-  Typography,
   Input,
   Card,
   Popconfirm,
   Modal,
+  InputNumber,
 } from "antd";
 import dayjs from "dayjs";
 import { request } from "../../share/request";
 import {
   SendOutlined,
   EyeFilled,
-  EditFilled,
   DeleteOutlined,
   SearchOutlined,
   ClearOutlined,
@@ -31,47 +30,16 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { isEmptyOrNull } from "../../share/helper";
-import { useParams, Link } from "react-router-dom";
 import ModalForm from "./ModelForm";
 import Swal from "sweetalert2";
-import UserService from "../../UserService/UserService";
 import getColumnSearchProps from "../../share/ColumnSearchProps";
 const { Search } = Input;
 const { RangePicker } = DatePicker;
-const { Title } = Typography;
-
-const SELECT_ALL_OPTION = { label: "Select All", value: "_SELECT_ALL_OPTION" };
-function useSelectAllOption(options) {
-  const optionsWithAllOption = useMemo(
-    () => [SELECT_ALL_OPTION, ...options],
-    [options]
-  );
-
-  /** pass this to Form.Item's getValueFromEvent prop */
-  const getValueFromEvent = useCallback(
-    (value, selections) => {
-      if (!selections?.length) return selections;
-      if (!selections?.some((s) => s.value === SELECT_ALL_OPTION.value)) {
-        return selections;
-      }
-      const labelInValue = typeof value[0]?.label === "string";
-      // if "Select All" option selected, set value to all options
-      // also keep labelInValue in consideration
-      return labelInValue ? options : options.map((o) => o.value);
-    },
-    [options]
-  );
-
-  return [getValueFromEvent, optionsWithAllOption];
-}
 
 const PayrollPage = () => {
   const [form] = Form.useForm();
-  const now = Date.now();
-  const today = dayjs(now);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [salaryCycle, setSalaryCycle] = useState("1");
   const [loading, setLoading] = useState(false);
   const [department, setDepartment] = useState([]);
   const [emp, setEmp] = useState([]);
@@ -80,11 +48,62 @@ const PayrollPage = () => {
   const [item, setItem] = useState();
   const [empList, setEmpList] = useState([]);
   const [empId, setEmpId] = useState("");
-  const [status, setStatus] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const format = "YYYY-MM-DD";
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [allowances, setAllowances] = useState([]);
+  const [allowance, setAllowance] = useState("");
+  const [allDataSource, setAllDataSource] = useState([]);
+  const [allowanceAmount, setAllowanceAmount] = useState("");
 
+  const [deductions, setDeductions] = useState([]);
+  const [deduction, setDeduction] = useState("");
+  const [dedDataSource, setDedDataSource] = useState([]);
+  const [deductionAmount, setDeductionAmount] = useState("");
+
+  const handleAddDeductions = () => {
+    const data = {
+      deductionsId: deduction,
+      type: 1,
+      amount: deductionAmount,
+      emId: empList,
+    };
+    setDedDataSource((prevData) => [data, ...prevData]); // Add `data` as an element of the array
+  };
+  const handleRemoveDeductions = (deductionsIdToRemove) => {
+    setDedDataSource((prevData) =>
+      prevData.filter((item) => item.deductionsId !== deductionsIdToRemove)
+    );
+  };
+  //setData((prevData) => [...prevData, ...res.data.data]);
+  const handleDeductions = (value) => {
+    setDeduction(value);
+  };
+  const handleDedAmount = (value) => {
+    setDeductionAmount(value);
+  };
+
+  const handleAddAllowances = () => {
+    const data = {
+      allowanceId: allowance,
+      type: 1,
+      amount: allowanceAmount,
+      emId: empList,
+    };
+    setAllDataSource((prevData) => [data, ...prevData]); // Add `data` as an element of the array
+  };
+  const handleRemoveAllowances = (allowanceIdToRemove) => {
+    setAllDataSource((prevData) =>
+      prevData.filter((item) => item.allowanceId !== allowanceIdToRemove)
+    );
+  };
+  //setData((prevData) => [...prevData, ...res.data.data]);
+  const handleAllowances = (value) => {
+    setAllowance(value);
+  };
+  const handleAllAmount = (value) => {
+    setAllowanceAmount(value);
+  };
   const showModal = () => {
     setEdit(false);
     setIsModalOpen(true);
@@ -102,26 +121,17 @@ const PayrollPage = () => {
   const onCloseModal = () => {
     setVisibleModal(false);
   };
-  
-  const onChangeStatus = (value) => {
-    setStatus(value);
-    //console.log(value);
-  };
-  const onChangeType = (value) => {
-    setSalaryCycle(value);
-    //console.log(value);
-  };
 
-  const typeOption = [
-    {
-      value: "1",
-      label: "Monthly",
-    },
-    {
-      value: "2",
-      label: "Semi-Monthly",
-    },
-  ];
+  // const typeOption = [
+  //   {
+  //     value: "1",
+  //     label: "Monthly",
+  //   },
+  //   {
+  //     value: "2",
+  //     label: "Semi-Monthly",
+  //   },
+  // ];
 
   const statusOption = [
     {
@@ -166,18 +176,12 @@ const PayrollPage = () => {
   };
 
   const handleClickView = (Item) => {
-    //console.log("Failed:", Item);
     getEmpInfo(Item.empId);
-    setIsModalOpen(true)
-    setStatus(Item.status);
-    //console.log(Item.fromDate);
+    setIsModalOpen(true);
     setItem(Item);
     setEdit(true);
     form.setFieldsValue({
       employees: Item.empId,
-      endDate: dayjs(Item.toDate),
-      startDate: dayjs(Item.fromDate),
-      createDate: dayjs(Item.createDate),
       salary: Item.salary,
       selectType: Item.type === 1 ? "Monthly" : "Semi-Monthly",
       status: Item.status === 1 ? "New" : "Computed",
@@ -185,18 +189,9 @@ const PayrollPage = () => {
   };
 
   const onFinish = (values) => {
-    var startDate = dayjs(values.startDate).format(format);
-    var endDate = dayjs(values.endDate).format(format);
-    var today = dayjs(values.createDate).format(format);
-
     const param = {
-      empId: UserService.getUsername(),
       empIds: empList,
-      dateFrom: startDate,
-      dateTo: endDate,
-      type: salaryCycle,
-      status: status,
-      dateCreate: today,
+      status: 1,
     };
     //onsole.log(param);
 
@@ -222,7 +217,7 @@ const PayrollPage = () => {
         getList();
         setLoading(false);
         setEdit(false);
-        setIsModalOpen(false)
+        setIsModalOpen(false);
         onReset();
       } else {
         Swal.fire({
@@ -256,9 +251,6 @@ const PayrollPage = () => {
       setEmp(" ");
     }
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
   const onChange = (value) => {
     //setSalaryCycle(value);
     setEmpList(value);
@@ -274,20 +266,11 @@ const PayrollPage = () => {
     setEdit(false);
   };
 
-  const onSearch = (e) => {
-    setEmpId(e.target.value);
-    console.log(e.target.value);
-  };
-
   const onRangeChange = (dates, dateStrings) => {
     if (dates) {
       setStartDate(dateStrings[0]);
       setEndDate(dateStrings[1]);
-      //console.log("From: ", dates[0], ", to: ", dates[1]);
-      console.log("From: ", dateStrings[0], ", to: ", dateStrings[1]);
-    } else {
-      console.log("Clear");
-    }
+    } 
   };
   const getPayrollByEmId = (value) => {
     setLoading(true);
@@ -344,10 +327,25 @@ const PayrollPage = () => {
     setItem(Item);
     setEdit(true);
   };
+  const getListDeductions = () => {
+    setLoading(true);
+    request("payrolls/deductions", "get", {}).then((res) => {
+      if (res) {
+        setLoading(false);
+        const arrTmpP = res.data.map((items) => ({
+          label: items.deduction,
+          value: items.deId,
+        }));
+        setDeductions(arrTmpP);
+      }
+    });
+  };
 
   useEffect(() => {
     getListDep();
     getList();
+    getListAllowances();
+    getListDeductions();
   }, [empList]);
 
   const columns = [
@@ -402,11 +400,11 @@ const PayrollPage = () => {
             icon={<EyeFilled />}
             onClick={() => handleClickView(record)}
           />
-          <Button
+          {/* <Button
             type="primary"
             icon={<EditFilled />}
             onClick={() => onEdit(record)}
-          />
+          /> */}
           <Popconfirm
             title="Delete the Employee Salary"
             description="Are you sure to delete this Employee Salary?"
@@ -444,6 +442,22 @@ const PayrollPage = () => {
       }
     });
   };
+
+  const getListAllowances = () => {
+    setLoading(true);
+    request("payrolls/allowances", "get", {}).then((res) => {
+      if (res) {
+        setLoading(false);
+        const arrTmpP = res.data.map((items) => ({
+          label: items.allowances,
+          value: items.allid,
+        }));
+        //console.log(arrTmpP)
+        setAllowances(arrTmpP);
+      }
+    });
+  };
+
   const onClickClear = () => {
     setEmpId("");
     getList();
@@ -482,9 +496,75 @@ const PayrollPage = () => {
       }
     });
   };
+  const DeductionColumns = [
+    {
+      title: "Deductions",
+      dataIndex: "deductionsId",
+      key: "deductionsId",
+      render: (_, record) => {
+        const result = deductions.find(
+          (item) =>
+            item.label === record.deductionsId ||
+            item.value === record.deductionsId
+        );
+        return result.label;
+      },
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+    },
+    {
+      title: "Action",
+      key: "action",
+      fixed: "right",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          onClick={() => handleRemoveDeductions(record.deductionsId)}
+          icon={<DeleteOutlined />}
+          danger
+          size={"small"}
+        />
+      ),
+    },
+  ];
 
-  const [getValueFromEvent, optionsWithAllOption] = useSelectAllOption(emp);
-  const { productId } = useParams();
+  const AllownaceColumns = [
+    {
+      title: "Allownces",
+      dataIndex: "allownces",
+      key: "allownces",
+      render: (_, record) => {
+        const result = allowances.find(
+          (item) =>
+            item.label === record.allowanceId ||
+            item.value === record.allowanceId
+        );
+        return result.label;
+      },
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+    },
+    {
+      title: "Action",
+      key: "action",
+      fixed: "right",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          onClick={() => handleRemoveAllowances(record.allowanceId)}
+          icon={<DeleteOutlined />}
+          danger
+          size={"small"}
+        />
+      ),
+    },
+  ];
 
   return (
     <>
@@ -495,8 +575,6 @@ const PayrollPage = () => {
         onCancel={onCloseModal}
         onFinish={onFinish2}
       />
-      {/* <Link to={`/product/1`}>Hello</Link> */}
-
       <Modal
         title={edit ? "Edit Payroll" : "Add Payroll"}
         open={isModalOpen}
@@ -564,90 +642,92 @@ const PayrollPage = () => {
                 />
               </Form.Item>
             </Col>
+            <Divider>Allownace Part</Divider>
             <Col span={12}>
-              <Form.Item
-                name={"selectType"}
-                label="Select Cycle"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Date!",
-                  },
-                ]}
-              >
+              <Form.Item label="Allownces">
                 <Select
-                  placeholder="Select a Type"
-                  optionFilterProp="label"
-                  onChange={onChangeType}
-                  value={salaryCycle}
+                  showSearch
+                  placeholder="Select a allownces"
                   allowClear
-                  options={typeOption}
+                  optionFilterProp="label"
+                  onChange={handleAllowances}
+                  options={allowances}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name={"status"}
-                label="Select Status"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Date!",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Select a Salary Cycle"
-                  optionFilterProp="label"
-                  onChange={onChangeStatus}
-                  value={status}
-                  allowClear
-                  options={statusOption}
+              <Form.Item label="Amount">
+                <InputNumber
+                  onChange={handleAllAmount}
+                  style={{ width: "100%" }}
+                  addonAfter="$"
                 />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item>
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={handleAddAllowances}
+                  type="primary"
+                >
+                  Add
+                </Button>
               </Form.Item>
             </Col>
 
-            <Col span={8}>
-              <Form.Item
-                name={"startDate"}
-                label="From Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Date!",
-                  },
-                ]}
-              >
-                <DatePicker style={{ width: "100%" }} />
+            <Col span={24}>
+              <Table
+                size={"small"}
+                dataSource={allDataSource}
+                columns={AllownaceColumns}
+                pagination={{ pageSize: 3 }}
+              />
+            </Col>
+            <Divider>Deduction Part</Divider>
+
+            <Col span={12}>
+              <Form.Item label="Deduction">
+                <Select
+                  showSearch
+                  placeholder="Select a deduction"
+                  allowClear
+                  optionFilterProp="label"
+                  //mode="multiple"
+                  // value={allValue}
+                  onChange={handleDeductions}
+                  options={deductions}
+                />
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item
-                name={"endDate"}
-                label="To Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Date!",
-                  },
-                ]}
-              >
-                <DatePicker style={{ width: "100%" }} />
+            <Col span={12}>
+              <Form.Item label="Amount">
+                <InputNumber
+                  onChange={handleDedAmount}
+                  style={{ width: "100%" }}
+                  addonAfter="$"
+                />
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item
-                name={"createDate"}
-                label="Create Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please Select Date!",
-                  },
-                ]}
-              >
-                <DatePicker style={{ width: "100%" }} />
+            <Col span={24}>
+              <Form.Item>
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={handleAddDeductions}
+                  type="primary"
+                >
+                  Add
+                </Button>
               </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Table
+                size={"small"}
+                dataSource={dedDataSource}
+                columns={DeductionColumns}
+                pagination={{ pageSize: 3 }}
+              />
             </Col>
           </Row>
           <Form.Item>

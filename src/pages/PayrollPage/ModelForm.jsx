@@ -45,7 +45,7 @@ const ModalForm = ({
             >
 
                 <Form.Item
-                    label={"Select Date To"}
+                    label={"Select Date"}
                     name={"date"}
                     rules={[{
                         required: true, message: 'Please select date!'

@@ -106,11 +106,13 @@ function Report({ activeKey }) {
     });
   };
   const handleDownloadFile = (value) => {
+    setLoading(true);
     var url =
-      config.base_server + "payrolls/report/payslip?refNo=" + value.ref_no;
-    request("payrolls/report/payslip?refNo=" + value.ref_no, "get", {}).then(
+      config.base_server + "payrolls/v2/report/payslip?refNo=" + value.ref_no;
+    request("payrolls/v2/report/payslip?refNo=" + value.ref_no, "get", {}).then(
       (res) => {
         if (res) {
+          setLoading(false);
           window.open(url, "_blank");
         }
       }
