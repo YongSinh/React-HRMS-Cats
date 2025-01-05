@@ -17,6 +17,7 @@ import {
   Popconfirm,
   Modal,
   InputNumber,
+  message,
 } from "antd";
 import dayjs from "dayjs";
 import { request } from "../../share/request";
@@ -33,6 +34,7 @@ import { isEmptyOrNull } from "../../share/helper";
 import ModalForm from "./ModelForm";
 import Swal from "sweetalert2";
 import getColumnSearchProps from "../../share/ColumnSearchProps";
+
 const { Search } = Input;
 const { RangePicker } = DatePicker;
 
@@ -46,6 +48,7 @@ const PayrollPage = () => {
   const [data, setData] = useState([]);
   const [edit, setEdit] = useState(false);
   const [item, setItem] = useState();
+  const [messageApi, contextHolder] = message.useMessage();
   const [empList, setEmpList] = useState([]);
   const [empId, setEmpId] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
@@ -70,11 +73,37 @@ const PayrollPage = () => {
     };
     setDedDataSource((prevData) => [data, ...prevData]); // Add `data` as an element of the array
   };
+
   const handleRemoveDeductions = (deductionsIdToRemove) => {
     setDedDataSource((prevData) =>
       prevData.filter((item) => item.deductionsId !== deductionsIdToRemove)
     );
   };
+
+  const onCreateDed = () => {
+    let url = "payrolls/v2/empDeduction/addDeduction";
+    let method = "post";
+    if (dedDataSource.length != 0) {
+      request(url, method, dedDataSource).then((res) => {
+        if (res.code === 200) {
+          messageApi.open({
+            type: "success",
+            content: "Deductions have been added",
+          });
+          setLoading(false);
+          setDedDataSource([]);
+          //onReset();
+        } else {
+          messageApi.open({
+            type: "error",
+            content: res.message,
+          });
+          setLoading(false);
+        }
+      });
+    }
+  };
+
   //setData((prevData) => [...prevData, ...res.data.data]);
   const handleDeductions = (value) => {
     setDeduction(value);
@@ -82,7 +111,6 @@ const PayrollPage = () => {
   const handleDedAmount = (value) => {
     setDeductionAmount(value);
   };
-
   const handleAddAllowances = () => {
     const data = {
       allowanceId: allowance,
@@ -92,6 +120,34 @@ const PayrollPage = () => {
     };
     setAllDataSource((prevData) => [data, ...prevData]); // Add `data` as an element of the array
   };
+
+  const onCreateAllow = () => {
+    let url = "payrolls/v2/empAllowances/add";
+    let method = "post";
+    // case update
+    // setLoading(true);
+    // empAllId
+    if (allDataSource.length != 0) {
+      request(url, method, allDataSource).then((res) => {
+        if (res.code === 200) {
+          messageApi.open({
+            type: "success",
+            content: "Allowances have been added",
+          });
+          setLoading(false);
+          setAllDataSource([]);
+          //onReset();
+        } else {
+          messageApi.open({
+            type: "error",
+            content: res.message,
+          });
+          setLoading(false);
+        }
+      });
+    }
+  };
+
   const handleRemoveAllowances = (allowanceIdToRemove) => {
     setAllDataSource((prevData) =>
       prevData.filter((item) => item.allowanceId !== allowanceIdToRemove)
@@ -113,6 +169,9 @@ const PayrollPage = () => {
   };
   const handleCancel = () => {
     setIsModalOpen(false);
+    setAllDataSource([]);
+    setDedDataSource([]);
+    form.resetFields();
   };
   const handleOpenModal = () => {
     setVisibleModal(true);
@@ -122,27 +181,6 @@ const PayrollPage = () => {
     setVisibleModal(false);
   };
 
-  // const typeOption = [
-  //   {
-  //     value: "1",
-  //     label: "Monthly",
-  //   },
-  //   {
-  //     value: "2",
-  //     label: "Semi-Monthly",
-  //   },
-  // ];
-
-  const statusOption = [
-    {
-      value: "1",
-      label: "New",
-    },
-    {
-      value: "2",
-      label: "Completed",
-    },
-  ];
   const onDelete = (Item) => {
     setLoading(true);
     request("payrolls/deletePayroll?id=" + Item.id, "delete", {}).then(
@@ -163,6 +201,42 @@ const PayrollPage = () => {
     );
   };
 
+  const getAllowEmp = (value) => {
+    request(
+      `payrolls/getAllowancesForCurrentMonth?emId=${value}`,
+      "get",
+      {}
+    ).then((res) => {
+      if (res) {
+        const arrTmpP = res.data.map((item) => ({
+          allowanceId: item.allowancesId,
+          type: item.type,
+          amount: item.amount,
+          emId: [item.empId],
+        }));
+        setAllDataSource(arrTmpP);
+      }
+    });
+  };
+
+  const getAllowDed = (value) => {
+    request(
+      `payrolls/getDeductionsForCurrentMonth?emId=${value}`,
+      "get",
+      {}
+    ).then((res) => {
+      if (res) {
+        const arrTmpP = res.data.map((item) => ({
+          deductionsId: item.deductionsId,
+          type: item.type,
+          amount: item.amount,
+          emId: [item.empId],
+        }));
+        setDedDataSource(arrTmpP);
+      }
+    });
+  };
+
   const getEmpInfo = (value) => {
     request(`info/employee/getEmployeeById/${value}`, "get", {}).then((res) => {
       if (res) {
@@ -179,6 +253,8 @@ const PayrollPage = () => {
     getEmpInfo(Item.empId);
     setIsModalOpen(true);
     setItem(Item);
+    getAllowEmp(Item.empId);
+    getAllowDed(Item.empId);
     setEdit(true);
     form.setFieldsValue({
       employees: Item.empId,
@@ -193,16 +269,9 @@ const PayrollPage = () => {
       empIds: empList,
       status: 1,
     };
-    //onsole.log(param);
 
     let url = "payrolls/addPayroll";
     let method = "post";
-    // case update
-    if (edit) {
-      url = "payrolls/updatePayroll?id=" + item.id;
-      method = "put";
-    }
-    // setLoading(true);
 
     request(url, method, param).then((res) => {
       if (res.code === 200) {
@@ -219,6 +288,8 @@ const PayrollPage = () => {
         setEdit(false);
         setIsModalOpen(false);
         onReset();
+        onCreateAllow();
+        onCreateDed();
       } else {
         Swal.fire({
           icon: "error",
@@ -270,8 +341,9 @@ const PayrollPage = () => {
     if (dates) {
       setStartDate(dateStrings[0]);
       setEndDate(dateStrings[1]);
-    } 
+    }
   };
+
   const getPayrollByEmId = (value) => {
     setLoading(true);
     request("payrolls/payrollByEmId?emId=" + value, "get", {}).then((res) => {
@@ -525,6 +597,7 @@ const PayrollPage = () => {
           onClick={() => handleRemoveDeductions(record.deductionsId)}
           icon={<DeleteOutlined />}
           danger
+          disabled={edit}
           size={"small"}
         />
       ),
@@ -560,6 +633,7 @@ const PayrollPage = () => {
           onClick={() => handleRemoveAllowances(record.allowanceId)}
           icon={<DeleteOutlined />}
           danger
+          disabled={edit}
           size={"small"}
         />
       ),
@@ -569,6 +643,7 @@ const PayrollPage = () => {
   return (
     <>
       <PageTitle PageTitle="Payroll" />
+      {contextHolder}
       <ModalForm
         open={visibleModal}
         title={"Update status"}
@@ -576,7 +651,7 @@ const PayrollPage = () => {
         onFinish={onFinish2}
       />
       <Modal
-        title={edit ? "Edit Payroll" : "Add Payroll"}
+        title={edit ? "View Payroll" : "Add Payroll"}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -664,18 +739,19 @@ const PayrollPage = () => {
                 />
               </Form.Item>
             </Col>
-            <Col span={24}>
-              <Form.Item>
-                <Button
-                  icon={<PlusOutlined />}
-                  onClick={handleAddAllowances}
-                  type="primary"
-                >
-                  Add
-                </Button>
-              </Form.Item>
-            </Col>
-
+            {!edit && (
+              <Col span={24}>
+                <Form.Item>
+                  <Button
+                    icon={<PlusOutlined />}
+                    onClick={handleAddAllowances}
+                    type="primary"
+                  >
+                    Add
+                  </Button>
+                </Form.Item>
+              </Col>
+            )}
             <Col span={24}>
               <Table
                 size={"small"}
@@ -709,18 +785,19 @@ const PayrollPage = () => {
                 />
               </Form.Item>
             </Col>
-            <Col span={24}>
-              <Form.Item>
-                <Button
-                  icon={<PlusOutlined />}
-                  onClick={handleAddDeductions}
-                  type="primary"
-                >
-                  Add
-                </Button>
-              </Form.Item>
-            </Col>
-
+            {!edit && (
+              <Col span={24}>
+                <Form.Item>
+                  <Button
+                    icon={<PlusOutlined />}
+                    onClick={handleAddDeductions}
+                    type="primary"
+                  >
+                    Add
+                  </Button>
+                </Form.Item>
+              </Col>
+            )}
             <Col span={24}>
               <Table
                 size={"small"}
@@ -730,16 +807,22 @@ const PayrollPage = () => {
               />
             </Col>
           </Row>
-          <Form.Item>
-            <Space>
-              <Button icon={<SendOutlined />} type="primary" htmlType="submit">
-                Generate
-              </Button>
-              <Button type="primary" danger onClick={onReset}>
-                Clear
-              </Button>
-            </Space>
-          </Form.Item>
+          {!edit && (
+            <Form.Item>
+              <Space>
+                <Button
+                  icon={<SendOutlined />}
+                  type="primary"
+                  htmlType="submit"
+                >
+                  Generate
+                </Button>
+                <Button type="primary" danger onClick={onReset}>
+                  Clear
+                </Button>
+              </Space>
+            </Form.Item>
+          )}
         </Form>
       </Modal>
       <Card style={{ width: "100%" }}>
